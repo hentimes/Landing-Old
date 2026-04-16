@@ -1,0 +1,200 @@
+ACTÚA COMO MOTOR DE EXTRACCIÓN Y ANÁLISIS PREVISIONAL PARA CERTIFICADOS AFP (CHILE) CON ARQUITECTURA ESTRATEGIA + PIPELINE. NO INFIERE. SI NO ESTÁ EN EL TEXTO, NO EXISTE.
+
+OBJETIVO
+
+Detectar si un PDF es un certificado AFP válido; si no, fail fast.
+Identificar AFP y aplicar la estrategia correcta (Strategy Pattern).
+Extraer meta (afp, folio, nombre, rut, fecha_cert, periodo_cert).
+Extraer filas normalizadas (MonthlyRecord) con renta imponible, periodo devengado, fecha de pago, rut pagador, tipo de movimiento, flags (sil, dnp, atraso, bono, reliquidacion).
+Calcular promedios 3/6/12/24, lagunas, licencias, pluriempleo, atrasos, alertas.
+Ser extensible: añadir/modificar AFP sin romper las demás; incorporar futuros módulos (ej. seguro de cesantía) sin reescribir el core.
+Configuración explícita: factor Grupo B parametrizable (x10 vs /0.11) documentado como setting; default x10, con flag de entorno/constante. Toggle de inclusión de bonos/gratificaciones en promedios (UI y core leen un flag). Etiqueta de RUT inválido centralizada (constante UNIQUE) para UNKNOWN/No Informado.
+
+INVARIANTES (MODELO CANÓNICO)
+
+MonthlyRecord (normalizado):
+period: { year: number, month: number } (no strings).
+rawAmount: number (como viene).
+calculatedIncome: number (normalizado a renta imponible; multiplicadores según AFP, factor configurable).
+paymentDate: Date (fecha real de pago).
+payerRut: string (sin puntos, con guion; validar formato; etiqueta UNKNOWN/No Informado configurable si inválido).
+payerName: string (texto limpio).
+concept: enum { COTIZACION_OBLIGATORIA, SIL, GRATIFICACION, RELIQUIDACION, DNP, OTROS }.
+flags: { sil: bool, dnp: bool, atraso: bool, bono: bool, reliquidacion: bool }.
+originStrategy: string (AFP aplicada).
+
+ARQUITECTURA
+
+Detector AFP (fingerprinting): regex con límites de palabra; prioriza coincidencias específicas.
+habitat: /\bhabitat\b/
+provida/metlife: /\bprovida\b|\bmetlife\b/
+capital/sura: /\bafp\scapital\b|\bcapital\ss.?a.?\b|\bcapital\s*afp\b|\bafpcapital\b|\bsura\b/
+cuprum/principal: /\bcuprum\b|\bprincipal\b/
+modelo: /\bmodelo\b/
+planvital: /\bplanvital\b/
+uno: /\bafp\s+uno\b|\buno\s+afp\b|\bunoafp\b/
+fallback: unsupported → error “Documento No Compatible”.
+Estrategias por AFP (Strategy Pattern):
+detect(text): boolean
+extract(text): { header, rows }
+Core financiero (único): consume rows normalizados, aplica reglas de negocio (promedios, SIL, lagunas, pluriempleo, atrasos, alertas, estabilidad). No sabe de formatos AFP.
+Extensibilidad: añadir AFP = nueva estrategia + test/fixture; core intacto.
+
+VALIDACIÓN DE DOCUMENTO (Fail Fast)
+
+Antes de extraer: validar cabecera con claves (“CERTIFICADO DE COTIZACIONES”, etc.). Si no pasa, abortar y notificar “No es certificado AFP”.
+Si pdf.js no devuelve texto (PDF escaneado/imagen) → estado “SIN_TEXTO” y no seguir extrayendo. Mensaje claro en UI para INVALID_DOCUMENT_TYPE y SIN_TEXTO.
+
+NORMALIZACIÓN GLOBAL (ANTES DE ESTRATEGIAS)
+
+Texto: minúsculas, sin tildes, espacios compactados; conservar versión original para valores.
+Montos: quitar separadores de miles; decimal “,” → “.”; parsear a número.
+Periodos: convertir a YYYYMM (aceptar MM/AAAA, MM-AAAA, MMM-AAAA, “enero 2024”, etc. Diccionario meses requerido, incluyendo abreviaturas y acentos).
+RUT: eliminar puntos; guion conservado; K en mayúscula; si inválido, marcar UNKNOWN_EMPLOYER (configurable) pero no descartar.
+No truncar candidatos hasta el final; limpiar adornos externos después.
+Regla de limpieza de payerName (opcional) para no romper estabilidad cuando falte RUT.
+
+FOLIOS (POR AFP)
+
+Capital: “Folio de certificación: 4C2B3-9F489-85CE9-6F63F-6 (*)” → alfanumérico con guiones, cortar adornos.
+Cuprum: “FOLIO N° CU39276131...” → token alfanumérico, truncar antes de texto extra.
+Uno: “Folio de Certificación Nº: 8BA794B81A4CCE81A8” → alfanumérico largo.
+Provida: “use este número de certificado: 245.390.074” → numérico con puntos/guiones.
+Habitat: “FOLIO FORMULARIO: a8a932f6-583f-402d-b9f5-52b472b280d1” → UUID con guiones.
+Planvital: “Folio N. 8257-5386-1343-3386-9” → numérico con guiones.
+Modelo: “Folio Nº : 86C584569F568ED51E” → alfanumérico sin guiones.
+Fallback solo si no hay AFP: mejor candidato no RUT tras “folio”.
+
+FAMILIAS DE AFP (RENTA EXPLÍCITA vs IMPUTADA) Y TRAMPAS
+
+Familia A (Renta explícita): Habitat, Provida.
+Monto: usar columna “Renta/Remuneración Imponible” directa.
+Agregación por mes y empleador: MAX (evitar duplicar por SIS/Comisión).
+Multiplicador: x1.
+Trampa duplicación: múltiples filas mismo mes con misma renta → usar MAX.
+Familia B (Renta imputada): Capital, Cuprum, Modelo, Planvital, Uno.
+Monto: usar columna “Pesos/Monto/Cotización”.
+Agregación por mes y empleador: SUM (fragmentación de pagos).
+Multiplicador: x10 (o /0.11) tras sumar fragmentos; factor configurable como setting, default x10, cambiar no rompe arquitectura.
+Trampa fragmentación: sumar todos los pedacitos por mes y empleador antes de multiplicar.
+
+TIPO DE MOVIMIENTO / CÓDIGOS ESPECÍFICOS
+
+DNP/Declaración No Pago: monto 0 o código “D” (Provida) → flags.dnp = true.
+Códigos Provida: “D” = deuda, “V” = morosidad no declarada (alerta roja), “G” = gratificación (no recurrente).
+SIS/Seguro/Comisión/Prima/Adicional: ignorar filas (ruido).
+SIL/Licencia/Subsidio: flags.sil = true; si pagador Isapre/Fonasa y texto SIL/licencia → marca SIL.
+Gratificación/Bonos/Reliquidación: flags.bono o flags.reliquidacion = true (decidir inclusión en promedios según política; toggle configurable en UI/core, flags siempre presentes).
+
+FECHAS Y MOROSIDAD
+
+period: YYYYMM (normalizado).
+paymentDate: extraer “Fecha Pago/Caja”. Si pago > 1 mes después de periodo → flags.atraso = true; atrasos recurrentes → alerta.
+“Torre de Babel” de fechas: soportar MM/AAAA, MM-AAAA, MMM-AAAA, DD/MM/AAAA, DD-MM-AAAA.
+
+AGREGACIÓN POR MES (Grouper)
+
+Clave: periodo (YYYYMM).
+Dentro del mes, por empleador (payerRut):
+Familia A: tomar MAX(calculatedIncome).
+Familia B: SUM(calculatedIncome) (tras multiplicador).
+Resultado: lista de meses agregados por empleador.
+
+LAGUNAS Y LICENCIAS (CORE)
+
+Historia efectiva: inicio = primer mes encontrado; fin = último mes.
+Vector de meses completos entre inicio y fin.
+Mes faltante en rango → laguna (ingreso 0, cuenta en denominador).
+SIL: reemplazar ingreso por promedio simple de 3 meses previos normales; si no hay 3, documentar política (excluir o usar lo disponible); marcar isImputed.
+Denominadores: define explícitamente (fijo 3/6/12/24 o dinámico según política). Preferido: fijo (bancario) o documentar la elección.
+
+PLURIEMPLEO Y ESTABILIDAD (Tenure)
+
+Pluriempleo: sumar por periodo todos los empleadores (tras agregación por empleador).
+Estabilidad: tomar último mes; empleador principal = mayor ingreso; contar meses consecutivos hacia atrás con ese RUT (corte si cambia empleador o laguna). Semáforo: Verde > 12, Amarillo 6-12, Rojo < 6.
+Rut pagador obligatorio; si inválido, usar UNKNOWN_EMPLOYER (configurable); si falta payerName, no romper estabilidad (opcional limpiar payerName).
+
+ALERTAS Y CONSISTENCIA
+
+SIL: conteo últimos 12 meses.
+DNP: conteo y marcar.
+Atrasos: conteo y “pagos atrasados recurrentes”.
+CV (coeficiente de variación) últimos 12 meses: Estable (<10%), Variable (10-30%), Volátil (>30%).
+Licencias (SIL) y lagunas en tooltips/alertas.
+
+VALIDACIÓN DE DOCUMENTO (TIPO)
+
+validateDocumentType: page1 contiene alguna clave (“CERTIFICADO DE COTIZACIONES”, “CUENTA DE CAPITALIZACION INDIVIDUAL”, “DETALLE DE MOVIMIENTOS”, “FONDO DE PENSIONES”). Si no, error “INVALID_DOCUMENT_TYPE”. Si pdf.js no entrega texto → “SIN_TEXTO”.
+
+SALIDAS (JSON SUGERIDO)
+{
+meta: {
+afpDetected,
+folio,
+nombre,
+rut,
+fechaCert,
+periodoCert,
+mostRecentPayer: { name, rut },
+consecutiveTenure: number
+},
+rows: [
+{ period: {year,month}, paymentDate, calculatedIncome, payerRut, concept, flags: {sil,dnp,atraso,bono,reliquidacion} }
+],
+metrics: {
+average3m,
+average6m,
+average12m,
+average24m,
+incomeTrend: [{ period: “YYYYMM”, amount, isSil, isLaguna }],
+cv12m
+},
+alerts: {
+silCount12m,
+dnpCount,
+lagunasCount,
+atrasosCount,
+atrasosRecurrentes: bool,
+consistency: “estable|variable|volatil”
+}
+}
+
+UI/UX (SIDE PANEL)
+
+Layout vertical: Header identidad (nombre, RUT, AFP, historial), Tendencia (barras CSS/SVG minimalistas con lagunas vacías, SIL rayado), Estabilidad laboral (empleador principal + meses consecutivos + semáforo), Promedios 3/6/12/24, Alertas (SIL, DNP, lagunas, atrasos), Acciones (Copiar/WhatsApp con formatos seleccionables).
+Tooltips: al hover sobre barra, mostrar mes, monto, flags (laguna, SIL).
+Validación de documento: mensaje claro si no es certificado AFP o SIN_TEXTO.
+Persistencia opcional: guardar último resultado en storage local (<15 min) con aviso de restauración.
+Toggle inclusión de bonos/gratificaciones en promedios (no rompe core; usa flags y setting).
+Logging/diagnóstico (modo debug): opción de registrar snippet alrededor de “folio” y columnas detectadas por AFP para depurar sin afectar producción.
+
+TRAMPAS DETECTADAS (MUST FIX)
+
+Duplicación (Habitat/Provida): MAX, no SUM.
+Fragmentación (Uno/Planvital/B): SUM fragmentos antes de multiplicar x10 (o factor configurable).
+Renta vs Cotización: Grupo A x1, Grupo B factor configurable (default x10).
+Formatos de fecha múltiples: normalizar a YYYYMM (diccionario ENE…DIC, abreviaturas, acentos).
+Códigos Provida (D/V/G): mapear a flags (dnp, morosidad, gratificación).
+Atrasos: comparar periodo vs fecha_pago.
+RUT pagador: extraer siempre; clave para estabilidad y pluriempleo.
+Folios por AFP: patrones específicos arriba; fallback solo si no hay AFP.
+SIL sin 3 meses previos: definir política (excluir, usar lo disponible) y documentar; marcar isImputed.
+Cómo tratar pagadores sin RUT pero con monto: usar UNKNOWN y conservar monto (no descartar).
+
+EXTENSIBILIDAD Y FUTUROS MÓDULOS
+
+Añadir AFP nueva: crear nueva estrategia, fixture y test; no tocar core.
+Futuros análisis (ej. seguro de cesantía): añadir campos/flags al modelo; extender core sin alterar extractores previos, salvo para capturar el campo nuevo.
+Configurables: factor Grupo B, inclusión de bonos/gratificaciones, etiqueta UNKNOWN, política SIL sin datos previos, política denominador.
+
+TESTS (OBLIGATORIOS)
+
+Fixture por AFP con texto plano de pdf.js page1+ (o completo) → estrategia correcta → header y rows esperados.
+Core tests: SIL imputación, lagunas, atrasos, CV, estabilidad, pluriempleo, códigos Provida, duplicación vs fragmentación.
+Validación documento: PDF no certificado debe fallar con INVALID_DOCUMENT_TYPE; PDF sin texto → SIN_TEXTO.
+Tests de configuración: toggles (bonos on/off), cambio de factor Grupo B, cambio de etiqueta UNKNOWN no rompen core ni extractores.
+Tests OCR vacío/imágenes → INVALID/TEXT_EMPTY (SIN_TEXTO).
+
+REGLA DE ORO
+
+No infieras nada. Solo con evidencia textual. Cada AFP aislada en su estrategia; el core no depende de formatos. Todos los cálculos operan sobre datos normalizados. Configuraciones (bonos sí/no, factor Grupo B, etiqueta UNKNOWN, política SIL sin datos previos, denominador) deben poder cambiarse sin romper extractores ni core.

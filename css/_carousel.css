@@ -1,0 +1,66 @@
+/* ===================================
+   6.0 -> Estilos del Carrusel de Logos
+   =================================== */
+
+.section-logos {
+  background-color: var(--color-white);
+  padding: var(--spacing-lg) 0;
+  overflow: hidden; /* Clave para que la animación funcione sin scroll */
+  position: relative;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Gradientes en los costados para un efecto de desvanecimiento */
+.section-logos::before,
+.section-logos::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100px;
+    z-index: 2;
+    pointer-events: none; /* Para poder hacer hover en los logos debajo */
+}
+.section-logos::before {
+    left: 0;
+    background: linear-gradient(to right, var(--color-white), transparent);
+}
+.section-logos::after {
+    right: 0;
+    background: linear-gradient(to left, var(--color-white), transparent);
+}
+
+.logos-carousel {
+  display: flex;
+  /* Ancho duplicado para crear el efecto de bucle infinito */
+  width: calc(250px * 14); /* 250px por logo x 7 logos x 2 copias */
+  animation: scroll-logos 40s linear infinite;
+}
+.logos-carousel__slide {
+  display: flex;
+  /* Ancho de la mitad del carrusel total */
+  width: calc(250px * 7);
+}
+.logos-carousel__slide img {
+  height: 35px;
+  width: auto;
+  margin: 0 40px; /* Espacio entre logos */
+  filter: grayscale(100%);
+  opacity: 0.6;
+  transition: all var(--transition-base);
+}
+.logos-carousel:hover {
+    animation-play-state: paused; /* Pausa la animación al pasar el mouse */
+}
+.logos-carousel__slide img:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Animación de desplazamiento horizontal */
+@keyframes scroll-logos {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); } /* Se mueve la mitad de su ancho */
+}

@@ -1,0 +1,257 @@
+/* ===================================
+   5.0 -> Estilos de Header y Footer
+   =================================== */
+
+/* --- Header (Encabezado) --- */
+.header {
+  background-color: var(--color-white);
+  height: var(--header-height);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: var(--shadow-sm);
+}
+.header__container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+.header__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-text);
+  font-weight: var(--font-weight-bold);
+}
+.header__logo-img {
+  height: 40px;
+  width: auto;
+}
+.header__brand-name {
+  font-size: 1.2rem;
+}
+
+/* Regla para ocultar el nombre solo en el header en vista de escritorio */
+.header .header__brand-name {
+    display: none;
+}
+
+/* Regla para mostrar SIEMPRE el nombre en el footer */
+.footer .header__brand-name {
+    display: inline;
+    color: var(--color-white);
+}
+
+.header__nav {
+  display: flex; 
+  gap: var(--spacing-lg);
+}
+.header__nav-link {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+  padding: 8px 0;
+  border-bottom: 2px solid transparent;
+  transition: all var(--transition-base);
+}
+.header__nav-link:hover {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+.header__nav-link--active {
+  color: var(--color-primary);
+}
+.header__actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.header__nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 24px;
+    height: 18px;
+    position: relative;
+    z-index: 1001;
+}
+.header__nav-toggle span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: var(--color-text-dark);
+    border-radius: 3px;
+    position: absolute;
+    left: 0;
+    transition: all 0.3s ease-in-out;
+}
+.header__nav-toggle span:nth-child(1) { top: 0; }
+.header__nav-toggle span:nth-child(2) { top: 50%; transform: translateY(-50%); }
+.header__nav-toggle span:nth-child(3) { bottom: 0; }
+
+.header__nav-toggle.is-active span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+.header__nav-toggle.is-active span:nth-child(2) { opacity: 0; }
+.header__nav-toggle.is-active span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+/* --- Navegación Móvil (Menú Flotante) --- */
+.nav-mobile {
+  position: fixed;
+  top: calc(var(--header-height) + 10px);
+  right: var(--spacing-md);
+  width: 250px;
+  background-color: var(--color-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-md);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-20px) scale(0.95);
+  transition: opacity 0.2s ease, visibility 0s 0.2s, transform 0.2s ease;
+}
+.nav-mobile--is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  transition-delay: 0s;
+}
+.nav-mobile__link {
+    font-size: 1rem;
+    color: var(--color-text);
+    padding: 4px 12px;
+    border-radius: 6px;
+}
+.nav-mobile__cta {
+    margin-top: 4px;
+}
+
+/* --- Footer (Pie de Página) --- */
+.footer {
+  background-color: #1c1c1c;
+  color: var(--color-white);
+  padding: var(--spacing-xl) 0 var(--spacing-lg) 0;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.footer__container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "left right"
+    "bottom bottom";
+  gap: var(--spacing-xl);
+  align-items: start;
+}
+
+.footer__left-column {
+    grid-area: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinea todo a la izquierda */
+    gap: var(--spacing-lg);
+}
+.footer__logo-img {
+  height: 45px;
+}
+.footer__contact {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.footer__contact p {
+    margin: 0;
+    color: var(--color-text-light);
+}
+.footer__contact p i {
+    margin-right: 8px;
+    width: 20px;
+    text-align: center;
+}
+.footer__social {
+    display: flex;
+    gap: var(--spacing-md);
+}
+.footer__social a {
+    color: var(--color-text-light);
+    font-size: 1.2rem;
+    transition: color var(--transition-base), transform var(--transition-base);
+}
+.footer__social a:hover {
+    color: var(--color-white);
+    transform: scale(1.1);
+}
+
+.footer__right-column {
+    grid-area: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Alinea todo a la derecha */
+    gap: var(--spacing-md);
+}
+.footer__title {
+    font-size: 1rem;
+    font-weight: var(--font-weight-bold);
+    color: var(--color-white);
+    margin: 0;
+}
+.footer__institutional-logos {
+    display: flex;
+    gap: var(--spacing-lg);
+}
+.footer-link-logo {
+    height: 35px;
+    opacity: 0.7;
+    transition: opacity var(--transition-base);
+}
+.footer-link-logo:hover {
+    opacity: 1;
+}
+
+.footer__bottom {
+  grid-area: bottom;
+  text-align: center;
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid #343a40;
+  font-size: 0.8rem;
+  color: #adb5bd;
+}
+
+/* --- Botón Flotante de WhatsApp --- */
+.floating-whatsapp {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--color-whatsapp);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    box-shadow: var(--shadow-lg);
+    z-index: 998;
+    animation: whatsapp-pulse 2.5s infinite ease-in-out;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+.floating-whatsapp:hover {
+    animation-play-state: paused;
+    transform: scale(1.1);
+    color: var(--color-white);
+}
+
+/* --- Ocultar enlace activo en menú móvil --- */
+.nav-mobile__link--active {
+    display: none;
+}

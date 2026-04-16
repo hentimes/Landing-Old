@@ -1,0 +1,18 @@
+/* ===================================
+   PlanesPro.cl - Hoja de Estilos Principal
+   =================================== */
+
+/* --- Importación de Módulos de Estilo --- */
+/* El orden es importante para la cascada de estilos. */
+
+@import url('_variables.css');       /* 1. Variables globales (colores, fuentes) */
+@import url('_base.css');            /* 2. Reseteo y estilos base (body, html) */
+@import url('_layout.css');          /* 3. Estructura principal (container, sections) */
+@import url('_components.css');      /* 4. Componentes reutilizables (botones, tarjetas) */
+@import url('_header-footer.css');   /* 5. Estilos específicos del header y footer */
+@import url('_animations.css');      /* 6. Animaciones (logos, whatsapp) */
+@import url('_asesores-page.css');   /* 7. Estilos para la página de asesores */
+@import url('_nosotros-page.css');    /* 8. Estilos para la página de nosotros */
+@import url('_modal.css');           /* 8. Estilos para la ventana modal */
+@import url('_responsive.css');      /* 9. Media queries para diseño adaptable (móviles) */
+@import url('../formulario/styles/styles.css'); /* 10. Estilos del formulario */

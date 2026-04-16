@@ -1,0 +1,316 @@
+/* ===================================
+   3.0 -> Estructura Principal (Layout)
+   =================================== */
+/* CORRECCIÓN: Se usa Flexbox para asegurar que el footer llegue al final */
+.body-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+main {
+   padding-top: 0;
+   flex-grow: 1; /* Esto empuja el footer hacia abajo */
+}
+
+.container {
+   width: 100%;
+   max-width: var(--container-width);
+   margin-left: auto;
+   margin-right: auto;
+   padding-left: var(--spacing-lg);
+   padding-right: var(--spacing-lg);
+}
+
+.section__title {
+   text-align: center;
+   font-size: 2rem;
+   margin-bottom: var(--spacing-xl);
+}
+.section__title--left {
+   text-align: left;
+}
+
+/* ===================================
+   3.1 -> Layout de Secciones
+   =================================== */
+.screen {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+}
+.screen--light-bg {
+    background-color: var(--color-background);
+}
+.screen .page-section,
+.screen .page-section-full {
+    padding: 0;
+    width: 100%;
+    background-color: transparent;
+}
+
+#planes,
+#casos-exito,
+#testimonios,
+#cta-final {
+    content-visibility: auto;
+    contain-intrinsic-size: 700px;
+}
+
+.screen[id] {
+    scroll-margin-top: calc(var(--header-height) + 24px);
+}
+
+/* ===================================
+   3.2 -> Estilos Específicos por Sección
+   =================================== */
+#inicio.screen {
+    padding: 0;
+    background-color: var(--color-white);
+}
+.hero {
+     display: flex;
+     align-items: center;
+}
+.hero__container {
+     display: flex;
+     flex-direction: column;
+     justify-content: space-around;
+     align-items: center;
+     text-align: center;
+     width: 100%;
+     padding-top: calc(var(--header-height) + 20px);
+     padding-bottom: 20px;
+}
+.hero__title {
+     margin-top: 0;
+     margin-bottom: var(--spacing-md);
+     font-size: 2.2rem;
+}
+.hero__logos-group {
+    width: 100%;
+    margin-top: var(--spacing-md);
+}
+.section-logos__title {
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--color-text-light);
+    margin-bottom: var(--spacing-md);
+}
+.logo-fader {
+    min-height: 40px;
+}
+#proceso .section__title {
+    margin-bottom: var(--spacing-lg);
+}
+#proceso.screen {
+    padding-top: var(--spacing-lg);
+}
+#proceso .page-section {
+    display: flow-root;
+    padding-top: var(--spacing-sm);
+}
+#proceso .section__title {
+    margin-top: 0;
+}
+.proceso__grid {
+   display: grid;
+   grid-template-columns: repeat(4, 1fr);
+   gap: var(--spacing-lg);
+   width: 100%;
+}
+.proceso__illustration-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--spacing-xl);
+}
+.proceso__illustration {
+    max-width: 280px;
+    height: auto;
+}
+#planes.screen {
+    background-color: var(--color-white);
+}
+#planes .section__title--compact {
+    margin-bottom: var(--spacing-lg);
+}
+.attention-card {
+    background-color: #fffbe6;
+    border: 1px solid #ffe58f;
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin: var(--spacing-xl) auto 0 auto;
+    max-width: 600px;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    color: var(--color-text);
+}
+.attention-card i {
+    color: #faad14;
+    font-size: 1.5rem;
+}
+
+.page-ebook main {
+    padding-top: 0;
+}
+
+.ebook-page-main {
+    background:
+        radial-gradient(circle at top left, rgba(10, 116, 218, 0.1), transparent 26%),
+        linear-gradient(180deg, #f6fbff 0%, #ffffff 24%, #f5f9ff 100%);
+}
+
+.ebook-hero {
+    padding-top: calc(var(--header-height) + 28px);
+    padding-bottom: 52px;
+}
+
+.ebook-hero__container {
+    display: grid;
+    grid-template-columns: minmax(0, 0.96fr) minmax(360px, 460px);
+    gap: 28px;
+    align-items: center;
+}
+
+.ebook-hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    padding: 8px 14px;
+    border-radius: 999px;
+    background-color: rgba(10, 116, 218, 0.08);
+    color: var(--color-primary);
+    font-size: 0.9rem;
+    font-weight: var(--font-weight-bold);
+}
+
+.ebook-hero h1 {
+    font-size: clamp(2.4rem, 4vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+    max-width: 8.5ch;
+}
+
+.ebook-hero__subtitle {
+    font-size: clamp(1.1rem, 1.9vw, 1.55rem);
+    line-height: 1.35;
+    color: var(--color-primary);
+    max-width: 26ch;
+    margin-bottom: 16px;
+}
+
+.ebook-hero__lead {
+    font-size: 1rem;
+    line-height: 1.7;
+    max-width: 58ch;
+}
+
+.ebook-hero__bullets {
+    display: grid;
+    gap: 10px;
+    margin-top: var(--spacing-lg);
+}
+
+.ebook-hero__bullets span {
+    position: relative;
+    padding-left: 26px;
+    color: var(--color-text-dark);
+    font-weight: 500;
+}
+
+.ebook-hero__bullets span::before {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 0;
+    top: 1px;
+    color: var(--color-secondary);
+}
+
+.ebook-hero__media {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100%;
+    padding: 24px 20px 0;
+    border-radius: 32px;
+    background:
+        radial-gradient(circle at 30% 18%, rgba(60, 145, 230, 0.18), transparent 34%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 248, 255, 0.98) 100%);
+    border: 1px solid rgba(10, 116, 218, 0.1);
+    box-shadow: var(--shadow-md);
+}
+
+.ebook-hero__image {
+    width: min(100%, 430px);
+    transform: translateY(18px);
+    filter: drop-shadow(0 22px 46px rgba(0, 0, 0, 0.22));
+}
+
+.ebook-final-cta {
+    margin-top: var(--spacing-xl);
+}
+
+/* --- Sección final: CTA y Footer --- */
+.screen--footer {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+.section-cta-final {
+   background-color: var(--color-primary);
+   color: var(--color-white);
+   width: 100%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   padding: var(--spacing-xxl) 0;
+}
+.cta-final__container {
+     text-align: center;
+}
+.cta-final__container h2 {
+   color: var(--color-white);
+}
+.cta-benefits {
+   margin-top: var(--spacing-xl);
+   display: flex;
+   justify-content: center;
+   flex-wrap: wrap;
+   gap: var(--spacing-xl);
+}
+.cta-benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ===================================
+   3.3 -> Estilos Específicos por Página
+   =================================== */
+
+/* --- Página de Noticias --- */
+.page-noticias main {
+    padding-top: var(--header-height);
+}
+.page-noticias .page-section {
+    padding-top: 20px;
+    text-align: center;
+}
+.page-noticias .section__title {
+    font-size: 2.5rem;
+    margin-bottom: 32px;
+}
+.page-noticias .placeholder-illustration {
+    max-width: 300px;  
+    margin: 0 auto 24px auto;
+}
+.page-noticias .placeholder-content p {
+    padding-bottom: 40px;
+}

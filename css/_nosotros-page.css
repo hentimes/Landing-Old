@@ -1,0 +1,215 @@
+/* ===================================
+   _nosotros-page.css
+   Estilos específicos para la página "Nosotros" (Versión Final Definitiva)
+   =================================== */
+
+/* --- AJUSTE GLOBAL PARA ESTA PÁGINA --- */
+/* Añadimos el padding superior directamente al 'main' en desktop para evitar el corte del header */
+@media (min-width: 768px) {
+    .page-nosotros main {
+        padding-top: 30px;
+    }
+}
+
+/* Reducción del espaciado entre secciones */
+.page-nosotros .screen {
+    padding-top: var(--spacing-md);
+    padding-bottom: var(--spacing-lg);
+}
+
+/* --- 1. Hero Section --- */
+.hero-nosotros__container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    align-items: center;
+    text-align: center;
+    /* En móvil, este padding crea el espacio necesario bajo el header fijo */
+    padding-top: 80px;
+}
+
+.hero-nosotros__text-content {
+    order: 2; /* Texto va después de la imagen en móvil */
+}
+
+.hero-nosotros__illustration-content {
+    order: 1; /* Imagen va primero en móvil */
+    display: flex;
+    justify-content: center;
+}
+
+.hero-nosotros__illustration-content .hero__illustration {
+    max-width: 300px;
+}
+
+/* Ajustes de los títulos */
+.hero-nosotros__text-content .hero__title {
+    font-size: 1.9rem; /* Tamaño para el H1 */
+    margin-bottom: var(--spacing-sm);
+}
+
+.hero-nosotros__text-content .hero__subtitle {
+    font-size: 1.1rem; /* Tamaño para el H2 (subtítulo) */
+    font-weight: 400;
+    color: var(--color-text-light);
+    line-height: 1.6;
+}
+
+
+/* --- 2. Sección de Pilares --- */
+.pilares__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-md);
+}
+
+.pilar-card {
+    text-align: center;
+    padding: var(--spacing-lg);
+    background-color: var(--color-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+}
+
+.pilar-card__icon {
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-md);
+}
+
+.pilar-card__title {
+    font-size: 1.25rem;
+    color: var(--color-text-dark);
+    margin-bottom: var(--spacing-sm);
+}
+
+.pilar-card__text {
+    color: var(--color-text-light);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* --- 3. Sección de Ética Profesional --- */
+.insignia-container {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.insignia-etica {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-weight: var(--font-weight-bold);
+    font-size: 1rem;
+}
+
+.etica__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+}
+
+.etica__columna h4 {
+    font-size: 1.2rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-dark);
+}
+
+.etica__columna p {
+    line-height: 1.7;
+    color: var(--color-text);
+}
+
+.etica__columna .benefits-accordion .accordion-item__header h4 {
+    font-size: 1.1rem;
+    color: var(--color-secondary);
+}
+
+/* --- Estilos para la lista de riesgos en la sección de Ética --- */
+.riesgos-lista {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-lg) 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.riesgo-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    line-height: 1.6;
+}
+
+.riesgo-item i {
+    font-size: 1.2rem;
+    color: var(--color-primary);
+    margin-top: 4px;
+    width: 20px;
+    text-align: center;
+}
+
+.riesgo-item strong {
+    color: var(--color-text-dark);
+}
+
+/* --- 4. Sección Conoce al Equipo --- */
+.equipo__grid {
+    display: flex;
+    flex-direction: column; /* Apilados en móvil */
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+/* --- Media Queries para TABLET Y ESCRITORIO --- */
+@media (min-width: 768px) {
+    .hero-nosotros__container {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-xl);
+        text-align: left;
+        padding-top: 0; /* Reseteamos el padding porque ahora lo controla el 'main' */
+        min-height: 400px;
+    }
+    
+    .hero-nosotros__text-content {
+        order: 1;
+    }
+     .hero-nosotros__illustration-content {
+        order: 2;
+        align-self: center; /* ¡Alineación corregida! */
+    }
+    .hero-nosotros__illustration-content .hero__illustration {
+        max-width: 400px;
+    }
+
+    .pilares__grid {
+        grid-template-columns: repeat(3, 1fr);
+        margin-top: var(--spacing-xl);
+    }
+
+    .etica__grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-xxl);
+    }
+
+    .equipo__grid {
+        flex-direction: row; /* En línea para desktop */
+        justify-content: center;
+    }
+}
+
+@media (min-width: 992px) {
+    .hero-nosotros__container {
+         grid-template-columns: 60% 40%;
+    }
+    .insignia-etica {
+        font-size: 1.1rem;
+    }
+}

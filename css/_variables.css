@@ -1,0 +1,68 @@
+/* ===================================
+   1.0 -> Variables del Proyecto
+   =================================== */
+/* Centralizar estas propiedades permite cambios globales rápidos. */
+
+:root {
+  /* --- Paleta de Colores --- */
+  --color-primary: #0a74da;         /* Azul principal */
+  --color-primary-dark: #005aae;   /* Azul para hover */
+  --color-primary-light: #3c91e6;  /* Azul claro para reverso de tarjetas y botón */
+  --color-secondary: #00c48c;       /* Acento verde para elementos positivos */
+  --color-whatsapp: #25D366;        /* Verde de WhatsApp */
+
+  /* --- Tonos de Texto y Fondos --- */
+  --color-text-dark: #212529;       /* Negro suave para títulos */
+  --color-text: #343a40;             /* Color de texto principal */
+  --color-text-light: #6c757d;      /* Color de texto secundario (gris) */
+  --color-background: #f8f9fa;       /* Color de fondo general */
+  --color-white: #ffffff;
+  --color-border: #dee2e6;          /* Color para bordes sutiles */
+  --color-neutral: #f39c12;         /* Acento neutro/advertencia */
+
+  /* --- Fuentes --- */
+  --font-family-base: 'Poppins', sans-serif;
+  --font-weight-normal: 400;
+  --font-weight-bold: 600;
+
+  /* --- Espaciados --- */
+  /* core:start – espaciados mínimos para responsive */
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  /* core:end */
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 40px;
+  --spacing-xxl: 64px;
+
+  /* --- Layout --- */
+  --container-width: 1140px;
+  --header-height: 70px;
+
+  /* --- Efectos Visuales --- */
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.15);
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.8s; /* Para el flip de la tarjeta */
+
+  /* --- Colores de Casos de Éxito --- */
+  --color-case-before: #fff7f7;   /* Fondo atenuado para "Situación Anterior" */
+  --color-case-after: #f7fff7;    /* Fondo atenuado para "Optimización Realizada" */
+  --color-case-result: #e9ecef;   /* Fondo atenuado para "Resultado" */
+
+  /* --- Colores de Testimonios --- */
+  --color-testimonial-bg-1: #f0f8ff; /* Azul claro */
+  --color-testimonial-bg-2: #fff5f0; /* Naranja claro */
+  --color-testimonial-bg-3: #f0fff0; /* Verde claro */
+  --color-testimonial-bg-4: #f5f0ff; /* Lavanda claro */
+  --color-testimonial-bg-5: #fff0f5; /* Rosa claro */
+  --color-testimonial-bg-6: #f0f5ff; /* Azul grisáceo claro */
+  --color-testimonial-bg-7: #f5fff0; /* Verde menta claro */
+  --color-testimonial-bg-8: #fff0f0; /* Coral claro */
+  --color-testimonial-bg-9: #f0f0ff; /* Azul pálido */
+  --color-testimonial-bg-10: #f5f0f0; /* Rosa pálido */ 
+}
