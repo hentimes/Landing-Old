@@ -103,7 +103,10 @@
   }
   .ebook-hero { padding-top: calc(var(--header-height) + var(--spacing-lg)); padding-bottom: var(--spacing-xl); }
   .ebook-hero__container,
-  .ebook-problem,
+  .ebook-outcomes__grid,
+  .ebook-fit,
+  .ebook-cost-band,
+  .ebook-warning,
   .ebook-includes,
   .ebook-toc,
   .ebook-objections__grid,
@@ -111,16 +114,25 @@
   .ebook-metrics { grid-template-columns: 1fr; }
   .ebook-hero h1 { max-width: none; font-size: 2.2rem; }
   .ebook-hero__subtitle { max-width: none; font-size: 1.15rem; }
+  .ebook-outcomes__title { max-width: none; font-size: 1.9rem; line-height: 1.12; }
   .ebook-hero__actions { flex-direction: column; }
   .ebook-hero__actions .button { width: 100%; }
+  .ebook-hero__actions .button { white-space: normal; }
   .ebook-hero__media { padding: 18px 14px 0; border-radius: 24px; }
-  .ebook-hero__image { max-width: 280px; transform: none; }
-  .ebook-problem__panel,
+  .ebook-hero__media { min-height: auto; }
+  .ebook-hero__image { max-width: 320px; transform: none; }
   .ebook-objection,
   .ebook-metric { padding: var(--spacing-lg); }
+  .ebook-cost-band__copy,
+  .ebook-cost-band__cta { padding: var(--spacing-lg); }
+  .ebook-warning__price-box,
+  .ebook-warning__highlight { padding: var(--spacing-lg); }
   .ebook-toc .accordion-item__header { padding: 18px; }
   .ebook-toc .accordion-item.is-open .accordion-item__content { padding: 0 18px 18px; }
   .ebook-toc .accordion-item__content { padding: 0 18px; }
+  .ebook-faq__accordion .accordion-item__header { padding: 18px; }
+  .ebook-faq__accordion .accordion-item.is-open .accordion-item__content { padding: 0 18px 18px; }
+  .ebook-faq__accordion .accordion-item__content { padding: 0 18px; }
   .floating-whatsapp { display: flex; }
 }
 
