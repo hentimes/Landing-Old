@@ -145,10 +145,13 @@
   .case-study-tabs { justify-content: flex-start; }
   .case-study-tabs-desc { min-height: 0; }
   #testimonios.screen { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
-  #testimonios .section__title { margin-bottom: var(--spacing-md); }
+  #testimonios .section__title { margin-bottom: 0; }
+  .testimonials-section__subtitle { font-size: 0.96rem; line-height: 1.55; }
   #testimonial-container { grid-template-columns: 1fr; gap: var(--spacing-md); }
-  .testimonial-fader { min-height: 180px; }
-  .testimonial-card__quote { font-size: 0.9rem; }
+  .testimonial-card { height: auto; min-height: 220px; }
+  .testimonial-card__body { min-height: 0; }
+  .testimonial-card__quote { font-size: 0.95rem; -webkit-line-clamp: unset; overflow: visible; display: block; }
+  .testimonial-card__date { margin-top: 12px; padding-top: 0; margin-left: auto; text-align: right; }
   #testimonios .trust-box { display: grid; grid-template-columns: 44px 1fr; grid-template-areas: "title title" "icon  body"; align-items: start; gap: 8px; }
   #testimonios .trust-box__text { display: contents; }
   #testimonios .trust-box > i { grid-area: icon;  font-size: 1.3rem; margin-top: 2px; }
@@ -157,9 +160,11 @@
 
   /* ---------- CTA FINAL (MÓVIL) ---------- */
   .section-cta-final {
-      padding: var(--spacing-xl) 0;
+      min-height: auto;
+      padding: 34px 0 28px;
   }
-  .section-cta-final p { margin: 0 0 var(--spacing-md); }
+  .section-cta-final p { margin: 12px 0 0; }
+  .cta-final__container .button { min-width: 260px; min-height: 56px; margin-top: 20px; }
   .cta-benefits { display: flex; flex-wrap: nowrap; justify-content: center; align-items: center; gap: var(--spacing-md); }
   .cta-benefit-item i { font-size: 0.95rem; }
   .cta-benefit-item span { font-size: 0.8rem; }
