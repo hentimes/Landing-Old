@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Bloquear directorios innecesarios o internos si los hay
+Disallow: /formulario/
+Disallow: /context/
+Disallow: /default.php
+
+# Sitemap 
+Sitemap: https://planespro.cl/sitemap.xml

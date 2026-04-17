@@ -41,10 +41,10 @@
   flex-direction: column;
 }
 .modal__content {
-  background-color: #2C303A;
-  color: #F0F0F0;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background-color: var(--color-white);
+  color: var(--color-text);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -58,20 +58,23 @@
   padding: 50px;
   text-align: center;
   font-size: 1.2rem;
+  color: var(--color-text-light);
 }
 
-/* --- Estilos del Formulario (adaptados de tus archivos) --- */
+/* --- Estilos del Formulario --- */
 .modal-header {
-  padding: 15px 25px;
-  border-bottom: 1px solid #5A5F70;
+  padding: 20px 30px;
+  border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-/* ... (Aquí irían todos los demás estilos de _form.css, _progress-bar.css, etc.) ... */
-/* Por ejemplo: */
+.modal-header h3 { margin: 0; font-family: var(--font-family-heading); }
 .form-step { display: none; }
-.form-step.active { display: block; }
+.form-step.active { display: block; animation: fadeInUp 0.4s ease forwards; }
 .modal-body { 
-    padding: 25px; 
+    padding: 30px; 
     overflow-y: auto;
     flex-grow: 1;
 }
@@ -80,10 +83,16 @@
 }
 input, select {
     width: 100%;
-    padding: 12px 15px;
-    background-color: #3C414E;
-    border: 1px solid #5A5F70;
-    border-radius: 8px;
-    color: #F0F0F0;
+    padding: 14px 16px;
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-dark);
+    font-family: var(--font-family-base);
+    transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
-/* ... (Y así sucesivamente con todos los estilos del formulario) ... */
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--color-primary-light);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}

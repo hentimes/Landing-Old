@@ -73,7 +73,7 @@ function updateLogos(container) {
             });
         }, 50);
 
-    }, 500); // Este tiempo debe coincidir con la duración de la transición en el CSS.
+    }, 800); // Este tiempo debe coincidir con la duración de la transición en el CSS.
 }
 
 

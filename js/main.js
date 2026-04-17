@@ -18,6 +18,8 @@ import { initLogoFader } from './modules/logo-fader.js';          // Anima los l
 import { initPlanesSlider } from './modules/planes-slider.js';    // Inicializa el carrusel de planes de salud.
 import { initAsesores, initNosotrosAsesores } from './modules/asesores-loader.js';   // Carga y gestiona el carrusel de asesores. 
 import { initAccordion } from './modules/accordion.js';     // Inicializa el acordeón de beneficios.
+import { initAnalytics } from './modules/analytics.js';     // Carga los scripts de Meta/Google Analytics.
+import { initHeroTypewriter } from './modules/typewriter.js'; // Efecto tipeado en el eyebrow del hero.
 import { loadModules } from '../formulario/js/_module-loader.js'; // Carga el HTML de los modales del formulario.
 import { setElements } from '../formulario/js/_dom-elements.js';    // Asigna las referencias a los elementos del DOM.
 import {
@@ -55,8 +57,12 @@ function initializeFormApp() {
 // --- Punto de Entrada de la Aplicación ---
 document.addEventListener('DOMContentLoaded', () => {
     
+    // 0. Inicializa Módulo de Analíticas
+    initAnalytics();
+
     // 1. Inicializa todos los componentes de la página principal.
     initNavigation();
+    initHeroTypewriter();  // Efecto tipeado en el eyebrow
     initPlanesSlider();
     initFlipCards();
     initCasosDeExitoSlider();

@@ -1,22 +1,56 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Noticias y contenidos de PlanesPro.cl sobre Isapres, Fonasa, cobertura y decisiones de salud para elegir mejor y entender tu plan con mas claridad." />
+    <meta name="description" content="Noticias y contenidos de PlanesPro.cl sobre Isapres, Fonasa, cobertura y decisiones de salud para elegir mejor y entender tu plan con más claridad." />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#0a74da" />
     <link rel="canonical" href="https://planespro.cl/noticias.html" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Noticias | PlanesPro.cl" />
-    <meta property="og:description" content="Explora noticias y contenidos de PlanesPro.cl para seguir entendiendo mejor el sistema de salud y tomar decisiones mas informadas." />
+    <meta property="og:description" content="Explora noticias y contenidos de PlanesPro.cl para entender mejor el sistema de salud y tomar decisiones más informadas." />
     <meta property="og:url" content="https://planespro.cl/noticias.html" />
+    <meta property="og:locale" content="es_CL" />
+    <meta property="og:site_name" content="PlanesPro.cl" />
+    <meta property="og:image" content="https://planespro.cl/assets/ilustraciones/heroimg.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Noticias | PlanesPro.cl" />
+    <meta name="twitter:description" content="Noticias y contenidos de PlanesPro.cl sobre Isapres, Fonasa, cobertura y decisiones de salud para elegir mejor y entender tu plan con más claridad." />
+    <meta name="twitter:image" content="https://planespro.cl/assets/ilustraciones/heroimg.webp" />
     <title>Noticias - PlanesPro.cl</title>
     <link rel="stylesheet" href="css/styles.css?v=1.2" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "CollectionPage",
+          "@id": "https://planespro.cl/noticias.html",
+          "url": "https://planespro.cl/noticias.html",
+          "name": "Noticias del Sector Salud y Planes de Isapre | PlanesPro",
+          "description": "Explora noticias y contenidos de PlanesPro.cl para seguir entendiendo mejor el sistema de salud en Chile.",
+          "publisher": {
+            "@id": "https://planespro.cl/#organization"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://planespro.cl/#organization",
+          "name": "PlanesPro.cl",
+          "url": "https://planespro.cl/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://planespro.cl/assets/logos_pp/logo-planespro.cla.png"
+          }
+        }
+      ]
+    }
+    </script>
 </head>
 <body class="body-wrapper page-noticias">
 
@@ -31,11 +65,11 @@
                 <a href="nosotros.html" class="header__nav-link">Nosotros</a>
                 <a href="noticias.html" class="header__nav-link header__nav-link--active">Noticias</a>
                 <a href="asesores.html" class="header__nav-link">Nuestros Asesores</a>
-                <a href="#" class="header__nav-link" data-modal-trigger="formModal">Simular Plan</a>
+                <button type="button" class="header__nav-link" data-modal-trigger="formModal">Simular Plan</button>
             </nav>
             <div class="header__actions">
                 <button class="button button--primary header__cta" data-modal-trigger="formModal" id="cta_superior">Analizar Mi Plan</button>
-                <button class="header__nav-toggle" id="nav-toggle" aria-label="Abrir menÃº">
+                <button class="header__nav-toggle" id="nav-toggle" aria-label="Abrir menú">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -49,16 +83,55 @@
         <a href="nosotros.html" class="nav-mobile__link">Nosotros</a>
         <a href="noticias.html" class="nav-mobile__link nav-mobile__link--active">Noticias</a>
         <a href="asesores.html" class="nav-mobile__link">Nuestros Asesores</a>
-        <a href="#" class="nav-mobile__link" data-modal-trigger="formModal">Simular Plan</a>
+        <button type="button" class="nav-mobile__link" data-modal-trigger="formModal">Simular Plan</button>
         <button class="button button--primary nav-mobile__cta" data-modal-trigger="formModal" id="cta_mobile_menu_noticias">Analizar Mi Plan</button>
     </div>
 
-    <main>
+    <main style="padding-top: var(--header-height); min-height: 70vh;">
         <section class="container page-section">
-            <div class="placeholder-content">
-                <h1 class="section__title">Noticias del Sector Salud</h1>
-                <img src="assets/ilustraciones/news.webp" alt="IlustraciÃ³n de noticias" class="placeholder-illustration">
-                <p>Â¡PrÃ³ximamente! Estamos preparando la mejor secciÃ³n de noticias y anÃ¡lisis sobre el sistema de salud en Chile para mantenerte siempre informado. Vuelve pronto.</p>
+            <h1 class="section__title" style="text-align: left; margin-bottom: 2.5rem;">Análisis y Noticias del Sistema de Salud</h1>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 3rem;">
+                
+                <!-- Artículo 1 -->
+                <article class="news-card" style="border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: transform 0.3s ease;">
+                    <div style="height: 200px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                        <img src="assets/ilustraciones/news.webp" alt="Alzas GES" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="padding: 24px;">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--color-primary); text-transform: uppercase; letter-spacing: 0.5px;">Actualidad</span>
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-dark); margin: 12px 0; line-height: 1.3;">Alzas GES 2026: ¿Qué debes hacer frente a los últimos fallos supremos?</h3>
+                        <p style="color: var(--color-text); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Analizamos las resoluciones más recientes sobre los topes de cobro y cómo estas nuevas normativas impactan tus descuentos mensuales...</p>
+                        <a href="https://wa.me/56958785580" class="button button--outline-blue" style="width: 100%; justify-content: center;">Leer Artículo</a>
+                    </div>
+                </article>
+
+                <!-- Artículo 2 -->
+                <article class="news-card" style="border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: transform 0.3s ease;">
+                    <div style="height: 200px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                        <img src="assets/ilustraciones/news1.webp" alt="Migrar de Fonasa a Isapre" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div style="padding: 24px;">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #10B981; text-transform: uppercase; letter-spacing: 0.5px;">Guías Prácticas</span>
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-dark); margin: 12px 0; line-height: 1.3;">La Guía para migrar de Fonasa a Isapre (y no perder beneficios)</h3>
+                        <p style="color: var(--color-text); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Una transición segura entre el sistema público y privado requiere entender la declaración de salud y el concepto de preexistencias. Así debes hacerlo.</p>
+                        <a href="https://wa.me/56958785580" class="button button--outline-blue" style="width: 100%; justify-content: center;">Leer Artículo</a>
+                    </div>
+                </article>
+
+                <!-- Artículo 3 -->
+                <article class="news-card" style="border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: transform 0.3s ease;">
+                    <div style="height: 200px; background-color: var(--color-primary-dark); display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+                        <h3 style="color: white; font-family: var(--font-family-heading); font-size: 1.5rem; line-height: 1.2;">Excesos vs<br> Excedentes</h3>
+                    </div>
+                    <div style="padding: 24px;">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--color-primary); text-transform: uppercase; letter-spacing: 0.5px;">Asesoría Legal</span>
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-dark); margin: 12px 0; line-height: 1.3;">La Gran Confusión: Diferencia Legal entre Excedentes y Excesos</h3>
+                        <p style="color: var(--color-text); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Descubre cómo el sistema previsional cataloga tu dinero retenido y qué mecanismos de cobro rápido ha habilitado la Superintendencia.</p>
+                        <a href="https://wa.me/56958785580" class="button button--outline-blue" style="width: 100%; justify-content: center;">Leer Artículo</a>
+                    </div>
+                </article>
+
             </div>
         </section>
     </main>
@@ -76,15 +149,15 @@
                     <p><a href="ebook.html" class="footer__subtle-link">E-book: Retiro de Fondos AFP</a></p>
                 </div>
                 <div class="footer__social">
-                    <a href="#" target="_blank" aria-label="X (antes Twitter)"><i class="fab fa-twitter"></i></a>
+                    <button type="button" aria-label="X (antes Twitter) (próximamente)" disabled><i class="fab fa-twitter"></i></button>
                     <a href="https://www.instagram.com/planespro.cl" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                     <a href="https://www.facebook.com/planespro.cl/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" target="_blank" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
+                    <button type="button" aria-label="Youtube (próximamente)" disabled><i class="fab fa-youtube"></i></button>
                     <a href="https://www.tiktok.com/@planespro.cl" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
                 </div>
             </div>
             <div class="footer__right-column">
-                <h4 class="footer__title">Links de interÃ©s:</h4>
+                <h4 class="footer__title">Links de interés:</h4>
                 <div class="footer__institutional-logos">
                     <a href="https://www.fonasa.cl" target="_blank" rel="noopener noreferrer">
                         <img src="assets/logos_isapre/fonasa-bn.png" alt="Logo Fonasa" class="footer-link-logo">
@@ -95,7 +168,7 @@
                 </div>
             </div>
             <div class="footer__bottom">
-                <p>Â© 2025 PlanesPro.cl. Todos los derechos reservados.</p>
+                <p>© 2026 PlanesPro.cl. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>

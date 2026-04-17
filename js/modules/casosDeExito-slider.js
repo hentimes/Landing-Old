@@ -1,122 +1,141 @@
 // ===================================
-// Módulo para el Slider de Casos de Éxito
+// Módulo para Casos Reales
 // ===================================
 import { casosDeExitoData } from '../../data/casosDeExito.js';
 
+const CASE_AVATARS = [
+  'assets/avatares/hero/avatar1.jpg',
+  'assets/avatares/hero/avatar2.jpg',
+  'assets/avatares/hero/avatar3.jpg',
+  'assets/avatares/hero/avatar4.jpg',
+  'assets/avatares/asesores/betzabeth-pereira.jpg',
+  'assets/avatares/asesores/daniela-rojas.webp',
+  'assets/avatares/asesores/henry-farias.jpg',
+  'assets/avatares/asesores/sofia-marquez.jpg'
+];
+
 export function initCasosDeExitoSlider() {
-    const sliderContainer = document.querySelector('.case-study-slider');
-    const dotsContainer = document.querySelector('.slider-dots');
-    const prevButton = document.querySelector('#casos-exito .slider-arrow.prev');
-    const nextButton = document.querySelector('#casos-exito .slider-arrow.next');
+  const panelMount = document.querySelector('#casos-exito .case-study-slider');
+  const tabsContainer = document.querySelector('#casos-exito .case-study-tabs');
+  const descEl = document.querySelector('#casos-exito .case-study-tabs-desc');
 
-    // Si los elementos no existen en la página, detenemos la ejecución.
-    if (!sliderContainer || !dotsContainer || !prevButton || !nextButton) {
-        return;
-    }
+  if (!panelMount || !tabsContainer || !descEl) return;
 
-    let currentIndex = 0;
-    let slideInterval; // Variable para guardar el temporizador del slider automático
+  panelMount.innerHTML = '';
+  tabsContainer.innerHTML = '';
+  descEl.textContent = '';
 
-    // 1. Construir el HTML de las tarjetas y los puntos a partir de los datos.
-    // CORRECCIÓN: Se debe iterar sobre el array 'casosDeExitoData', no sobre la función.
-    casosDeExitoData.forEach((study, index) => {
-        sliderContainer.appendChild(createCaseStudyCard(study));
-        const dot = document.createElement('button');
-        dot.classList.add('slider-dot');
-        dot.setAttribute('data-index', index);
-        dotsContainer.appendChild(dot);
+  const panel = document.createElement('div');
+  panel.className = 'case-study-panel';
+  panelMount.appendChild(panel);
+
+  let currentIndex = 0;
+
+  const tabs = casosDeExitoData.map((study, index) => {
+    const tab = document.createElement('button');
+    tab.type = 'button';
+    tab.className = 'case-study-tab';
+    tab.dataset.index = String(index);
+    tab.setAttribute('aria-label', `Caso ${index + 1}`);
+    tab.innerHTML = '<span class="case-study-tab__dot" aria-hidden="true"></span>';
+    tabsContainer.appendChild(tab);
+    return tab;
+  });
+
+  function setActive(index) {
+    const safeIndex = Math.max(0, Math.min(index, casosDeExitoData.length - 1));
+    currentIndex = safeIndex;
+
+    const study = casosDeExitoData[currentIndex];
+    if (!study) return;
+
+    panel.innerHTML = createCaseStudyPanelHtml(study, currentIndex);
+    descEl.textContent = study.description || study.title || '';
+
+    tabs.forEach((t) => t.classList.remove('is-active'));
+    if (tabs[currentIndex]) tabs[currentIndex].classList.add('is-active');
+  }
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', (e) => {
+      const idx = parseInt(e.currentTarget.dataset.index, 10);
+      if (Number.isNaN(idx)) return;
+      setActive(idx);
     });
+  });
 
-    const cards = sliderContainer.querySelectorAll('.case-study-card');
-    const dots = dotsContainer.querySelectorAll('.slider-dot');
-
-    // Si no se crearon tarjetas, detenemos la ejecución.
-    if (cards.length === 0) return;
-
-    // 2. Función principal que actualiza qué tarjeta y punto están activos.
-    function updateSliderView() {
-        // Oculta todas las tarjetas
-        cards.forEach(card => card.classList.remove('is-active'));
-        // Muestra solo la tarjeta actual
-        cards[currentIndex].classList.add('is-active');
-
-        // Actualiza el punto activo
-        dots.forEach(dot => dot.classList.remove('is-active'));
-        dots[currentIndex].classList.add('is-active');
-    }
-
-    // 3. Funciones para controlar el slider automático.
-    const startAutoSlide = () => {
-        stopAutoSlide(); // Limpiamos cualquier intervalo anterior para evitar duplicados.
-        slideInterval = setInterval(() => {
-            currentIndex = (currentIndex + 1) % cards.length;
-            updateSliderView();
-        }, 7000); // Cambia cada 7 segundos.
-    };
-
-    const stopAutoSlide = () => {
-        clearInterval(slideInterval);
-    };
-
-    // 4. Asignar eventos a los botones y puntos.
-    prevButton.addEventListener('click', () => {
-        currentIndex = (currentIndex - 1 + cards.length) % cards.length;
-        updateSliderView();
-        startAutoSlide(); // Reinicia el temporizador al navegar manualmente
-    });
-
-    nextButton.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % cards.length;
-        updateSliderView();
-        startAutoSlide(); // Reinicia el temporizador
-    });
-
-    dots.forEach(dot => {
-        dot.addEventListener('click', (e) => {
-            currentIndex = parseInt(e.target.dataset.index, 10);
-            updateSliderView();
-            startAutoSlide(); // Reinicia el temporizador
-        });
-    });
-
-    // Pausar el slider si el usuario pasa el mouse por encima (para escritorio).
-    sliderContainer.addEventListener('mouseenter', stopAutoSlide);
-    // Reanudar el slider cuando el mouse sale.
-    sliderContainer.addEventListener('mouseleave', startAutoSlide);
-
-    // Inicializar la primera vista y el slider automático.
-    updateSliderView();
-    startAutoSlide();
+  setActive(0);
 }
 
-// Función que genera el HTML para una sola tarjeta de caso de éxito.
-function createCaseStudyCard(studyData) {
-    const cardElement = document.createElement('div');
-    cardElement.classList.add('case-study-card');
-    const badgeClass = studyData.badgeType === 'neutral' ? 'case-study__badge--neutral' : '';
+function escapeHtml(text) {
+  return String(text)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
 
-    cardElement.innerHTML = `
-        <div class="case-study__header">
-            <h3><i class="${studyData.icon}"></i> ${studyData.title}</h3>
-            <div class="case-study__badge ${badgeClass}">${studyData.badge}</div>
+function getAvatarSrc(index) {
+  return CASE_AVATARS[index % CASE_AVATARS.length];
+}
+
+function createCaseStudyPanelHtml(study, caseIndex) {
+  const wins = Array.isArray(study.wins) ? study.wins : [];
+  const winsHtml = wins
+    .map(
+      (w) =>
+        `<li class="case-study-panel__win"><i class="fas fa-check-circle" aria-hidden="true"></i><span>${escapeHtml(
+          w
+        )}</span></li>`
+    )
+    .join('');
+
+  const avatarSrc = getAvatarSrc(caseIndex);
+  const name = study.name ? escapeHtml(study.name) : 'C. Cliente';
+  const origin = study.origin ? escapeHtml(study.origin) : '';
+  const icon = study.icon ? escapeHtml(study.icon) : 'fas fa-briefcase-medical';
+  const originHtml = origin ? `<span class="case-meta__pill">Venía de: ${origin}</span>` : '';
+  const savingsHtml = study.savings
+    ? `<span class="case-meta__pill case-meta__pill--em">Ahorro: ${escapeHtml(study.savings)}</span>`
+    : '';
+
+  return `
+    <div class="case-study-panel__top">
+      <div class="case-title">
+        <div class="case-avatar" aria-hidden="true">
+          <img src="${avatarSrc}" alt="" class="case-avatar__img" loading="lazy" decoding="async">
         </div>
-        <div class="case-study__content">
-            <div class="case-study__column case-study__column--before">
-                <h4>Situación Anterior:</h4>
-                <p>Isapre: ${studyData.before.isapre}</p>
-                <p>Pago mensual: <strong>${studyData.before.payment}</strong></p>
-                <p>Problema: ${studyData.before.problem}</p>
+        <div class="case-title__text">
+          <div class="case-title__row">
+            <div class="case-title__lead">
+              <i class="${icon} case-title__icon" aria-hidden="true"></i>
+              <h3>${escapeHtml(study.title)}</h3>
             </div>
-            <div class="case-study__column case-study__column--after">
-                <h4>Optimización Realizada:</h4>
-                <p>Isapre: ${studyData.after.isapre}</p>
-                <p>Pago mensual: <strong>${studyData.after.payment}</strong></p>
-                <p>Beneficio: ${studyData.after.benefit}</p>
-            </div>
+          </div>
+          <div class="case-meta">
+            <span class="case-meta__name">${name}</span>
+            ${originHtml}
+            ${savingsHtml}
+          </div>
         </div>
-        <div class="case-study__result">
-            <strong>Resultado:</strong> ${studyData.result}
-        </div>
-    `;
-    return cardElement;
+      </div>
+    </div>
+
+    <div class="case-study-panel__grid">
+      <div class="case-study-panel__col case-study-panel__col--before">
+        <h4>${escapeHtml(study.leftTitle || 'Punto de partida')}</h4>
+        <p>${escapeHtml(study.leftBody || '')}</p>
+      </div>
+      <div class="case-study-panel__col case-study-panel__col--after">
+        <h4>${escapeHtml(study.rightTitle || 'Optimización')}</h4>
+        <p>${escapeHtml(study.rightBody || '')}</p>
+      </div>
+    </div>
+
+    <div class="case-study-panel__wins">
+      <h4>Lo que ganó</h4>
+      <ul class="case-study-panel__wins-list">${winsHtml}</ul>
+    </div>
+  `;
 }

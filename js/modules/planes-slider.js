@@ -180,25 +180,25 @@ function createPlanCard(planData) {
 
     cardElement.innerHTML = `
         ${planData.featured ? '<div class="plan-card__featured-ribbon"><i class="fas fa-star"></i></div>' : ''}
-        <div class="plan-card__header">
-            <img src="${planData.isapreLogo}" alt="Logo Isapre" class="plan-card__logo">
-            <div class="plan-card__price">
-                <strong>$${planData.price}</strong>
-                <span>/mes</span>
+        <div class="plan-card__header" style="background-color: ${planData.colorTheme};">
+            <h3 class="plan-card__profile-name">${planData.profileName}</h3>
+            <div class="plan-card__marker" aria-hidden="true">
+                <i class="fas ${planData.headerIcon || 'fa-shield-heart'}"></i>
             </div>
         </div>
         <div class="plan-card__body">
+            <p class="plan-card__description">${planData.description}</p>
             <div class="plan-card__clinics">
                 <i class="fas fa-clinic-medical"></i>
                 <span>${clinicsHtml}</span>
             </div>
-            <div class="plan-card__plan-type">${planData.type}</div>
+            <div class="plan-card__divider"></div>
             <ul class="plan-card__benefits-list">
                 ${benefitsHtml}
             </ul>
         </div>
         <div class="plan-card__footer">
-            <button class="button button--primary plan-card__cta" data-modal-trigger="formModal">Ver Detalle</button>
+            <button class="button button--primary plan-card__cta" data-modal-trigger="formModal">Analizar este Plan</button>
         </div>
     `;
     return cardElement;

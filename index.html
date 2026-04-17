@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
@@ -27,13 +27,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@graph": [
                 {
                     "@type": "Organization",
+                    "@id": "https://planespro.cl/#organization",
                     "name": "PlanesPro.cl",
                     "url": "https://planespro.cl/",
                     "logo": "https://planespro.cl/assets/logos_pp/logo-planespro.cla.png",
@@ -55,8 +56,7 @@
                     "@type": "Service",
                     "serviceType": "Asesoría en planes de salud e Isapres",
                     "provider": {
-                        "@type": "Organization",
-                        "name": "PlanesPro.cl"
+                        "@id": "https://planespro.cl/#organization"
                     },
                     "areaServed": "CL",
                     "availableLanguage": "es-CL",
@@ -80,7 +80,7 @@
                 <a href="nosotros.html" class="header__nav-link">Nosotros</a>
                 <a href="noticias.html" class="header__nav-link">Noticias</a>
                 <a href="asesores.html" class="header__nav-link">Nuestros Asesores</a>
-                <a href="#" class="header__nav-link" data-modal-trigger="formModal">Simular Plan</a>
+                <button type="button" class="header__nav-link" data-modal-trigger="formModal">Simular Plan</button>
             </nav>
             
             <div class="header__actions">
@@ -99,78 +99,125 @@
         <a href="nosotros.html" class="nav-mobile__link">Nosotros</a>
         <a href="noticias.html" class="nav-mobile__link">Noticias</a>
         <a href="asesores.html" class="nav-mobile__link">Nuestros Asesores</a>
-        <a href="#" class="nav-mobile__link" data-modal-trigger="formModal">Simular Plan</a>
+        <button type="button" class="nav-mobile__link" data-modal-trigger="formModal">Simular Plan</button>
         <button class="button button--primary nav-mobile__cta" data-modal-trigger="formModal" id="cta_mobile_menu_index">Analizar Mi Plan</button>
     </div>
     <main id="main-content">
         <div id="inicio" class="screen">
-            <section class="hero">
-                <div class="container hero__container">
-                    <div class="hero__text-group">
-                        <h1 class="hero__title">Optimiza tu 7%. Mejor cobertura, mismo aporte.</h1>
-                        <p class="hero__subtitle">Te ayudamos a encontrar el plan de Isapre ideal para ti, optimizando tus cotizaciones y mejorando tus beneficios. Asesoría experta, transparente y 100% gratuita.</p>
-                    </div>
-                    
-                    <div class="hero__illustration-content">
-                        <img src="assets/ilustraciones/heroimg.webp" alt="Ilustración de una persona revisando su plan de salud" class="hero__illustration" fetchpriority="high" decoding="async">
-                    </div>
+            <section class="hero hero--v3">
+                <div class="container hero__container hero-v3">
+                    <div class="hero-v3__left">
+                        <h1 class="hero-v3__title">Deja de perder dinero<br>en tu Isapre.</h1>
+                        <p class="hero-v3__accent">Optimiza tu 7%</p>
+                        <p class="hero-v3__lead">Te mostramos exactamente cuánto puedes ahorrar y qué plan te conviene hoy. Cada mes que no revisas tu plan, sigues pagando de más. Asesoría experta, transparente y 100% gratuita.</p>
 
-                    <div class="hero__social-proof">
-                        <div class="social-proof__avatars-wrapper">
-                            <div class="social-proof__stars">★★★★★</div>
-                            <div class="social-proof__avatars">
-                                <img src="assets/avatares/hero/avatar1.jpg" alt="Cliente satisfecho 1" class="social-proof__avatar" loading="lazy" decoding="async">
-                                <img src="assets/avatares/hero/avatar2.jpg" alt="Cliente satisfecho 2" class="social-proof__avatar" loading="lazy" decoding="async">
-                                <img src="assets/avatares/hero/avatar3.jpg" alt="Cliente satisfecho 3" class="social-proof__avatar" loading="lazy" decoding="async">
-                                <img src="assets/avatares/hero/avatar4.jpg" alt="Cliente satisfecho 4" class="social-proof__avatar" loading="lazy" decoding="async">
+                        <div class="hero-v3__social">
+                            <div class="hero-v3__social-top">
+                                <div class="hero-v3__avatars" aria-hidden="true">
+                                    <img src="assets/avatares/hero/avatar1.jpg" alt="" class="social-proof__avatar" loading="lazy" decoding="async">
+                                    <img src="assets/avatares/hero/avatar2.jpg" alt="" class="social-proof__avatar" loading="lazy" decoding="async">
+                                    <img src="assets/avatares/hero/avatar3.jpg" alt="" class="social-proof__avatar" loading="lazy" decoding="async">
+                                    <img src="assets/avatares/hero/avatar4.jpg" alt="" class="social-proof__avatar" loading="lazy" decoding="async">
+                                </div>
+                                <div class="hero-v3__rating" aria-label="Calificación de 4.5 estrellas">
+                                    <span class="hero-v3__rating-value">4.5</span>
+                                    <span class="hero-v3__rating-stars" aria-hidden="true">
+                                        <i class="fas fa-star hero-v3__rating-star"></i>
+                                        <i class="fas fa-star hero-v3__rating-star"></i>
+                                        <i class="fas fa-star hero-v3__rating-star"></i>
+                                        <i class="fas fa-star hero-v3__rating-star"></i>
+                                        <i class="fas fa-star-half-alt hero-v3__rating-star hero-v3__rating-star--final"></i>
+                                    </span>
+                                </div>
                             </div>
+                            <p class="hero-v3__social-text">Únete a más de <strong>500 clientes</strong> que ya optimizaron su plan.</p>
                         </div>
-                        <div class="social-proof__text">
-                            <p>Únete a más de <strong>500 clientes</strong> que ya optimizaron su plan.</p>
+                        <button class="button button--primary hero-v3__cta" data-modal-trigger="formModal" id="cta_hero">
+                            Solicitar Análisis Gratuito
+                        </button>
+                    </div>
+
+                    <div class="hero-v3__right">
+                        <div class="hero-v3__image-wrap" aria-hidden="true">
+                            <img src="assets/ilustraciones/hero-person.webp" alt="" class="hero-v3__image" fetchpriority="high" decoding="async">
                         </div>
                     </div>
 
-                    <button class="button button--primary hero__button" data-modal-trigger="formModal" id="cta_hero">
-                        <i class="fas fa-search-dollar"></i> Solicitar Análisis Gratuito
-                    </button>
+                    <div class="hero-v3__chips" aria-label="Beneficios clave">
+                        <button type="button" class="hero-v3__chip is-active" aria-pressed="true">
+                            <i class="fas fa-badge-check" aria-hidden="true"></i> Asesoría 100% Gratuita
+                        </button>
+                        <button type="button" class="hero-v3__chip" aria-pressed="false">
+                            <i class="fas fa-bolt" aria-hidden="true"></i> Análisis Express 24hrs
+                        </button>
+                        <button type="button" class="hero-v3__chip" aria-pressed="false">
+                            <i class="fas fa-file-signature" aria-hidden="true"></i> Gestionamos Trámites
+                        </button>
+                    </div>
 
                     <div class="hero__logos-group">
                         <h2 class="section-logos__title">Te asesoramos en todas las Isapres</h2>
                         <div class="logo-fader"></div>
                     </div>
+
                 </div>
             </section>
         </div>
 
         <div id="proceso" class="screen screen--light-bg">
             <section class="container page-section">
-                <h2 class="section__title">¿Cómo funciona nuestra asesoría responsable?</h2>
-                <div class="proceso__illustration-container">
-                    <img src="assets/ilustraciones/comofunciona.png" alt="Ilustración del proceso de asesoría" class="proceso__illustration" loading="lazy" decoding="async">
+                <div class="proceso__header">
+                    <h2 class="section__title">¿Cómo funciona nuestra asesoría responsable?</h2>
                 </div>
-                <div class="proceso__grid">
-                    <div class="flip-card" tabindex="0">
-                        <div class="flip-card__inner">
-                            <div class="flip-card__front"><i class="fas fa-search proceso__icon"></i><h3>1. Análisis Integral</h3></div>
-                            <div class="flip-card__back"><p>Evaluamos tu situación, ingresos y necesidades para ver si Isapre te conviene.</p></div>
-                        </div>
+
+                <div class="proceso__layout">
+                    <div class="proceso__media proceso__media--person" aria-hidden="true">
+                        <img src="assets/ilustraciones/proceso-person.webp" alt="" class="proceso__person" loading="lazy" decoding="async">
                     </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flip-card__inner">
-                            <div class="flip-card__front"><i class="fas fa-balance-scale proceso__icon"></i><h3>2. Comparación Objetiva</h3></div>
-                            <div class="flip-card__back"><p>Comparamos Fonasa y todas las Isapres según tus datos, sin presiones.</p></div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flip-card__inner">
-                            <div class="flip-card__front"><i class="fas fa-clipboard-check proceso__icon"></i><h3>3. Recomendación Honesta</h3></div>
-                            <div class="flip-card__back"><p>Te diremos la verdad: incluso si lo mejor para ti es quedarte donde estás.</p></div>
-                        </div>
-                    </div>
-                    <div class="flip-card" tabindex="0">
-                        <div class="flip-card__inner">
-                            <div class="flip-card__front"><i class="fas fa-handshake proceso__icon"></i><h3>4. Acompañamiento Total</h3></div>
-                            <div class="flip-card__back"><p>Si decides cambiar, te guiamos en todo el proceso de traspaso.</p></div>
+
+                    <div class="proceso__cards">
+                        <p class="proceso__cards-kicker">Lo resolvemos en 4 pasos simples:</p>
+                        <ol class="proceso__steps" aria-label="Pasos del proceso">
+                            <li class="proceso-step">
+                                <div class="proceso-step__body">
+                                    <div class="proceso-step__header">
+                                        <div class="proceso-step__badge" aria-hidden="true">1</div>
+                                        <h3 class="proceso-step__title"><i class="fas fa-search" aria-hidden="true"></i> Análisis integral</h3>
+                                    </div>
+                                    <p class="proceso-step__text">Evaluamos tu situación, ingresos y necesidades para entender cuál es el plan que más te conviene hoy según tu perfil y grupo familiar.</p>
+                                </div>
+                            </li>
+                            <li class="proceso-step">
+                                <div class="proceso-step__body">
+                                    <div class="proceso-step__header">
+                                        <div class="proceso-step__badge" aria-hidden="true">2</div>
+                                        <h3 class="proceso-step__title"><i class="fas fa-balance-scale" aria-hidden="true"></i> Comparación objetiva</h3>
+                                    </div>
+                                    <p class="proceso-step__text">Comparamos planes de las diferentes Isapres para ofrecerte la mejor opción del mercado, con criterios claros y sin sesgos.</p>
+                                </div>
+                            </li>
+                            <li class="proceso-step">
+                                <div class="proceso-step__body">
+                                    <div class="proceso-step__header">
+                                        <div class="proceso-step__badge" aria-hidden="true">3</div>
+                                        <h3 class="proceso-step__title"><i class="fas fa-clipboard-check" aria-hidden="true"></i> Recomendación honesta</h3>
+                                    </div>
+                                    <p class="proceso-step__text">Una vez determinemos cuál es el plan que más te conviene, te lo comunicamos, incluso si lo mejor para ti es quedarte donde estás.</p>
+                                </div>
+                            </li>
+                            <li class="proceso-step">
+                                <div class="proceso-step__body">
+                                    <div class="proceso-step__header">
+                                        <div class="proceso-step__badge" aria-hidden="true">4</div>
+                                        <h3 class="proceso-step__title"><i class="fas fa-handshake" aria-hidden="true"></i> Acompañamiento total</h3>
+                                    </div>
+                                    <p class="proceso-step__text">Si tu decisión es tomar alguno de nuestros planes, te guiamos en todo el proceso de traspaso paso a paso, de principio a fin.</p>
+                                </div>
+                            </li>
+                        </ol>
+
+                        <div class="proceso__note" role="note">
+                            Resolvemos tus dudas sin costo ni letra chica. Claridad total desde el primer paso.
                         </div>
                     </div>
                 </div>
@@ -180,7 +227,8 @@
         <div id="planes" class="screen">
             <section class="page-section-full">
                 <div class="container">
-                    <h2 class="section__title section__title--compact">Encuentra un plan a tu medida</h2>
+                    <h2 class="section__title">Encuentra un plan a tu medida</h2>
+                    <p class="planes-section__intro">Estos son algunos de los tipos de planes que podrías necesitar según tu etapa de vida, tu grupo familiar y la forma en que cotizas hoy.</p>
                     
                     <div class="plan-slider-wrapper">
                         
@@ -203,8 +251,8 @@
                     </div>
 
                     <div class="attention-card">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Si ganas más de <strong>$1.000.000</strong> y estás en Fonasa, podrías estar perdiendo muchos beneficios.</p>
+                        <i class="fas fa-circle-info"></i>
+                        <p>Si hoy cotizas alto en Fonasa, vale la pena revisar si estás dejando beneficios sobre la mesa.</p>
                     </div>
                 </div>
             </section>
@@ -212,13 +260,23 @@
 
         <div id="casos-exito" class="screen screen--light-bg">
             <section class="page-section-full">
-                <h2 class="section__title">Casos Reales de Optimización</h2>
+                <div class="case-study-section__header">
+                    <p class="case-study-section__subtitle">Ejemplos concretos de cÃ³mo un mejor anÃ¡lisis puede traducirse en ahorro, mÃ¡s cobertura y decisiones mejor informadas segÃºn cada realidad.</p>
+                    <h2 class="section__title">Casos Reales de Optimización</h2>
+                </div>
                 <div class="container">
-                    <div class="case-study-slider"></div>
-                    <div class="slider-controls">
-                        <button class="slider-arrow prev" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
-                        <div class="slider-dots"></div>
-                        <button class="slider-arrow next" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+                    <div class="case-study-layout">
+                        <div class="case-study-left">
+                            <p class="case-study-microtitle">Algunos casos más recientes</p>
+                            <div class="case-study-slider"></div>
+                            <div class="case-study-tabs" aria-label="Selecciona un caso"></div>
+                            <p class="case-study-tabs-desc" aria-live="polite"></p>
+                        </div>
+                        <div class="case-study-right" aria-hidden="true">
+                            <div class="case-study-illustration-wrap">
+                        <img src="assets/ilustraciones/casos-person.webp" alt="" class="case-study-illustration" loading="lazy" decoding="async">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -268,10 +326,10 @@
                             <p><a href="ebook.html" class="footer__subtle-link">E-book: Retiro de Fondos AFP</a></p>
                         </div>
                         <div class="footer__social">
-                            <a href="#" target="_blank" rel="noopener noreferrer" aria-label="X (antes Twitter)"><i class="fab fa-twitter"></i></a>
+                            <button type="button" aria-label="X (antes Twitter) (próximamente)" disabled><i class="fab fa-twitter"></i></button>
                             <a href="https://www.instagram.com/planespro.cl" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                             <a href="https://www.facebook.com/planespro.cl/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
+                            <button type="button" aria-label="Youtube (próximamente)" disabled><i class="fab fa-youtube"></i></button>
                             <a href="https://www.tiktok.com/@planespro.cl" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
                         </div>
                     </div>

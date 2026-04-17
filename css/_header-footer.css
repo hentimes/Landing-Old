@@ -34,9 +34,9 @@
   font-size: 1.2rem;
 }
 
-/* Regla para ocultar el nombre solo en el header en vista de escritorio */
+/* Regla para mostrar el nombre en el header en todas las vistas */
 .header .header__brand-name {
-    display: none;
+    display: block;
 }
 
 /* Regla para mostrar SIEMPRE el nombre en el footer */
@@ -55,6 +55,12 @@
   padding: 8px 0;
   border-bottom: 2px solid transparent;
   transition: all var(--transition-base);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 .header__nav-link:hover {
   color: var(--color-primary);
@@ -126,6 +132,11 @@
     color: var(--color-text);
     padding: 4px 12px;
     border-radius: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
 }
 .nav-mobile__cta {
     margin-top: 4px;
@@ -182,6 +193,15 @@
     color: var(--color-text-light);
     font-size: 1.2rem;
     transition: color var(--transition-base), transform var(--transition-base);
+}
+.footer__social button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--color-text-light);
+    font-size: 1.2rem;
+    cursor: not-allowed;
+    opacity: 0.45;
 }
 .footer__social a:hover {
     color: var(--color-white);

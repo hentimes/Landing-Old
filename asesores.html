@@ -1,22 +1,56 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Conoce a los asesores de PlanesPro.cl: profesionales registrados, con enfoque honesto y acompanamiento continuo para ayudarte a evaluar tu mejor plan de salud." />
+    <meta name="description" content="Conoce a los asesores de PlanesPro.cl: profesionales registrados, con enfoque honesto y acompañamiento continuo para ayudarte a evaluar tu plan de salud." />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#0a74da" />
     <link rel="canonical" href="https://planespro.cl/asesores.html" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Nuestros Asesores | PlanesPro.cl" />
-    <meta property="og:description" content="Revisa el equipo de asesores de salud de PlanesPro.cl y conoce el estandar de acompanamiento con el que guiamos cada recomendacion." />
+    <meta property="og:description" content="Revisa el equipo de asesores de salud de PlanesPro.cl y conoce el estándar de acompañamiento con el que guiamos cada recomendación." />
     <meta property="og:url" content="https://planespro.cl/asesores.html" />
+    <meta property="og:locale" content="es_CL" />
+    <meta property="og:site_name" content="PlanesPro.cl" />
+    <meta property="og:image" content="https://planespro.cl/assets/ilustraciones/heroimg.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Nuestros Asesores | PlanesPro.cl" />
+    <meta name="twitter:description" content="Conoce a los asesores de PlanesPro.cl: profesionales registrados, con enfoque honesto y acompañamiento continuo para ayudarte a evaluar tu mejor plan de salud." />
+    <meta name="twitter:image" content="https://planespro.cl/assets/ilustraciones/heroimg.webp" />
     <title>Nuestros Asesores - PlanesPro.cl</title>
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "ProfilePage",
+          "@id": "https://planespro.cl/asesores.html",
+          "url": "https://planespro.cl/asesores.html",
+          "name": "Nuestros Asesores de Salud | PlanesPro",
+          "description": "Conoce a nuestro equipo de asesores certificados, expertos en el sistema de salud en Chile.",
+          "publisher": {
+            "@id": "https://planespro.cl/#organization"
+          }
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://planespro.cl/#organization",
+          "name": "PlanesPro.cl",
+          "url": "https://planespro.cl/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://planespro.cl/assets/logos_pp/logo-planespro.cla.png"
+          }
+        }
+      ]
+    }
+    </script>
 </head>
 <body class="body-wrapper">
 
@@ -31,11 +65,11 @@
                 <a href="nosotros.html" class="header__nav-link">Nosotros</a>
                 <a href="noticias.html" class="header__nav-link">Noticias</a>
                 <a href="asesores.html" class="header__nav-link header__nav-link--active">Nuestros Asesores</a>
-                <a href="#" class="header__nav-link" data-modal-trigger="formModal">Simular Plan</a>
+                <button type="button" class="header__nav-link" data-modal-trigger="formModal">Simular Plan</button>
             </nav>
             <div class="header__actions">
                 <button class="button button--primary header__cta" data-modal-trigger="formModal" id="cta_superior">Analizar Mi Plan</button>
-                <button class="header__nav-toggle" id="nav-toggle" aria-label="Abrir menÃº">
+                <button class="header__nav-toggle" id="nav-toggle" aria-label="Abrir menú">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -49,14 +83,14 @@
         <a href="nosotros.html" class="nav-mobile__link">Nosotros</a>
         <a href="noticias.html" class="nav-mobile__link">Noticias</a>
         <a href="asesores.html" class="nav-mobile__link nav-mobile__link--active">Nuestros Asesores</a>
-        <a href="#" class="nav-mobile__link" data-modal-trigger="formModal">Simular Plan</a>
+        <button type="button" class="nav-mobile__link" data-modal-trigger="formModal">Simular Plan</button>
         <button class="button button--primary nav-mobile__cta" data-modal-trigger="formModal" id="cta_mobile_menu_asesores">Analizar Mi Plan</button>
     </div>
 
     <main style="padding-top: var(--header-height);">
         <section class="container page-section hero-asesores">
             <div class="hero-asesores__header">
-                <img src="assets/ilustraciones/asesores.png" alt="IlustraciÃ³n de una asesora de salud" class="hero-asesores__img">
+                <img src="assets/ilustraciones/asesores.webp" alt="Ilustración de una asesora de salud" class="hero-asesores__img">
                 <div class="hero-asesores__text-content">
                     <h1>El Asesor Correcto<br>Marca la Diferencia</h1>
                     
@@ -64,22 +98,22 @@
                         <div class="guarantee-card">
                             <i class="fas fa-user-check"></i>
                             <div class="guarantee-card__content">
-                                <h4>AsesorÃ­a Certificada</h4>
+                                <h4>Asesoría Certificada</h4>
                                 <p>Expertos registrados en la Superintendencia de Salud.</p>
                             </div>
                         </div>
                         <div class="guarantee-card">
                             <i class="fas fa-balance-scale"></i>
                             <div class="guarantee-card__content">
-                                <h4>RecomendaciÃ³n Honesta</h4>
-                                <p>Si Fonasa es tu mejor opciÃ³n, te lo diremos.</p>
+                                <h4>Recomendación Honesta</h4>
+                                <p>Si Fonasa es tu mejor opción, te lo diremos.</p>
                             </div>
                         </div>
                         <div class="guarantee-card">
                             <i class="fas fa-handshake"></i>
                             <div class="guarantee-card__content">
-                                <h4>AcompaÃ±amiento Continuo</h4>
-                                <p>Estamos contigo antes, durante y despuÃ©s del proceso.</p>
+                                <h4>Acompañamiento Continuo</h4>
+                                <p>Estamos contigo antes, durante y después del proceso.</p>
                             </div>
                         </div>
                     </div>
@@ -87,37 +121,37 @@
                     <div class="hero-guarantees-mobile">
                         <div class="guarantee-item">
                             <i class="fas fa-user-check"></i>
-                            <div class="tooltip"><strong>AsesorÃ­a Certificada:</strong><br>Expertos registrados en la Superintendencia de Salud.</div>
+                            <div class="tooltip"><strong>Asesoría Certificada:</strong><br>Expertos registrados en la Superintendencia de Salud.</div>
                         </div>
                         <div class="guarantee-item">
                             <i class="fas fa-balance-scale"></i>
-                            <div class="tooltip"><strong>RecomendaciÃ³n Honesta:</strong><br>Si Fonasa es tu mejor opciÃ³n, te lo diremos.</div>
+                            <div class="tooltip"><strong>Recomendación Honesta:</strong><br>Si Fonasa es tu mejor opción, te lo diremos.</div>
                         </div>
                         <div class="guarantee-item">
                             <i class="fas fa-handshake"></i>
-                            <div class="tooltip"><strong>AcompaÃ±amiento Continuo:</strong><br>Estamos contigo antes, durante y despuÃ©s del proceso.</div>
+                            <div class="tooltip"><strong>Acompañamiento Continuo:</strong><br>Estamos contigo antes, durante y después del proceso.</div>
                         </div>
                     </div>
 
                     </div>
             </div>
             <p class="hero-asesores__paragraph">
-                Tu plan de salud es una de las decisiones mÃ¡s importantes. Contar con un experto no solo te ahorra dinero, sino que te da la tranquilidad de saber que tÃº y tu familia estÃ¡n realmente protegidos.
+                Tu plan de salud es una de las decisiones más importantes. Contar con un experto no solo te ahorra dinero, sino que te da la tranquilidad de saber que tú y tu familia están realmente protegidos.
             </p>
         </section>
 
         <section class="container page-section" style="padding-top: 0; padding-bottom: 0;">
-            <h2 class="section__title">Beneficios de Nuestra AsesorÃ­a</h2>
+            <h2 class="section__title">Beneficios de Nuestra Asesoría</h2>
         </section>
 
         <section class="container page-section benefits-accordion">
             <div class="accordion-item">
                 <div class="accordion-item__header">
-                    <h4><i class="fas fa-percentage"></i> OptimizaciÃ³n Real de tu 7%</h4>
+                    <h4><i class="fas fa-percentage"></i> Optimización Real de tu 7%</h4>
                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                 </div>
                 <div class="accordion-item__content">
-                    <p>Analizamos a fondo tu perfil para encontrar un plan que te ofrezca mÃ¡s y mejores coberturas por el mismo aporte legal.</p>
+                    <p>Analizamos a fondo tu perfil para encontrar un plan que te ofrezca más y mejores coberturas por el mismo aporte legal.</p>
                 </div>
             </div>
             <div class="accordion-item">
@@ -131,11 +165,11 @@
             </div>
             <div class="accordion-item">
                 <div class="accordion-item__header">
-                    <h4><i class="fas fa-hospital"></i> Acceso a las Mejores ClÃ­nicas</h4>
+                    <h4><i class="fas fa-hospital"></i> Acceso a las Mejores Clí­nicas</h4>
                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                 </div>
                 <div class="accordion-item__content">
-                    <p>Conocemos los convenios y redes de todas las Isapres para asegurar que tengas cobertura en tus centros mÃ©dicos de preferencia.</p>
+                    <p>Conocemos los convenios y redes de todas las Isapres para asegurar que tengas cobertura en tus centros médicos de preferencia.</p>
                 </div>
             </div>
             <div class="accordion-item">
@@ -144,16 +178,16 @@
                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                 </div>
                 <div class="accordion-item__content">
-                    <p>Una mala elecciÃ³n de plan puede significar un alto costo de bolsillo. Te guiamos para evitar clÃ¡usulas confusas y preexistencias no declaradas.</p>
+                    <p>Una mala elección de plan puede significar un alto costo de bolsillo. Te guiamos para evitar cláusulas confusas y preexistencias no declaradas.</p>
                 </div>
             </div>
             <div class="accordion-item">
                 <div class="accordion-item__header">
-                    <h4><i class="fas fa-headset"></i> AsesorÃ­a Continua y Postventa</h4>
+                    <h4><i class="fas fa-headset"></i> Asesoría Continua y Postventa</h4>
                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                 </div>
                 <div class="accordion-item__content">
-                    <p>Nuestro trabajo no termina con la firma. Te acompaÃ±amos durante todo el aÃ±o para resolver dudas y ayudarte a gestionar tu plan.</p>
+                    <p>Nuestro trabajo no termina con la firma. Te acompañamos durante todo el año para resolver dudas y ayudarte a gestionar tu plan.</p>
                 </div>
             </div>
             <div class="accordion-item">
@@ -162,7 +196,7 @@
                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                 </div>
                 <div class="accordion-item__content">
-                    <p>Nuestra recomendaciÃ³n es 100% objetiva. Si Fonasa es tu mejor opciÃ³n, seremos los primeros en decÃ­rtelo.</p>
+                    <p>Nuestra recomendación es 100% objetiva. Si Fonasa es tu mejor opción, seremos los primeros en decí­rtelo.</p>
                 </div>
             </div>
         </section>
@@ -173,7 +207,7 @@
                 <i class="fas fa-users"></i>
                 <div class="trust-box__text">
                     <h3>Conoce al Equipo Dedicado a tu Bienestar</h3>
-                    <p>Cada uno de nuestros asesores cuenta con la certificaciÃ³n y la experiencia para guiarte en el complejo sistema de salud y previsional. Explora sus perfiles y descubre al experto ideal para tus necesidades.</p>
+                    <p>Cada uno de nuestros asesores cuenta con la certificación y la experiencia para guiarte en el complejo sistema de salud y previsional. Explora sus perfiles y descubre al experto ideal para tus necesidades.</p>
                 </div>
             </div>
         </section>
@@ -197,17 +231,17 @@
         <section class="container page-section servicios">
             <h2 class="section__title">Servicios Profesionales a tu Medida</h2>
             <p class="section__subtitle" style="max-width: 800px; margin-left: auto; margin-right: auto;">
-                Todos nuestros asesores estÃ¡n capacitados para ofrecer servicios especializados, tanto para personas y familias como para empresas que buscan mejorar los beneficios de sus equipos.
+                Todos nuestros asesores están capacitados para ofrecer servicios especializados, tanto para personas y familias como para empresas que buscan mejorar los beneficios de sus equipos.
             </p>
              <div class="servicios__grid">
                 <div class="flip-card servicio-item" tabindex="0">
                     <div class="flip-card__inner">
                         <div class="flip-card__front">
                             <i class="fas fa-user-check"></i>
-                            <h3>AsesorÃ­as 1 a 1</h3>
+                            <h3>Asesorías 1 a 1</h3>
                         </div>
                         <div class="flip-card__back">
-                            <p>Analizamos tu perfil para encontrar el plan de salud o soluciÃ³n previsional que te entregue los mayores beneficios.</p>
+                            <p>Analizamos tu perfil para encontrar el plan de salud o solución previsional que te entregue los mayores beneficios.</p>
                         </div>
                     </div>
                 </div>
@@ -229,7 +263,7 @@
                             <h3>Reuniones Online</h3>
                         </div>
                          <div class="flip-card__back">
-                            <p>Coordinamos reuniones por videoconferencia para adaptarnos a tu horario, entregando una asesorÃ­a completa donde estÃ©s.</p>
+                            <p>Coordinamos reuniones por videoconferencia para adaptarnos a tu horario, entregando una asesorí­a completa donde estés.</p>
                         </div>
                     </div>
                 </div>
@@ -240,7 +274,7 @@
                             <h3>Soporte Continuo</h3>
                         </div>
                          <div class="flip-card__back">
-                            <p>Te acompaÃ±amos despuÃ©s de la afiliaciÃ³n, resolviendo tus dudas y ayudÃ¡ndote a sacar el mÃ¡ximo provecho de tu plan.</p>
+                            <p>Te acompañamos después de la afiliación, resolviendo tus dudas y ayudándote a sacar el máximo provecho de tu plan.</p>
                         </div>
                     </div>
                 </div>
@@ -261,15 +295,15 @@
                     <p><a href="ebook.html" class="footer__subtle-link">E-book: Retiro de Fondos AFP</a></p>
                 </div>
                 <div class="footer__social">
-                    <a href="#" target="_blank" aria-label="X (antes Twitter)"><i class="fab fa-twitter"></i></a>
+                    <button type="button" aria-label="X (antes Twitter) (próximamente)" disabled><i class="fab fa-twitter"></i></button>
                     <a href="https://www.instagram.com/planespro.cl" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
                     <a href="https://www.facebook.com/planespro.cl/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" target="_blank" aria-label="Youtube"><i class="fab fa-youtube"></i></a>
+                    <button type="button" aria-label="Youtube (próximamente)" disabled><i class="fab fa-youtube"></i></button>
                     <a href="https://www.tiktok.com/@planespro.cl" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
                 </div>
             </div>
             <div class="footer__right-column">
-                <h4 class="footer__title">Links de interÃ©s:</h4>
+                <h4 class="footer__title">Links de interés:</h4>
                 <div class="footer__institutional-logos">
                     <a href="https://www.fonasa.cl" target="_blank" rel="noopener noreferrer">
                         <img src="assets/logos_isapre/fonasa-bn.png" alt="Logo Fonasa" class="footer-link-logo">
@@ -280,7 +314,7 @@
                 </div>
             </div>
             <div class="footer__bottom">
-                <p>Â© 2025 PlanesPro.cl. Todos los derechos reservados.</p>
+                <p>© 2026 PlanesPro.cl. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
