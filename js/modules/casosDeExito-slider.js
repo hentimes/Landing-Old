@@ -3,16 +3,7 @@
 // ===================================
 import { casosDeExitoData } from '../../data/casosDeExito.js';
 
-const CASE_AVATARS = [
-  'assets/avatares/hero/avatar1.jpg',
-  'assets/avatares/hero/avatar2.jpg',
-  'assets/avatares/hero/avatar3.jpg',
-  'assets/avatares/hero/avatar4.jpg',
-  'assets/avatares/asesores/betzabeth-pereira.jpg',
-  'assets/avatares/asesores/daniela-rojas.webp',
-  'assets/avatares/asesores/henry-farias.jpg',
-  'assets/avatares/asesores/sofia-marquez.jpg'
-];
+const CASE_AVATAR_IDS = [61, 62, 63, 64, 65, 66, 67, 68, 69, 70];
 
 export function initCasosDeExitoSlider() {
   const panelMount = document.querySelector('#casos-exito .case-study-slider');
@@ -77,7 +68,8 @@ function escapeHtml(text) {
 }
 
 function getAvatarSrc(index) {
-  return CASE_AVATARS[index % CASE_AVATARS.length];
+  const avatarId = CASE_AVATAR_IDS[index % CASE_AVATAR_IDS.length];
+  return `https://i.pravatar.cc/150?img=${avatarId}`;
 }
 
 function createCaseStudyPanelHtml(study, caseIndex) {
