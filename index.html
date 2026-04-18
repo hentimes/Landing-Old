@@ -4,30 +4,31 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="index, follow" />
-    <title>PlanesPro.cl | Asesoría en Isapres, optimización de plan y guía de salud</title>
-    <meta name="description" content="Compara Isapre y Fonasa con asesoría clara, gratuita y honesta. Optimiza tu 7%, mejora tu cobertura y descubre nuestro ebook para tomar mejores decisiones de salud." />
+    <title>PlanesPro.cl | Asesoría en Isapres y optimización de plan</title>
+    <meta name="description" content="Compara Isapre y Fonasa con asesoría clara, gratuita y honesta. Optimiza tu 7%, mejora tu cobertura y toma decisiones de salud con más claridad." />
     <meta name="theme-color" content="#0a74da" />
     <link rel="canonical" href="https://planespro.cl/" />
     <meta property="og:locale" content="es_CL" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="PlanesPro.cl | Asesoría en Isapres y optimización de plan de salud" />
+    <meta property="og:title" content="PlanesPro.cl | Asesoría en Isapres y optimización de plan" />
     <meta property="og:description" content="Mejora tu cobertura, entiende mejor tu 7% y toma decisiones de salud con apoyo experto y una guía práctica descargable." />
     <meta property="og:url" content="https://planespro.cl/" />
     <meta property="og:site_name" content="PlanesPro.cl" />
     <meta property="og:image" content="https://planespro.cl/assets/ilustraciones/heroimg.webp" />
+    <meta property="og:image:alt" content="Ilustración principal de PlanesPro.cl sobre optimización de plan de salud" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="PlanesPro.cl | Asesoría en Isapres y optimización de plan de salud" />
+    <meta name="twitter:title" content="PlanesPro.cl | Asesoría en Isapres y optimización de plan" />
     <meta name="twitter:description" content="Asesoría gratuita, comparación responsable y un ebook práctico para elegir mejor tu plan de salud." />
     <meta name="twitter:image" content="https://planespro.cl/assets/ilustraciones/heroimg.webp" />
+    <meta name="twitter:image:alt" content="Ilustración principal de PlanesPro.cl sobre optimización de plan de salud" />
     <link rel="icon" href="assets/logos_pp/logo-planespro.cla.png" type="image/png">
     <link rel="preload" as="image" href="assets/ilustraciones/heroimg.webp" fetchpriority="high">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-
-    <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css?v=20260417_final" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -65,6 +66,49 @@
             ]
         }
     </script>
+    <!-- Schema SEO: FAQ Estructurado -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "¿Realmente la asesoría es gratuita?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sí, absolutamente. Nuestro servicio es financiado por las instituciones de salud, por lo que para ti es 100% gratuito, sin cobros ocultos ni compromisos de permanencia."
+        }
+      }, {
+        "@type": "Question",
+        "name": "¿Ustedes representan a las Isapres?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Somos asesores independientes. Trabajamos con todas las Isapres del mercado chileno, pero nuestra prioridad es encontrar el plan que mejor se adapte a tu perfil y presupuesto actual."
+        }
+      }, {
+        "@type": "Question",
+        "name": "¿Cuánto tiempo toma el análisis de mi plan?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Entendemos que tu tiempo es valioso. Normalmente, tras recibir tus datos, realizamos el estudio comparativo y te contactamos en menos de 24 horas hábiles."
+        }
+      }, {
+        "@type": "Question",
+        "name": "¿Qué pasa con mi excedente actual?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Tus excedentes son tuyos. Si decides cambiarte, estos se traspasan legalmente a tu nueva Isapre. Nosotros te explicamos cómo se calcula y cómo aprovecharlo mejor."
+        }
+      }, {
+        "@type": "Question",
+        "name": "¿Gestionan el trámite de cambio?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "¡Claro! Nos encargamos de toda la burocracia. Te guiamos en la firma (digital o física) y hacemos seguimiento hasta que tu nuevo plan esté 100% vigente."
+        }
+      }]
+    }
+    </script>
 </head>
 <body class="body-wrapper">
 
@@ -85,7 +129,7 @@
             
             <div class="header__actions">
                 <button class="button button--primary header__cta" data-modal-trigger="formModal" id="cta_superior">Analizar Mi Plan</button>
-                <button class="header__nav-toggle" id="nav-toggle" aria-label="Abrir menú">
+                <button class="header__nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-controls="nav-mobile" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -114,10 +158,10 @@
                         <div class="hero-v3__social">
                             <div class="hero-v3__social-top">
                                 <div class="hero-v3__avatars" aria-hidden="true">
-                                    <img src="assets/avatares/hero/avatar1.jpg" alt="" class="social-proof__avatar" loading="lazy" decoding="async">
-                                    <img src="assets/avatares/hero/avatar2.jpg" alt="" class="social-proof__avatar" loading="lazy" decoding="async">
-                                    <img src="assets/avatares/hero/avatar3.jpg" alt="" class="social-proof__avatar" loading="lazy" decoding="async">
-                                    <img src="assets/avatares/hero/avatar4.jpg" alt="" class="social-proof__avatar" loading="lazy" decoding="async">
+                                    <img src="assets/avatares/hero/avatar1.jpg" alt="Usuario 1" class="social-proof__avatar" loading="lazy" decoding="async">
+                                    <img src="assets/avatares/hero/avatar2.jpg" alt="Usuario 2" class="social-proof__avatar" loading="lazy" decoding="async">
+                                    <img src="assets/avatares/hero/avatar3.jpg" alt="Usuario 3" class="social-proof__avatar" loading="lazy" decoding="async">
+                                    <img src="assets/avatares/hero/avatar4.jpg" alt="Usuario 4" class="social-proof__avatar" loading="lazy" decoding="async">
                                 </div>
                                 <div class="hero-v3__rating" aria-label="Calificación de 4.5 estrellas">
                                     <span class="hero-v3__rating-value">4.5</span>
@@ -139,7 +183,7 @@
 
                     <div class="hero-v3__right">
                         <div class="hero-v3__image-wrap" aria-hidden="true">
-                            <img src="assets/ilustraciones/hero-person.webp" alt="" class="hero-v3__image" fetchpriority="high" decoding="async">
+                            <img src="assets/ilustraciones/hero-person.webp" alt="Asesora de planes de salud experta" class="hero-v3__image" fetchpriority="high" decoding="async">
                         </div>
                     </div>
 
@@ -172,7 +216,7 @@
 
                 <div class="proceso__layout">
                     <div class="proceso__media proceso__media--person" aria-hidden="true">
-                        <img src="assets/ilustraciones/proceso-person.webp" alt="" class="proceso__person" loading="lazy" decoding="async">
+                        <img src="assets/ilustraciones/proceso-person.webp" alt="Asesora experta de PlanesPro guiando el proceso de asesoría responsable" class="proceso__person" loading="lazy" decoding="async">
                     </div>
 
                     <div class="proceso__cards">
@@ -261,8 +305,8 @@
         <div id="casos-exito" class="screen screen--light-bg">
             <section class="page-section-full">
                 <div class="case-study-section__header">
-                    <p class="case-study-section__subtitle">Ejemplos concretos de cÃ³mo un mejor anÃ¡lisis puede traducirse en ahorro, mÃ¡s cobertura y decisiones mejor informadas segÃºn cada realidad.</p>
                     <h2 class="section__title">Casos Reales de Optimización</h2>
+                    <p class="case-study-section__subtitle">Ejemplos concretos de cómo un mejor análisis puede traducirse en ahorro, más cobertura y decisiones mejor informadas según cada realidad.</p>
                 </div>
                 <div class="container">
                     <div class="case-study-layout">
@@ -303,16 +347,337 @@
 
         <div id="cta-final" class="screen screen--footer">
             <section class="section-cta-final">
-                <div class="container cta-final__container">
-                    <h2>¿Listo para optimizar tu plan de salud?</h2>
-                    <p>Recibe un análisis personalizado, honesto y sin compromiso.</p>
-                    <button data-modal-trigger="formModal" id="cta_inferior" class="button button--light-blue button--large">Solicitar Análisis Gratuito</button>
-                    <div class="cta-benefits">
-                        <div class="cta-benefit-item"><i class="fas fa-gift"></i><span>100% Gratuito</span></div>
-                        <div class="cta-benefit-item"><i class="fas fa-handshake-slash"></i><span>Sin Compromiso</span></div>
-                        <div class="cta-benefit-item"><i class="fas fa-clock"></i><span>Respuesta en 24hrs</span></div>
+        <div class="container cta-final__grid-layout">
+            <!-- Columna Izquierda: Asistente FAQ -->
+            <div class="cta-final__faq-col">
+                <div id="asistente-faq" class="asistente-faq" role="region" aria-label="Asistente de preguntas frecuentes">
+                    <div class="asistente-faq__shell">
+                        <div class="asistente-faq__header">
+                            <h3 class="asistente-faq__title">¿Tienes preguntas?</h3>
+                        </div>
+                        <div class="asistente-faq__stage">
+                            <div class="asistente-faq__img-wrapper">
+                                <img src="assets/ilustraciones/asistente-faq.webp" alt="Asistente de consultas pensando" class="asistente-faq__img" loading="lazy" decoding="async">
+                            </div>
+                            <div class="asistente-faq__list" id="faq-list">
+                            <!-- VISTA 1: MENÚ DE CATEGORÍAS -->
+                            <div class="asistente-faq__view asistente-faq__view--active" id="view-categories">
+                                <button type="button" class="category-btn" data-target="marca">
+                                    <span>Marca y empresa</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                                <button type="button" class="category-btn" data-target="asesoria">
+                                    <span>Asesoría comercial</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                                <button type="button" class="category-btn" data-target="educacion">
+                                    <span>Educación básica sobre Isapres</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                                <button type="button" class="category-btn" data-target="cambio">
+                                    <span>Cambio de Isapre y proceso</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                                <button type="button" class="category-btn" data-target="confianza">
+                                    <span>Confianza y seguridad</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                                <button type="button" class="category-btn" data-target="contacto">
+                                    <span>Contacto y soporte</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                </button>
+                            </div>
+
+                            <!-- VISTA 1: Marca y empresa -->
+                            <div class="asistente-faq__view" id="view-marca">
+                                <div class="asistente-faq__view-top">
+                                    <button type="button" class="btn-volver" aria-label="Volver al menú">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <p class="asistente-faq__view-title">Marca y empresa</p>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Qué es PlanesPro y qué hace?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>PlanesPro es una plataforma de orientación y asesoría en salud previsional que ayuda a las personas a entender, comparar y elegir mejor su sistema o plan de salud en Chile.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Cómo funciona PlanesPro?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Analizamos tu situación, revisamos tus necesidades y te orientamos para evaluar alternativas de Isapre o sistema de salud de forma más clara y personalizada.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Por qué elegir la asesoría de PlanesPro?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Porque buscamos simplificar decisiones complejas, entregando orientación clara, cercana y enfocada en tu caso real.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Qué diferencia a PlanesPro de otras asesorías?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Nos enfocamos en explicar con claridad, acompañar el proceso y ayudarte a tomar decisiones informadas, no solo a mostrar opciones.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- VISTA 2: Asesoría comercial -->
+                            <div class="asistente-faq__view" id="view-asesoria">
+                                <div class="asistente-faq__view-top">
+                                    <button type="button" class="btn-volver" aria-label="Volver al menú">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <p class="asistente-faq__view-title">Asesoría comercial</p>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿A quién va dirigida la asesoría?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>A personas que quieren evaluar su plan de salud, cambiar de Isapre, entender mejor su cobertura o revisar si tienen alternativas más convenientes.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Qué incluye la asesoría?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Incluye orientación personalizada, revisión general de tu situación y apoyo para entender opciones de Isapre o sistema de salud.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Cómo obtengo la asesoría?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Puedes solicitarla a través de nuestro formulario de contacto o escribiéndonos directamente por nuestros canales habilitados.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Cuál es el costo de la asesoría?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Depende del tipo de orientación o servicio que necesites. Puedes contactarnos y te indicaremos la modalidad disponible.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Qué experiencia tiene PlanesPro?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>PlanesPro se basa en experiencia práctica en orientación previsional y de salud, con enfoque en atención clara, responsable y personalizada.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- VISTA 3: Educación básica -->
+                            <div class="asistente-faq__view" id="view-educacion">
+                                <div class="asistente-faq__view-top">
+                                    <button type="button" class="btn-volver" aria-label="Volver al menú">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <p class="asistente-faq__view-title">Educación básica sobre Isapres</p>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Qué es una Isapre?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Una Isapre es una institución privada de salud que administra cotizaciones y ofrece planes de salud con distintas coberturas y condiciones.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Qué diferencia hay entre Isapre y Fonasa?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Fonasa es el sistema público de salud; la Isapre es una alternativa privada con planes, coberturas y costos que varían según cada caso.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Qué pasa si estoy en Fonasa?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>También puedes recibir orientación para evaluar tu situación actual y revisar si te conviene mantenerte en Fonasa o considerar otra alternativa.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- VISTA 4: Cambio de Isapre -->
+                            <div class="asistente-faq__view" id="view-cambio">
+                                <div class="asistente-faq__view-top">
+                                    <button type="button" class="btn-volver" aria-label="Volver al menú">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <p class="asistente-faq__view-title">Cambio de Isapre y proceso</p>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Cómo contratar un plan de Isapre?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Primero se revisa tu situación y necesidades, luego se comparan opciones y finalmente se avanza con la contratación del plan que mejor se ajuste a tu perfil.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Cómo cambiar mi plan de Isapre?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>El cambio depende de tu situación actual, tu plan vigente y las alternativas disponibles. Lo ideal es revisar primero qué opciones te convienen antes de avanzar.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Cuánto tarda el cambio de plan?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Puede variar según el caso, la documentación y la entidad involucrada, pero normalmente el proceso requiere revisión y validación previa.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Me conviene cambiarme de Isapre?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Depende de tu edad, cargas, presupuesto, cobertura buscada y situación actual. Por eso conviene evaluarlo de forma personalizada.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- VISTA 5: Confianza y seguridad -->
+                            <div class="asistente-faq__view" id="view-confianza">
+                                <div class="asistente-faq__view-top">
+                                    <button type="button" class="btn-volver" aria-label="Volver al menú">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <p class="asistente-faq__view-title">Confianza y seguridad</p>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Mis datos están seguros?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Sí. Tratamos la información con confidencialidad y con el objetivo exclusivo de evaluar y orientar tu caso.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Es seguro usar este sitio web?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Sí. El sitio está pensado para ofrecer una experiencia segura y para proteger la información que compartes en nuestros formularios.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿PlanesPro es una empresa formal?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>PlanesPro opera como una plataforma de orientación y asesoría, enfocada en ayudar a las personas a entender mejor sus opciones de salud previsional.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Dónde están ubicados?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Atendemos de forma digital y, según el caso, también podemos orientarte respecto a nuestra modalidad de atención y cobertura.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- VISTA 6: Contacto y soporte -->
+                            <div class="asistente-faq__view" id="view-contacto">
+                                <div class="asistente-faq__view-top">
+                                    <button type="button" class="btn-volver" aria-label="Volver al menú">
+                                        <i class="fas fa-arrow-left"></i>
+                                    </button>
+                                    <p class="asistente-faq__view-title">Contacto y soporte</p>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Cómo los contacto?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Puedes escribirnos a través del formulario del sitio o por los canales de contacto disponibles en la página.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿En qué horarios atienden?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>Atendemos en horarios hábiles. Si nos escribes fuera de ese horario, te responderemos apenas retomemos la atención.</p>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <button class="accordion-item__header">
+                                        <span>¿Tienen soporte 24/7?</span>
+                                        <i class="fas fa-chevron-down accordion-item__icon"></i>
+                                    </button>
+                                    <div class="accordion-item__content">
+                                        <p>No contamos con atención continua 24/7, pero sí revisamos y respondemos las solicitudes dentro de nuestros horarios de atención.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Columna Derecha: CTA Original -->
+            <div class="cta-final__main-col">
+                <div class="cta-final__main-shell">
+                <div class="cta-final__main-inner">
+                    <h2 class="cta-final__title">¿Optimizamos tu plan de salud?</h2>
+                    <p class="cta-final__lead">Recibe un análisis personalizado, honesto y sin compromiso.</p>
+                </div>
+                <div class="cta-final__actions">
+                    <button data-modal-trigger="formModal" id="cta_inferior" class="button button--light-blue button--large">Solicitar Análisis Gratuito</button>
+                </div>
+                <div class="cta-benefits">
+                    <div class="cta-benefit-item"><i class="fas fa-gift" aria-hidden="true"></i><span>100% Gratuito</span></div>
+                    <div class="cta-benefit-item"><i class="fas fa-handshake-slash" aria-hidden="true"></i><span>Sin Compromiso</span></div>
+                    <div class="cta-benefit-item"><i class="fas fa-clock" aria-hidden="true"></i><span>Respuesta en 24hrs</span></div>
+                </div>
+                </div>
+            </div>
+        </div>
             </section>
         
             <footer class="footer">
@@ -320,7 +685,7 @@
                     
                     <div class="footer__left-column">
                         <a href="index.html" class="header__brand footer__brand">
-                            <img src="assets/logos_pp/logo-planespro.cla.png" alt="PlanesPro.cl Logo Oscuro" class="footer__logo-img" />
+                            <img src="assets/logos_pp/logo-planespro.cla.png" alt="PlanesPro.cl Logo Oscuro" class="footer__logo-img" loading="lazy" decoding="async" />
                             <span class="header__brand-name">PlanesPro.cl</span>
                         </a>
                         <div class="footer__contact">
@@ -367,7 +732,7 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <script src="js/main.js" type="module"></script>
+    <script src="js/main.js?v=20260417_final" type="module"></script>
 </body>
 </html>
 

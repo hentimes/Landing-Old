@@ -13,6 +13,7 @@
 @import url('_animations.css');      /* 6. Animaciones (logos, whatsapp) */
 @import url('_asesores-page.css');   /* 7. Estilos para la página de asesores */
 @import url('_nosotros-page.css');    /* 8. Estilos para la página de nosotros */
-@import url('_modal.css');           /* 8. Estilos para la ventana modal */
-@import url('_responsive.css');      /* 9. Media queries para diseño adaptable (móviles) */
-@import url('../formulario/styles/styles.css'); /* 10. Estilos del formulario */
+@import url('_modal.css');           /* 9. Estilos para la ventana modal */
+@import url('_responsive.css');      /* 10. Media queries para diseño adaptable */
+@import url('_asistente-faq.css');   /* 11. Estilos para el asistente FAQ (Overrides) */
+@import url('../formulario/styles/styles.css'); /* 12. Estilos del formulario */
