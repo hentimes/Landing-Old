@@ -118,7 +118,7 @@ export function isFullFormValid() {
     let firstInvalidStep = -1;
     DOM.formSteps.forEach((step, index) => {
         const fields = step.querySelectorAll('input[required], select[required]');
-        fields.forEach(field => field.closest('.form-group')?.classList.add('is-interacted'));
+        fields.forEach(field => field.closest('.form-group').classList.add('is-interacted'));
         for (const field of fields) {
             if (!validateField(field)) {
                 isAllValid = false;

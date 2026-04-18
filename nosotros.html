@@ -14,16 +14,19 @@
     <meta property="og:locale" content="es_CL" />
     <meta property="og:site_name" content="PlanesPro.cl" />
     <meta property="og:image" content="https://planespro.cl/assets/ilustraciones/heroimg.webp" />
+    <meta property="og:image:alt" content="Equipo de PlanesPro.cl y su enfoque de asesoría honesta en salud" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Nosotros | PlanesPro.cl" />
     <meta name="twitter:description" content="Conoce al equipo de PlanesPro.cl, nuestra visión de asesoría honesta en salud y cómo trabajamos para recomendar solo lo que realmente te conviene." />
     <meta name="twitter:image" content="https://planespro.cl/assets/ilustraciones/heroimg.webp" />
+    <meta name="twitter:image:alt" content="Equipo de PlanesPro.cl y su enfoque de asesoría honesta en salud" />
     <title>Nosotros - PlanesPro.cl</title>
-    <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css?v=20260417_final" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -37,6 +40,23 @@
           "publisher": {
             "@id": "https://planespro.cl/#organization"
           }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Inicio",
+              "item": "https://planespro.cl/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Nosotros",
+              "item": "https://planespro.cl/nosotros.html"
+            }
+          ]
         },
         {
           "@type": "Organization",
@@ -69,7 +89,7 @@
             </nav>
             <div class="header__actions">
                 <button class="button button--primary header__cta" data-modal-trigger="formModal" id="cta_superior">Analizar Mi Plan</button>
-                <button class="header__nav-toggle" id="nav-toggle" aria-label="Abrir menú">
+                <button class="header__nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-controls="nav-mobile" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -95,7 +115,7 @@
                     <p class="hero__subtitle">Más que asesores, somos tus aliados en salud. Nacimos de una idea simple: la asesoría de salud en Chile debe ser transparente, honesta y centrada 100% en las personas. Bienvenido a PlanesPro.</p>
                 </div>
                 <div class="hero-nosotros__illustration-content">
-                    <img src="assets/ilustraciones/ilustracion-nosotros.png" alt="Equipo de PlanesPro protegiendo a una familia con un escudo de salud." class="hero__illustration">
+                    <img src="assets/ilustraciones/ilustracion-nosotros.webp" alt="Equipo de PlanesPro protegiendo a una familia con un escudo de salud." class="hero__illustration" loading="lazy" decoding="async">
                 </div>
             </div>
         </section>
@@ -106,17 +126,17 @@
                 <div class="pilares__grid">
                     <div class="pilar-card">
                         <i class="fas fa-balance-scale pilar-card__icon"></i>
-                        <h4 class="pilar-card__title">Honestidad Radical</h4>
-                        <p class="pilar-card__text">Nuestra primera recomendación siempre será la verdad. Si Fonasa o tu plan actual es tu mejor alternativa, seremos los primeros en decí­rtelo. Tu bienestar está por encima de todo.</p>
+                        <h3 class="pilar-card__title">Honestidad Radical</h3>
+                        <p class="pilar-card__text">Nuestra primera recomendación siempre será la verdad. Si Fonasa o tu plan actual es tu mejor alternativa, seremos los primeros en decírtelo. Tu bienestar está por encima de todo.</p>
                     </div>
                     <div class="pilar-card">
                         <i class="fas fa-user-check pilar-card__icon"></i>
-                        <h4 class="pilar-card__title">Experiencia Certificada</h4>
-                        <p class="pilar-card__text">Nuestro equipo está compuesto únicamente por asesores registrados y acreditados por la Superintendencia de Salud. Tienes la garantí­a de estar en manos de verdaderos profesionales.</p>
+                        <h3 class="pilar-card__title">Experiencia Certificada</h3>
+                        <p class="pilar-card__text">Nuestro equipo está compuesto únicamente por asesores registrados y acreditados por la Superintendencia de Salud. Tienes la garantía de estar en manos de verdaderos profesionales.</p>
                     </div>
                     <div class="pilar-card">
                         <i class="fas fa-handshake pilar-card__icon"></i>
-                        <h4 class="pilar-card__title">Compromiso a Largo Plazo</h4>
+                        <h3 class="pilar-card__title">Compromiso a Largo Plazo</h3>
                         <p class="pilar-card__text">No desaparecemos después de la firma. Somos tus asesores permanentes para resolver dudas, gestionar tu plan y reevaluar tus opciones cada vez que lo necesites. Tu confianza es nuestro mayor activo.</p>
                     </div>
                 </div>
@@ -125,7 +145,7 @@
 
         <section class="screen">
             <div class="container">
-                <h2 class="section__title">Tu tranquilidad no tiene precio. Nuestra asesorí­a, tampoco.</h2>
+                <h2 class="section__title">Tu tranquilidad no tiene precio. Nuestra asesoría, tampoco.</h2>
                 <div class="insignia-container">
                     <span class="insignia-etica">
                         <i class="fas fa-handshake-slash"></i> No pagamos ni trabajamos con intermediarios
@@ -133,13 +153,13 @@
                 </div>
                 <div class="etica__grid">
                     <div class="etica__columna">
-                        <h4>El Riesgo de Cambiarse por Dinero</h4>
+                        <h3>El Riesgo de Cambiarse por Dinero</h3>
                         <p>Aceptar un incentivo económico para cambiarte de Isapre es una práctica riesgosa, ya que a menudo tratas con un intermediario enfocado en la transacción y no en tu bienestar. Esto te expone a varios peligros:</p>
                         <ul class="riesgos-lista">
                             <li class="riesgo-item">
                                 <i class="fas fa-shield-alt"></i>
                                 <div>
-                                    <strong>Datos en riesgo:</strong> Entregas información personal sensible sin garantí­as.
+                                    <strong>Datos en riesgo:</strong> Entregas información personal sensible sin garantías.
                                 </div>
                             </li>
                             <li class="riesgo-item">
@@ -158,21 +178,21 @@
                         <p>Un asesor que necesita pagar para atraer clientes rara vez ofrecerá la experiencia que mereces, resultando en un plan costoso, inadecuado y limitando tus futuras opciones.</p>
                     </div>
                     <div class="etica__columna">
-                        <h4>Por Qué Somos Diferentes</h4>
-                        <p>En PlanesPro, nuestra filosofí­a es radicalmente opuesta. <strong>No pagamos por clientes, los ganamos con excelencia.</strong> Nuestra reputación se construye sobre la base de la ética, la transparencia y los resultados medibles que entregamos. Creemos que nuestro trabajo es ayudarte a optimizar tu salud, no "comprar" tu afiliación.</p>
+                        <h3>Por Qué Somos Diferentes</h3>
+                        <p>En PlanesPro, nuestra filosofía es radicalmente opuesta. <strong>No pagamos por clientes, los ganamos con excelencia.</strong> Nuestra reputación se construye sobre la base de la ética, la transparencia y los resultados medibles que entregamos. Creemos que nuestro trabajo es ayudarte a optimizar tu salud, no "comprar" tu afiliación.</p>
                         <div class="benefits-accordion" style="margin-top: 24px;">
                             <div class="accordion-item is-open">
                                 <div class="accordion-item__header">
-                                    <h4><i class="fas fa-check-circle"></i> Nuestra misión es tu bienestar</h4>
+                                    <h3><i class="fas fa-check-circle"></i> Nuestra misión es tu bienestar</h3>
                                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                                 </div>
                                 <div class="accordion-item__content">
-                                    <p>No estamos aquí­ para venderte el plan más caro, sino el más inteligente para ti. Si tu mejor opción es Fonasa, te lo diremos con total honestidad.</p>
+                                    <p>No estamos aquí para venderte el plan más caro, sino el más inteligente para ti. Si tu mejor opción es Fonasa, te lo diremos con total honestidad.</p>
                                 </div>
                             </div>
                             <div class="accordion-item">
                                 <div class="accordion-item__header">
-                                    <h4><i class="fas fa-check-circle"></i> Conocemos nuestro valor</h4>
+                                    <h3><i class="fas fa-check-circle"></i> Conocemos nuestro valor</h3>
                                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                                 </div>
                                 <div class="accordion-item__content">
@@ -181,7 +201,7 @@
                             </div>
                             <div class="accordion-item">
                                 <div class="accordion-item__header">
-                                    <h4><i class="fas fa-check-circle"></i> Vivimos de las referencias</h4>
+                                    <h3><i class="fas fa-check-circle"></i> Vivimos de las referencias</h3>
                                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                                 </div>
                                 <div class="accordion-item__content">
@@ -197,7 +217,7 @@
         <section class="screen screen--light-bg">
             <div class="container" style="text-align: center;">
                 <h2 class="section__title">Las Caras Detrás de tu Bienestar</h2>
-                <p class="section__subtitle" style="max-width: 800px; margin: 0 auto 40px auto;">PlanesPro es la suma del talento y la vocación de nuestros asesores. Cada uno aporta una especialización única con un objetivo en común: darte la mejor asesorí­a de salud del paí­s.</p>
+                <p class="section__subtitle" style="max-width: 800px; margin: 0 auto 40px auto;">PlanesPro es la suma del talento y la vocación de nuestros asesores. Cada uno aporta una especialización única con un objetivo en común: darte la mejor asesoría de salud del país.</p>
                 <div class="equipo__grid">
                     </div>
                 <a href="asesores.html" class="button button--light-blue" style="margin-top: 40px;"><i class="fas fa-users"></i> Ver Perfiles Completos</a>
@@ -207,7 +227,7 @@
         <section class="section-cta-final">
             <div class="container cta-final__container">
                 <h2>¿Listo para tomar el control de tu salud?</h2>
-                <p>Permí­tenos demostrarte cómo una asesorí­a experta y honesta puede marcar la diferencia. El análisis es gratuito, sin compromiso y el primer paso hacia tu tranquilidad.</p>
+                <p>Permítenos demostrarte cómo una asesoría experta y honesta puede marcar la diferencia. El análisis es gratuito, sin compromiso y el primer paso hacia tu tranquilidad.</p>
                 <button data-modal-trigger="formModal" id="cta_nosotros" class="button button--light-blue button--large">Solicitar Análisis Gratuito</button>
                 <div class="cta-benefits">
                     <div class="cta-benefit-item"><i class="fas fa-gift"></i><span>100% Gratuito</span></div>
@@ -222,7 +242,7 @@
         <div class="container footer__container">
             <div class="footer__left-column">
                 <a href="index.html" class="header__brand footer__brand">
-                    <img src="assets/logos_pp/logo-planespro.cla.png" alt="PlanesPro.cl Logo Oscuro" class="footer__logo-img" />
+                    <img src="assets/logos_pp/logo-planespro.cla.png" alt="PlanesPro.cl Logo Oscuro" class="footer__logo-img" loading="lazy" decoding="async" />
                     <span class="header__brand-name">PlanesPro.cl</span>
                 </a>
                 <div class="footer__contact">
@@ -232,17 +252,17 @@
                 </div>
                 <div class="footer__social">
                     <button type="button" aria-label="X (antes Twitter) (próximamente)" disabled><i class="fab fa-twitter"></i></button>
-                    <a href="https://www.instagram.com/planespro.cl" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.facebook.com/planespro.cl/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/planespro.cl" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/planespro.cl/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                     <button type="button" aria-label="Youtube (próximamente)" disabled><i class="fab fa-youtube"></i></button>
-                    <a href="https://www.tiktok.com/@planespro.cl" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://www.tiktok.com/@planespro.cl" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
                 </div>
             </div>
             <div class="footer__right-column">
                 <h4 class="footer__title">Links de interés:</h4>
                 <div class="footer__institutional-logos">
-                    <a href="https://www.fonasa.cl" target="_blank" rel="noopener noreferrer"><img src="assets/logos_isapre/fonasa-bn.png" alt="Logo Fonasa" class="footer-link-logo"></a>
-                    <a href="https://www.superdesalud.gob.cl/" target="_blank" rel="noopener noreferrer"><img src="assets/logos_isapre/gob-bn.png" alt="Logo Superintendencia de Salud" class="footer-link-logo"></a>
+                    <a href="https://www.fonasa.cl" target="_blank" rel="noopener noreferrer"><img src="assets/logos_isapre/fonasa-bn.png" alt="Logo Fonasa" class="footer-link-logo" loading="lazy" decoding="async"></a>
+                    <a href="https://www.superdesalud.gob.cl/" target="_blank" rel="noopener noreferrer"><img src="assets/logos_isapre/gob-bn.png" alt="Logo Superintendencia de Salud" class="footer-link-logo" loading="lazy" decoding="async"></a>
                 </div>
             </div>
             <div class="footer__bottom">
@@ -257,8 +277,8 @@
     <div id="isapre-warning-modal-placeholder"></div>
     <div id="exit-confirm-modal-placeholder"></div>
     
-    <a href="https://wa.me/56958785580" class="floating-whatsapp" aria-label="Contactar por WhatsApp" target="_blank"><i class="fab fa-whatsapp"></i></a>
-    <script src="js/main.js" type="module"></script>
+    <a href="https://wa.me/56958785580" class="floating-whatsapp" aria-label="Contactar por WhatsApp" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
+    <script src="js/main.js?v=20260417_final" type="module"></script>
 </body>
 </html>
 

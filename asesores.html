@@ -14,16 +14,19 @@
     <meta property="og:locale" content="es_CL" />
     <meta property="og:site_name" content="PlanesPro.cl" />
     <meta property="og:image" content="https://planespro.cl/assets/ilustraciones/heroimg.webp" />
+    <meta property="og:image:alt" content="Equipo de asesores de PlanesPro.cl" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Nuestros Asesores | PlanesPro.cl" />
     <meta name="twitter:description" content="Conoce a los asesores de PlanesPro.cl: profesionales registrados, con enfoque honesto y acompañamiento continuo para ayudarte a evaluar tu mejor plan de salud." />
     <meta name="twitter:image" content="https://planespro.cl/assets/ilustraciones/heroimg.webp" />
+    <meta name="twitter:image:alt" content="Equipo de asesores de PlanesPro.cl" />
     <title>Nuestros Asesores - PlanesPro.cl</title>
-    <link rel="stylesheet" href="css/styles.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css?v=20260417_final" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -37,6 +40,23 @@
           "publisher": {
             "@id": "https://planespro.cl/#organization"
           }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Inicio",
+              "item": "https://planespro.cl/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Nuestros Asesores",
+              "item": "https://planespro.cl/asesores.html"
+            }
+          ]
         },
         {
           "@type": "Organization",
@@ -69,7 +89,7 @@
             </nav>
             <div class="header__actions">
                 <button class="button button--primary header__cta" data-modal-trigger="formModal" id="cta_superior">Analizar Mi Plan</button>
-                <button class="header__nav-toggle" id="nav-toggle" aria-label="Abrir menú">
+                <button class="header__nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-controls="nav-mobile" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -90,7 +110,7 @@
     <main style="padding-top: var(--header-height);">
         <section class="container page-section hero-asesores">
             <div class="hero-asesores__header">
-                <img src="assets/ilustraciones/asesores.webp" alt="Ilustración de una asesora de salud" class="hero-asesores__img">
+                <img src="assets/ilustraciones/asesores.webp" alt="Ilustración de una asesora de salud" class="hero-asesores__img" loading="lazy" decoding="async">
                 <div class="hero-asesores__text-content">
                     <h1>El Asesor Correcto<br>Marca la Diferencia</h1>
                     
@@ -98,21 +118,21 @@
                         <div class="guarantee-card">
                             <i class="fas fa-user-check"></i>
                             <div class="guarantee-card__content">
-                                <h4>Asesoría Certificada</h4>
+                                <h3>Asesoría Certificada</h3>
                                 <p>Expertos registrados en la Superintendencia de Salud.</p>
                             </div>
                         </div>
                         <div class="guarantee-card">
                             <i class="fas fa-balance-scale"></i>
                             <div class="guarantee-card__content">
-                                <h4>Recomendación Honesta</h4>
+                                <h3>Recomendación Honesta</h3>
                                 <p>Si Fonasa es tu mejor opción, te lo diremos.</p>
                             </div>
                         </div>
                         <div class="guarantee-card">
                             <i class="fas fa-handshake"></i>
                             <div class="guarantee-card__content">
-                                <h4>Acompañamiento Continuo</h4>
+                                <h3>Acompañamiento Continuo</h3>
                                 <p>Estamos contigo antes, durante y después del proceso.</p>
                             </div>
                         </div>
@@ -147,7 +167,7 @@
         <section class="container page-section benefits-accordion">
             <div class="accordion-item">
                 <div class="accordion-item__header">
-                    <h4><i class="fas fa-percentage"></i> Optimización Real de tu 7%</h4>
+                    <h3><i class="fas fa-percentage"></i> Optimización Real de tu 7%</h3>
                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                 </div>
                 <div class="accordion-item__content">
@@ -156,7 +176,7 @@
             </div>
             <div class="accordion-item">
                 <div class="accordion-item__header">
-                    <h4><i class="fas fa-coins"></i> Ahorro Inteligente en Excedentes</h4>
+                    <h3><i class="fas fa-coins"></i> Ahorro Inteligente en Excedentes</h3>
                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                 </div>
                 <div class="accordion-item__content">
@@ -165,7 +185,7 @@
             </div>
             <div class="accordion-item">
                 <div class="accordion-item__header">
-                    <h4><i class="fas fa-hospital"></i> Acceso a las Mejores Clí­nicas</h4>
+                    <h3><i class="fas fa-hospital"></i> Acceso a las Mejores Clínicas</h3>
                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                 </div>
                 <div class="accordion-item__content">
@@ -174,7 +194,7 @@
             </div>
             <div class="accordion-item">
                 <div class="accordion-item__header">
-                    <h4><i class="fas fa-exclamation-triangle"></i> Evita Errores Costosos</h4>
+                    <h3><i class="fas fa-exclamation-triangle"></i> Evita Errores Costosos</h3>
                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                 </div>
                 <div class="accordion-item__content">
@@ -183,7 +203,7 @@
             </div>
             <div class="accordion-item">
                 <div class="accordion-item__header">
-                    <h4><i class="fas fa-headset"></i> Asesoría Continua y Postventa</h4>
+                    <h3><i class="fas fa-headset"></i> Asesoría Continua y Postventa</h3>
                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                 </div>
                 <div class="accordion-item__content">
@@ -192,11 +212,11 @@
             </div>
             <div class="accordion-item">
                 <div class="accordion-item__header">
-                    <h4><i class="fas fa-balance-scale"></i> Experiencia y Transparencia Total</h4>
+                    <h3><i class="fas fa-balance-scale"></i> Experiencia y Transparencia Total</h3>
                     <i class="fas fa-chevron-down accordion-item__icon"></i>
                 </div>
                 <div class="accordion-item__content">
-                    <p>Nuestra recomendación es 100% objetiva. Si Fonasa es tu mejor opción, seremos los primeros en decí­rtelo.</p>
+                    <p>Nuestra recomendación es 100% objetiva. Si Fonasa es tu mejor opción, seremos los primeros en decírtelo.</p>
                 </div>
             </div>
         </section>
@@ -286,7 +306,7 @@
         <div class="container footer__container">
             <div class="footer__left-column">
                 <a href="index.html" class="header__brand footer__brand">
-                    <img src="assets/logos_pp/logo-planespro.cla.png" alt="PlanesPro.cl Logo Oscuro" class="footer__logo-img" />
+                    <img src="assets/logos_pp/logo-planespro.cla.png" alt="PlanesPro.cl Logo Oscuro" class="footer__logo-img" loading="lazy" decoding="async" />
                     <span class="header__brand-name">PlanesPro.cl</span>
                 </a>
                 <div class="footer__contact">
@@ -296,20 +316,20 @@
                 </div>
                 <div class="footer__social">
                     <button type="button" aria-label="X (antes Twitter) (próximamente)" disabled><i class="fab fa-twitter"></i></button>
-                    <a href="https://www.instagram.com/planespro.cl" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.facebook.com/planespro.cl/" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://www.instagram.com/planespro.cl" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/planespro.cl/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                     <button type="button" aria-label="Youtube (próximamente)" disabled><i class="fab fa-youtube"></i></button>
-                    <a href="https://www.tiktok.com/@planespro.cl" target="_blank" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://www.tiktok.com/@planespro.cl" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
                 </div>
             </div>
             <div class="footer__right-column">
                 <h4 class="footer__title">Links de interés:</h4>
                 <div class="footer__institutional-logos">
                     <a href="https://www.fonasa.cl" target="_blank" rel="noopener noreferrer">
-                        <img src="assets/logos_isapre/fonasa-bn.png" alt="Logo Fonasa" class="footer-link-logo">
+                        <img src="assets/logos_isapre/fonasa-bn.png" alt="Logo Fonasa" class="footer-link-logo" loading="lazy" decoding="async">
                     </a>
                     <a href="https://www.superdesalud.gob.cl/" target="_blank" rel="noopener noreferrer">
-                        <img src="assets/logos_isapre/gob-bn.png" alt="Logo Superintendencia de Salud" class="footer-link-logo">
+                        <img src="assets/logos_isapre/gob-bn.png" alt="Logo Superintendencia de Salud" class="footer-link-logo" loading="lazy" decoding="async">
                     </a>
                 </div>
             </div>
@@ -325,8 +345,8 @@
     <div id="isapre-warning-modal-placeholder"></div>
     <div id="exit-confirm-modal-placeholder"></div>
     
-    <a href="https://wa.me/56958785580" class="floating-whatsapp" aria-label="Contactar por WhatsApp" target="_blank"><i class="fab fa-whatsapp"></i></a>
-    <script src="js/main.js" type="module"></script>
+    <a href="https://wa.me/56958785580" class="floating-whatsapp" aria-label="Contactar por WhatsApp" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
+    <script src="js/main.js?v=20260417_final" type="module"></script>
 </body>
 </html>
 

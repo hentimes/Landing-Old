@@ -4,14 +4,14 @@
 // ===================================
 
 const PHRASES = [
-    "¿Estás pagando de más por tu plan de salud?",
-    "¿Estás insatisfecho con tu plan de Isapre actual?",
-    "¿Incrementó tu 7% y aún no mejoras la cobertura?",
-    "¿Te volvieron a aumentar el plan de Isapre?",
-    "¿Lo que descuentan en Fonasa podría pagarte un excelente plan de Isapre?",
-    "¿Le temes a las listas de espera del sistema público?",
-    "¿Prefieres atenderte en clínicas pero sigues afiliado a Fonasa?",
-    "¿Guagua en camino? Ya no se trata solo de ti. ¡Mejora tu plan!"
+    "¿Estás pagando de más por tu plan de salud",
+    "¿Estás insatisfecho con tu plan de Isapre actual",
+    "¿Incrementó tu 7% y aún no mejoras la cobertura",
+    "¿Te volvieron a aumentar el plan de Isapre",
+    "¿Lo que descuentan en Fonasa podría pagarte un excelente plan de Isapre",
+    "¿Le temes a las listas de espera del sistema público",
+    "¿Prefieres atenderte en clínicas pero sigues afiliado a Fonasa",
+    "¿Guagua en camino Ya no se trata solo de ti. ¡Mejora tu plan!"
 ];
 
 const TYPE_SPEED   = 40;   // ms por carácter al tipear

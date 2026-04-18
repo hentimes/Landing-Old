@@ -24,15 +24,15 @@ function createModalContent(asesor) {
         facebook: 'fab fa-facebook-f',
         tiktok: 'fab fa-tiktok'
     };
-    
+
     let socialsHtml = '';
     if (asesor.socials) {
         const socialLinks = Object.entries(asesor.socials)
             .filter(([_, url]) => url && url.trim() !== '')
             .map(([platform, url]) => `
-                <a href="${url}" target="_blank" aria-label="${platform}"><i class="${socialIcons[platform]}"></i></a>
+                <a href="${url}" target="_blank" rel="noopener noreferrer" aria-label="${platform}"><i class="${socialIcons[platform]}"></i></a>
             `).join('');
-        
+
         if (socialLinks) {
             socialsHtml = `<div class="asesor-modal__socials">${socialLinks}</div>`;
         }
@@ -49,7 +49,7 @@ function createModalContent(asesor) {
                     <h2 class="asesor-modal__nombre">${asesor.nombre}</h2>
                     <p class="asesor-modal__cargo">${asesor.cargo}</p>
                     <p class="asesor-modal__bio">${asesor.biografia}</p>
-                    <h4 class="asesor-modal__subtitle">Especialidades Clave:</h4>
+                    <h3 class="asesor-modal__subtitle">Especialidades Clave</h3>
                     <ul class="asesor-modal__especialidades">
                         ${especialidadesHtml}
                     </ul>
@@ -76,7 +76,7 @@ function showAsesorModal(asesorId) {
     const modalContainer = document.createElement('div');
     modalContainer.className = 'asesor-modal';
     modalContainer.innerHTML = createModalContent(asesor);
-    
+
     document.body.appendChild(modalContainer);
     document.body.classList.add('no-scroll');
 
@@ -108,7 +108,7 @@ function showAsesorModal(asesorId) {
  */
 function hideAsesorModal(modalContainer) {
     modalContainer.classList.remove('is-visible');
-    
+
     modalContainer.addEventListener('transitionend', () => {
         modalContainer.remove();
         if (document.querySelectorAll('.modal.is-visible, .asesor-modal.is-visible').length === 0) {
@@ -125,7 +125,7 @@ function createAsesorCard(asesor) {
         <li><i class="fas fa-check-circle"></i> ${item}</li>
     `).join('');
 
-    const certificacionHtml = asesor.certificacion 
+    const certificacionHtml = asesor.certificacion
         ? `<span class="asesor-card__certificacion">
                <i class="fas fa-shield-alt"></i>
                <span class="tooltip-text">Certificado por la Superintendencia de Salud</span>
@@ -137,7 +137,7 @@ function createAsesorCard(asesor) {
                <i class="fas fa-star"></i>
            </div>`
         : '';
-    
+
     const fortalezaHtml = asesor.fortaleza ? `
         <p class="asesor-card__fortaleza">
             <i class="fas ${asesor.fortaleza.icon}"></i>
@@ -148,7 +148,7 @@ function createAsesorCard(asesor) {
     return `
         <div class="asesor-card" data-asesor-id="${asesor.id}">
             ${premiumRibbonHtml}
-            
+
             <div class="asesor-card__header">
                 <div class="asesor-card__img-container">
                     <img src="${asesor.foto}" alt="Foto de ${asesor.nombre}" class="asesor-card__img">
@@ -193,21 +193,18 @@ function createAsesorCard(asesor) {
     `;
 }
 
-
 /**
  * Inicializa la carga de los perfiles de asesores y la lógica del carrusel/acordeón.
  */
 export function initAsesores() {
     const sliderWrapper = document.querySelector('.asesores-slider-wrapper');
     if (!sliderWrapper) return;
-    
+
     const container = sliderWrapper.querySelector('#asesores-container');
     if (!container) return;
 
     container.innerHTML = asesoresData.map(createAsesorCard).join('');
 
-    // --- INICIO DE LA MODIFICACIÓN: Lógica de Clic y Doble Clic ---
-    
     let clickTimer = null;
 
     container.addEventListener('click', (event) => {
@@ -216,41 +213,32 @@ export function initAsesores() {
 
         const asesorId = card.dataset.asesorId;
 
-        // Acción para el botón "Ver Especialidades" (móvil)
         if (event.target.closest('.asesor-card__accordion-toggle')) {
             card.classList.toggle('is-open');
-            return; // Detiene la ejecución para no interferir con otras lógicas
+            return;
         }
 
-        // Acción para el botón "Ver Perfil Completo"
         if (event.target.closest('.asesor-card__cta')) {
             showAsesorModal(asesorId);
             return;
         }
 
-        // Lógica de clic/doble clic en el nombre o la foto
         const isClickableArea = event.target.closest('.asesor-card__nombre, .asesor-card__img-container');
         if (isClickableArea) {
             if (clickTimer === null) {
-                // PRIMER CLIC: Inicia un temporizador.
                 clickTimer = setTimeout(() => {
                     clickTimer = null;
-                    // ACCIÓN DE UN SOLO CLIC: Abrir el acordeón
-                    if (window.innerWidth < 768) { // Solo en móvil
+                    if (window.innerWidth < 768) {
                         card.classList.toggle('is-open');
                     }
-                }, 250); // 250ms de espera para un segundo clic
+                }, 250);
             } else {
-                // SEGUNDO CLIC: Cancela el temporizador y ejecuta la acción de doble clic.
                 clearTimeout(clickTimer);
                 clickTimer = null;
-                // ACCIÓN DE DOBLE CLIC: Abrir el modal del perfil
                 showAsesorModal(asesorId);
             }
         }
     });
-    
-    // --- FIN DE LA MODIFICACIÓN ---
 
     const setupDesktopCarousel = () => {
         const prevButton = sliderWrapper.querySelector('.slider-arrow.prev');
@@ -260,13 +248,13 @@ export function initAsesores() {
         if (!prevButton || !nextButton || !dotsContainer) return;
 
         dotsContainer.innerHTML = asesoresData.map((_, index) => `<button class="slider-dot" data-index="${index}"></button>`).join('');
-        
+
         const cards = container.querySelectorAll('.asesor-card');
         const dots = dotsContainer.querySelectorAll('.slider-dot');
         if (cards.length === 0) return;
 
         const scrollAmount = cards[0].offsetWidth + parseInt(window.getComputedStyle(container).gap, 10);
-        
+
         const updateSliderUI = () => {
             const currentIndex = Math.round(container.scrollLeft / scrollAmount);
             dots.forEach((dot, index) => dot.classList.toggle('is-active', index === currentIndex));
@@ -281,7 +269,7 @@ export function initAsesores() {
         prevButton.addEventListener('click', () => {
             container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
         });
-        
+
         dots.forEach(dot => {
             dot.addEventListener('click', (e) => {
                 const index = parseInt(e.target.dataset.index, 10);
@@ -309,13 +297,10 @@ export function initAsesores() {
             container.classList.add('mobile-view');
         }
     };
-    
+
     window.addEventListener('resize', handleView);
     handleView();
 }
-
-
-// --- ¡NUEVO! FUNCIÓN SIMPLE PARA LA PÁGINA /nosotros.html ---
 
 /**
  * Crea el HTML para una tarjeta de asesor simplificada para la página "Nosotros".
@@ -350,10 +335,7 @@ function createNosotrosAsesorCard(asesor) {
  */
 export function initNosotrosAsesores() {
     const container = document.querySelector('.page-nosotros .equipo__grid');
-    if (!container) {
-        // Si no estamos en la página "Nosotros", no hace nada.
-        return;
-    }
+    if (!container) return;
 
     const asesoresDestacados = asesoresData.slice(0, 2);
     container.innerHTML = asesoresDestacados.map(createNosotrosAsesorCard).join('');

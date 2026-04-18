@@ -1,5 +1,5 @@
 // ===================================
-// Datos de los Testimonios
+// Datos de los testimonios
 // ===================================
 
 export const testimonialsData = [
@@ -7,37 +7,37 @@ export const testimonialsData = [
     author: "Patricio González",
     stars: 5,
     quote: "Gracias a Henry optimicé mi plan y ahora pago mucho menos. Su honestidad es única.",
-    avatar: "" 
+    avatar: ""
   },
   {
     author: "Carlos Mendoza",
     stars: 5,
     quote: "Profesional y transparente. Me recomendó quedarme en Fonasa porque era mejor para mi situación.",
-    avatar: "" 
+    avatar: ""
   },
   {
     author: "Sofía Pérez",
     stars: 5,
     quote: "Nos ayudó a entender las diferencias entre los planes y elegimos uno perfecto para nuestra familia.",
-    avatar: "" 
+    avatar: ""
   },
   {
     author: "Javier Ruiz",
     stars: 5,
     quote: "Excelente servicio, muy atentos y preocupados por encontrar la mejor opción para mí.",
-    avatar: "" 
+    avatar: ""
   },
   {
     author: "Carolina Soto",
     stars: 5,
     quote: "El proceso fue rapidísimo y muy claro. Me ahorraron mucho tiempo y dinero.",
-    avatar: "" 
+    avatar: ""
   },
   {
     author: "Miguel Torres",
     stars: 5,
     quote: "Tenía dudas sobre mi cobertura y me las aclararon todas. Un servicio de primer nivel.",
-    avatar: "" 
+    avatar: ""
   },
   {
     author: "Valentina Rojas",
@@ -48,7 +48,7 @@ export const testimonialsData = [
   {
     author: "Andrés Silva",
     stars: 5,
-    quote: "Impresionante el nivel de detalle. Revisamos 4 opciones y me explicó la letra chica de cada una.",
+    quote: "Impresionante el nivel de detalle. Revisamos cuatro opciones y me explicó la letra chica de cada una.",
     avatar: ""
   },
   {

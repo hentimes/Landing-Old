@@ -134,8 +134,8 @@
   #casos-exito .page-section-full,
   #casos-exito .container { min-height: auto; display: block; }
   #casos-exito .section__title { margin-top: 0; margin-bottom: 0; }
+  .case-study-section__eyebrow { font-size: 0.95rem; }
   .case-study-section__subtitle { font-size: 0.96rem; line-height: 1.55; }
-  .case-study-microtitle { font-size: 1.02rem; margin-bottom: 10px; }
   .case-study-layout { grid-template-columns: 1fr; }
   .case-study-right { display: none; }
   .case-study-slider { min-height: 0; }

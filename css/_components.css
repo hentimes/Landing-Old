@@ -61,6 +61,17 @@
   background-color: var(--color-white);
   color: var(--color-primary);
 }
+.button:focus-visible,
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.38);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.12);
+}
 .button--large {
   padding: 16px 32px;
   font-size: 1.1rem;
@@ -123,31 +134,30 @@
 /* --- Slider de Casos de Éxito --- */
 .case-study-section__header {
     max-width: var(--container-width);
-    margin: 0 auto clamp(24px, 3vw, 40px);
+    margin: 0 auto clamp(28px, 3vw, 40px);
     padding: 0 var(--spacing-lg);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     text-align: center;
 }
+.case-study-section__eyebrow { display: none; }
 .case-study-section__header .section__title {
     margin: 0;
-    order: 1;
     width: 100%;
     font-size: clamp(2.5rem, 4vw, 3.35rem);
     line-height: 1.08;
     letter-spacing: -0.02em;
 }
 .case-study-section__subtitle {
-    order: 2;
     width: 100%;
-    max-width: 760px;
+    max-width: 700px;
     margin: 0 auto;
     color: var(--color-text-light);
-    font-size: 1.03rem;
-    line-height: 1.65;
+    font-size: 1rem;
+    line-height: 1.62;
 }
 .case-study-layout {
     display: grid;
@@ -160,13 +170,6 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-}
-.case-study-microtitle {
-    margin: 0 0 12px;
-    color: var(--color-primary);
-    font-size: 1.18rem;
-    font-weight: 700;
-    line-height: 1.25;
 }
 .case-study-right {
     display: flex;
@@ -204,22 +207,23 @@
     width: 100%;
     max-width: 900px;
     margin: 0 auto;
-    min-height: 520px;
+    min-height: 540px;
 }
 
 .case-study-panel {
     max-width: 100%;
     margin: 0 auto;
-    background: transparent;
-    border: 1px solid rgba(226, 232, 240, 0.9);
-    border-radius: 18px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.68) 0%, rgba(248, 251, 255, 0.74) 100%);
+    border: 1px solid rgba(226, 232, 240, 0.72);
+    border-radius: 24px;
     box-shadow: none;
-    padding: clamp(18px, 3vw, 28px);
-    height: 520px;
+    padding: clamp(22px, 3vw, 30px);
+    height: 540px;
     display: grid;
     align-content: start;
     grid-template-rows: auto auto 1fr;
     overflow: visible;
+    backdrop-filter: blur(8px);
 }
 .case-study-panel__top {
     display: flex;
@@ -227,6 +231,8 @@
     justify-content: space-between;
     gap: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.7);
 }
 .case-title {
     display: grid;
@@ -297,14 +303,14 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: 20px;
 }
 .case-study-panel__col {
     padding: var(--spacing-lg);
-    border-radius: var(--radius-md);
+    border-radius: 18px;
     color: var(--color-text);
-    background: rgba(248, 250, 252, 0.7);
-    border: 1px solid rgba(226, 232, 240, 0.9);
+    background: rgba(248, 250, 252, 0.42);
+    border: 1px solid rgba(226, 232, 240, 0.78);
     box-shadow: none;
 }
 .case-study-panel__col--before { border-left: none; }
@@ -470,7 +476,7 @@
     flex-wrap: nowrap;
     justify-content: center;
     gap: 10px;
-    margin: calc(var(--spacing-lg) + 4px) auto 0;
+    margin: calc(var(--spacing-lg) + 6px) auto 0;
     padding: 0 var(--spacing-lg) 6px;
     max-width: 900px;
     overflow-x: auto;
@@ -515,12 +521,13 @@
 }
 .case-study-tabs-desc {
     max-width: 900px;
-    margin: 14px auto 0;
+    margin: 16px auto 0;
     padding: 0 var(--spacing-lg);
     min-height: 64px;
     text-align: center;
     color: var(--color-text-light);
     line-height: 1.5;
+    text-wrap: balance;
 }
 .logo-fader__img {
     height: 28px;
@@ -1844,3 +1851,16 @@
 @keyframes exit-to-right   { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
 @keyframes enter-from-right{ from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes exit-to-left    { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
+.case-study-microtitle {
+    display: block;
+    position: static;
+    width: 100%;
+    max-width: none;
+    margin: 0 0 14px;
+    align-self: flex-start;
+    color: var(--color-primary);
+    font-size: 1.02rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+}

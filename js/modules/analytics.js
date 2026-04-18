@@ -1,55 +1,88 @@
-// ===================================
-// Módulo de Analíticas y Seguimiento (Meta Pixel & GA4)
-// ===================================
+// ===========================================
+// Módulo de analíticas y seguimiento (v1.1)
+// ===========================================
+
+/**
+ * Configuración de IDs:
+ * Reemplaza los valores de abajo por tus IDs reales para activar el seguimiento.
+ */
+const TRACKING_IDS = {
+    META_PIXEL: 'TU_PIXEL_ID_AQUI',
+    GA4: 'G-TU_ID_AQUI'
+};
 
 export function initAnalytics() {
-    // Aquí puedes pegar tu ID de Pixel de Facebook/Meta
-    const META_PIXEL_ID = 'TU_PIXEL_ID_AQUI'; 
-    
-    // Aquí puedes pegar tu ID de Google Analytics (GA4) o Tag Manager (GTM)
-    const GOOGLE_ANALYTICS_ID = 'G-TU_ID_AQUI'; 
+    console.log('PlanesPro Analytics: Inicializando módulo...');
 
-    console.log("📊 Sistema de analíticas inicializado en modo Standby.");
-    
-    /* 
-    ========================================================
-    INSTRUCCIONES PARA ACTIVAR:
-    Una vez obtengas tus IDs reales, quita las barras de comentario
-    del código de abajo para que los scripts empiecen a rastrear 
-    las visitas de manera nativa sin ralentizar la página.
-    ========================================================
-    */
-
-    /*
-    // 1. INICIALIZADOR DE META PIXEL
-    if(META_PIXEL_ID !== 'TU_PIXEL_ID_AQUI') {
-        !function(f,b,e,v,n,t,s)
-        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)}(window, document,'script',
-        'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', META_PIXEL_ID);
-        fbq('track', 'PageView');
+    // 1. Inicialización de Meta Pixel
+    if (TRACKING_IDS.META_PIXEL && TRACKING_IDS.META_PIXEL !== 'TU_PIXEL_ID_AQUI') {
+        initMetaPixel(TRACKING_IDS.META_PIXEL);
     }
 
-    // 2. INICIALIZADOR DE GOOGLE ANALYTICS (GA4)
-    if(GOOGLE_ANALYTICS_ID !== 'G-TU_ID_AQUI') {
-        const gaScript = document.createElement('script');
-        gaScript.async = true;
-        gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}`;
-        document.head.appendChild(gaScript);
-
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', GOOGLE_ANALYTICS_ID);
+    // 2. Inicialización de Google Analytics 4
+    if (TRACKING_IDS.GA4 && TRACKING_IDS.GA4 !== 'G-TU_ID_AQUI') {
+        initGA4(TRACKING_IDS.GA4);
     }
-    */
+
+    // 3. Registro de eventos globales
+    setupEventTracking();
 }
 
-// Puedes expandir exportando funciones específicas como:
-// export function trackLead() { fbq('track', 'Lead'); }
-// export function trackClickEbook() { fbq('track', 'AddToCart'); }
+function initMetaPixel(id) {
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    
+    fbq('init', id);
+    fbq('track', 'PageView');
+    console.log('PlanesPro Analytics: Meta Pixel activo.');
+}
+
+function initGA4(id) {
+    const gaScript = document.createElement('script');
+    gaScript.async = true;
+    gaScript.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
+    document.head.appendChild(gaScript);
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(){ dataLayer.push(arguments); };
+    gtag('js', new Date());
+    gtag('config', id);
+    console.log('PlanesPro Analytics: GA4 activo.');
+}
+
+/**
+ * Configura el seguimiento de clics y conversiones relevantes.
+ */
+function setupEventTracking() {
+    document.addEventListener('click', (e) => {
+        const target = e.target.closest('a, button');
+        if (!target) return;
+
+        // Clic en WhatsApp
+        if (target.href && target.href.includes('wa.me')) {
+            trackEvent('Contact', { method: 'WhatsApp', location: target.id || 'floating' });
+        }
+
+        // Clic en CTA de Formulario
+        if (target.hasAttribute('data-modal-trigger') || target.id === 'cta_hero') {
+            trackEvent('LeadStarted', { label: target.textContent.trim() });
+        }
+    });
+}
+
+/**
+ * Función auxiliar para enviar eventos a todas las plataformas activas.
+ */
+export function trackEvent(name, params = {}) {
+    console.log(`PlanesPro Event: ${name}`, params);
+    
+    if (window.fbq) fbq('trackCustom', name, params);
+    if (window.gtag) gtag('event', name, params);
+}
+

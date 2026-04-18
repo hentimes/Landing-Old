@@ -1,7 +1,6 @@
 // Carga los módulos HTML de forma asíncrona.
 
 export async function loadModules() {
-    // CORRECCIÓN: Se añaden las rutas a los nuevos modales flotantes.
     const modulePaths = {
         'form-modal-placeholder': './formulario/templates/_form-modal.html',
         'welcome-modal-placeholder': './formulario/templates/_welcome-modal.html',
@@ -17,7 +16,6 @@ export async function loadModules() {
             const html = await response.text();
             const placeholder = document.getElementById(placeholderId);
             if (placeholder) {
-                // Reemplazamos el placeholder con el contenido cargado
                 placeholder.outerHTML = html;
             } else {
                 console.warn(`El placeholder con id "${placeholderId}" no fue encontrado.`);
@@ -30,9 +28,9 @@ export async function loadModules() {
 
     try {
         await Promise.all(modulePromises);
-        console.log("Módulos del formulario cargados correctamente.");
+        console.log('Módulos del formulario cargados correctamente.');
     } catch (error) {
         document.body.innerHTML = '<p style="color: black; text-align: center; padding: 2rem;">Error crítico al cargar los componentes del formulario. Por favor, recargue la página.</p>';
-        throw new Error("La carga de módulos del formulario falló.");
+        throw new Error('La carga de módulos del formulario falló.');
     }
 }

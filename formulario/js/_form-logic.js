@@ -83,9 +83,9 @@ export function loadProgress() {
                 }
             }
         }
-        document.getElementById('sistema_actual')?.dispatchEvent(new Event('change'));
-        document.getElementById('comuna')?.dispatchEvent(new Event('change'));
-        document.querySelector('input[name="evaluar_afp"]:checked')?.dispatchEvent(new Event('change'));
+        document.getElementById('sistema_actual').dispatchEvent(new Event('change'));
+        document.getElementById('comuna').dispatchEvent(new Event('change'));
+        document.querySelector('input[name="evaluar_afp"]:checked').dispatchEvent(new Event('change'));
     } catch (error) {
         console.error("Error al cargar el progreso:", error);
         localStorage.removeItem(LOCAL_STORAGE_KEY);
@@ -131,7 +131,7 @@ export function initModals() {
             const buttonId = button.id;
             switch (buttonId) {
                 case 'continue-btn':
-                    if (document.getElementById('consent-checkbox')?.checked) {
+                    if (document.getElementById('consent-checkbox').checked) {
                         closeModal('welcomeModal');
                         openModal('formModal');
                         setFormStepNum(0);
@@ -177,7 +177,7 @@ export function initModals() {
     }
 
     window.addEventListener('popstate', (event) => {
-      if (document.getElementById('formModal')?.classList.contains('is-visible') && event.state && event.state.inForm) {
+      if (document.getElementById('formModal').classList.contains('is-visible') && event.state && event.state.inForm) {
         openModal('exitConfirmModal');
         history.pushState({ inForm: true }, 'Formulario');
       }
@@ -208,7 +208,7 @@ export function initStepNavigation() {
                 }
             } else {
                 const firstError = currentStep.querySelector('.input-error');
-                firstError?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
         if (e.target.matches('.prev-btn')) {
@@ -225,10 +225,10 @@ export function handleFieldInteraction(e) {
     const field = e.target;
     const formGroup = field.closest('.form-group');
     if (e.type === 'focusout') {
-        formGroup?.classList.add('is-interacted');
+        formGroup.classList.add('is-interacted');
         validateField(field);
     } else if (e.type === 'input' || e.type === 'change') {
-        if (formGroup?.classList.contains('is-interacted')) {
+        if (formGroup.classList.contains('is-interacted')) {
             validateField(field);
         }
     }
@@ -277,7 +277,7 @@ export function initFormEventListeners() {
     const modalBody = document.querySelector('#formModal .modal-body');
     if (modalBody) {
         modalBody.addEventListener('scroll', () => {
-            document.querySelector('#formModal .modal-header')?.classList.toggle('scrolled', modalBody.scrollTop > 0);
+            document.querySelector('#formModal .modal-header').classList.toggle('scrolled', modalBody.scrollTop > 0);
         });
     }
 
@@ -370,7 +370,7 @@ function initComunaAutocomplete() {
                 comunaInput.value = comuna;
                 if (regionInput) regionInput.value = comunasRegiones[comuna] || '';
                 const formGroup = comunaInput.closest('.form-group');
-                formGroup?.classList.add('is-interacted');
+                formGroup.classList.add('is-interacted');
                 validateField(comunaInput);
                 hideSuggestions();
                 updateActionButtonState();
@@ -393,7 +393,7 @@ function initComunaAutocomplete() {
         setTimeout(() => {
             hideSuggestions();
             const formGroup = comunaInput.closest('.form-group');
-            formGroup?.classList.add('is-interacted');
+            formGroup.classList.add('is-interacted');
             validateField(comunaInput);
             updateActionButtonState();
         }, 150);

@@ -59,7 +59,7 @@ function createTestimonialHTML(testimonial, slotIndex) {
                 </div>
             </div>
             <div class="testimonial-card__body">
-                 <p class="testimonial-card__quote">“${testimonial.quote}”</p>
+                 <p class="testimonial-card__quote">"${testimonial.quote}"</p>
                  <p class="testimonial-card__date">${reviewDate}</p>
             </div>
         </div>
@@ -81,7 +81,7 @@ function updateTestimonialCardDOM(cardDOM, newTestimonial) {
     setTimeout(() => {
         if (avatarImg) avatarImg.src = avatarSrc;
         if (authorName) authorName.textContent = formatAuthorName(newTestimonial.author);
-        if (quoteText) quoteText.textContent = `“${newTestimonial.quote}”`;
+        if (quoteText) quoteText.textContent = `"${newTestimonial.quote}"`;
         if (dateEl) dateEl.textContent = generateReviewDate();
 
         if (starsContainer) {

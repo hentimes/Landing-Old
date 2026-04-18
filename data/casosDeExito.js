@@ -63,7 +63,7 @@ export const casosDeExitoData = [
       "Se eligió un plan mejor alineado al uso real, con buena red ambulatoria y beneficios útiles.",
     wins: [
       "Mejor cobertura en especialidades médicas",
-      "Descuentos en prestaciones dentales o farmacia (según uso)",
+      "Descuentos en prestaciones dentales o farmacia según uso",
       "Mayor claridad para entender su plan",
       "Salió de Fonasa para cotizar en Isapre"
     ]
@@ -74,7 +74,7 @@ export const casosDeExitoData = [
     name: "J. Contreras",
     origin: "Fonasa",
     description:
-      "Caso para planificar maternidad/paternidad y asegurar cobertura antes del nacimiento.",
+      "Caso para planificar maternidad y asegurar cobertura antes del nacimiento.",
     leftTitle: "Punto de partida",
     leftBody:
       "Incertidumbre sobre cobertura de controles, parto y costos asociados.",
@@ -175,7 +175,7 @@ export const casosDeExitoData = [
     rightTitle: "Optimización",
     rightBody: "Se definió una estrategia de ingreso y se eligió un plan viable para el caso.",
     wins: [
-      "Ingresar a Isapre con preexistencias (cuando aplica)",
+      "Ingresar a Isapre con preexistencias cuando aplica",
       "Claridad sobre exclusiones y topes",
       "Mejor cobertura en prestaciones clave",
       "Evitar decisiones apresuradas"
