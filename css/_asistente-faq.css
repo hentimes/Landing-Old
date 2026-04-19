@@ -96,12 +96,16 @@
     content: "";
     position: absolute;
     left: 50%;
-    bottom: -2%;
-    width: min(500px, 86%);
-    height: 360px;
+    bottom: -4%;
+    width: min(500px, 82%);
+    height: 560px;
     transform: translateX(-50%);
-    background: none;
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.54) 0%, rgba(255, 255, 255, 0.34) 24%, rgba(255, 255, 255, 0.16) 44%, rgba(255, 255, 255, 0.06) 58%, rgba(255, 255, 255, 0) 76%);
+    opacity: 0.96;
+    animation: asistente-faq-glow 3.2s ease-in-out infinite;
     pointer-events: none;
+    border-radius: 50%;
+    filter: blur(18px);
 }
 
 .asistente-faq__img {
@@ -114,6 +118,21 @@
     object-fit: contain;
     object-position: bottom center;
     filter: none;
+}
+
+@keyframes asistente-faq-glow {
+    0% {
+        opacity: 0.42;
+        transform: translateX(-50%) scale(0.94);
+    }
+    50% {
+        opacity: 0.82;
+        transform: translateX(-50%) scale(1.04);
+    }
+    100% {
+        opacity: 0.42;
+        transform: translateX(-50%) scale(0.94);
+    }
 }
 
 .asistente-faq__list {
@@ -301,7 +320,7 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 24px;
+    gap: 32px;
     padding-top: 6px;
     min-height: 132px;
 }
@@ -335,6 +354,7 @@
 
 .cta-final__actions {
     width: 100%;
+    margin-top: 12px;
 }
 
 .cta-final__actions .button {
@@ -353,6 +373,7 @@
     flex-wrap: wrap;
     gap: 14px;
     max-width: 440px;
+    margin-top: 8px;
 }
 
 .cta-benefit-item {

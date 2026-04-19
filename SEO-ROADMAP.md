@@ -107,7 +107,7 @@ Uso:
 
 - [x] Evaluar `BreadcrumbList`.
 - [x] Evaluar `FAQPage`.
-- [ ] Evaluar `Person` para asesores.
+- [x] Evaluar `Person` para asesores.
 - [ ] Evaluar `Article` o `NewsArticle` en noticias.
 - [ ] Evaluar `Review` / `AggregateRating` si aplica de forma genuina.
 - [x] Revisar consistencia de `Organization`, `WebSite` y `Service`.

@@ -17,6 +17,11 @@ function createModalContent(asesor) {
         </div>
     ` : '';
 
+    const isapreHtml = asesor.isapre ? `
+        <h3 class="asesor-modal__subtitle">Isapre en la que trabaja</h3>
+        <p class="asesor-modal__bio">${asesor.isapre}</p>
+    ` : '';
+
     const socialIcons = {
         linkedin: 'fab fa-linkedin-in',
         x: 'fab fa-twitter',
@@ -49,6 +54,7 @@ function createModalContent(asesor) {
                     <h2 class="asesor-modal__nombre">${asesor.nombre}</h2>
                     <p class="asesor-modal__cargo">${asesor.cargo}</p>
                     <p class="asesor-modal__bio">${asesor.biografia}</p>
+                    ${isapreHtml}
                     <h3 class="asesor-modal__subtitle">Especialidades Clave</h3>
                     <ul class="asesor-modal__especialidades">
                         ${especialidadesHtml}
@@ -146,7 +152,7 @@ function createAsesorCard(asesor) {
     ` : '';
 
     return `
-        <div class="asesor-card" data-asesor-id="${asesor.id}">
+        <div class="asesor-card" id="${asesor.id}" data-asesor-id="${asesor.id}">
             ${premiumRibbonHtml}
 
             <div class="asesor-card__header">
@@ -307,7 +313,7 @@ export function initAsesores() {
  */
 function createNosotrosAsesorCard(asesor) {
     return `
-        <div class="asesor-card" data-asesor-id="${asesor.id}">
+        <div class="asesor-card" id="${asesor.id}" data-asesor-id="${asesor.id}">
             <div class="asesor-card__header">
                 <div class="asesor-card__img-container">
                     <img src="${asesor.foto}" alt="Foto de ${asesor.nombre}" class="asesor-card__img">
