@@ -13,19 +13,19 @@
     <meta property="og:url" content="https://planespro.cl/noticias.html" />
     <meta property="og:locale" content="es_CL" />
     <meta property="og:site_name" content="PlanesPro.cl" />
-    <meta property="og:image" content="https://planespro.cl/assets/ilustraciones/heroimg.webp" />
-    <meta property="og:image:alt" content="Sección de noticias y guías de salud de PlanesPro.cl" />
+    <meta property="og:image" content="https://planespro.cl/assets/ilustraciones/noticias-salud.webp" />
+    <meta property="og:image:alt" content="Noticias de salud en Chile revisadas por PlanesPro.cl" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Noticias y guías de salud | PlanesPro.cl" />
     <meta name="twitter:description" content="Noticias, análisis y guías de PlanesPro.cl sobre Isapres, Fonasa, cobertura y decisiones de salud para elegir mejor tu plan." />
-    <meta name="twitter:image" content="https://planespro.cl/assets/ilustraciones/heroimg.webp" />
-    <meta name="twitter:image:alt" content="Sección de noticias y guías de salud de PlanesPro.cl" />
+    <meta name="twitter:image" content="https://planespro.cl/assets/ilustraciones/noticias-salud.webp" />
+    <meta name="twitter:image:alt" content="Noticias de salud en Chile revisadas por PlanesPro.cl" />
     <title>Noticias y guías de salud | PlanesPro.cl</title>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css?v=20260417_final" />
+    <link rel="stylesheet" href="css/styles.css?v=20260419_noticias_f5" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script type="application/ld+json">
     {
@@ -107,54 +107,55 @@
         <button class="button button--primary nav-mobile__cta" data-modal-trigger="formModal" id="cta_mobile_menu_noticias">Analizar Mi Plan</button>
     </div>
 
-    <main style="padding-top: var(--header-height); min-height: 70vh;">
-        <section class="container page-section">
-            <h1 class="section__title" style="text-align: left; margin-bottom: 1rem;">Análisis y Noticias del Sistema de Salud</h1>
-            <p class="section__subtitle" style="max-width: 760px; margin: 0 0 2.5rem 0;">Revisamos cambios regulatorios, guías prácticas y conceptos clave para entender mejor Fonasa, Isapres y la cobertura de salud en Chile.</p>
-            <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--color-text-dark); margin-bottom: 1.5rem;">Guías y análisis destacados</h2>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 3rem;">
-                
-                <!-- Artículo 1 -->
-                <article class="news-card" style="border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: transform 0.3s ease;">
-                    <div style="height: 200px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                        <img src="assets/ilustraciones/news.webp" alt="Alzas GES" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" decoding="async">
+    <main class="noticias-main">
+        <section class="noticias-hero noticias-hero--compact">
+            <div class="container noticias-hero__grid">
+                <div class="noticias-hero__media" aria-hidden="true">
+                    <img src="assets/ilustraciones/noticias-salud.webp" alt="" class="noticias-hero__image" width="612" height="577" decoding="async" fetchpriority="high">
+                </div>
+                <div class="noticias-hero__content">
+                    <span class="noticias-eyebrow"><i class="fas fa-newspaper"></i> Actualidad de salud en Chile</span>
+                    <h1 class="noticias-hero__title">Noticias para entender mejor tu salud previsional.</h1>
+                    <p class="noticias-hero__subtitle">Seguimos fuentes chilenas y ordenamos la información relevante sobre Isapres, Fonasa, salud y previsión para que puedas decidir con más contexto.</p>
+                    <div class="noticias-hero__meta" aria-label="Frecuencia y cobertura">
+                        <span><i class="fas fa-rotate"></i> Actualización cada 4 horas</span>
+                        <span><i class="fas fa-clock-rotate-left"></i> Histórico preparado para 60 días</span>
                     </div>
-                    <div style="padding: 24px;">
-                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--color-primary); text-transform: uppercase; letter-spacing: 0.5px;">Actualidad</span>
-                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-dark); margin: 12px 0; line-height: 1.3;">Alzas GES 2026: ¿Qué debes hacer frente a los últimos fallos supremos?</h3>
-                        <p style="color: var(--color-text); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Analizamos las resoluciones más recientes sobre los topes de cobro y cómo estas nuevas normativas impactan tus descuentos mensuales...</p>
-                        <a href="https://wa.me/56958785580" class="button button--outline-blue" style="width: 100%; justify-content: center;" target="_blank" rel="noopener noreferrer">Leer Artículo</a>
-                    </div>
-                </article>
-
-                <!-- Artículo 2 -->
-                <article class="news-card" style="border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: transform 0.3s ease;">
-                    <div style="height: 200px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                        <img src="assets/ilustraciones/news1.webp" alt="Migrar de Fonasa a Isapre" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy" decoding="async">
-                    </div>
-                    <div style="padding: 24px;">
-                        <span style="font-size: 0.8rem; font-weight: 700; color: #10B981; text-transform: uppercase; letter-spacing: 0.5px;">Guías Prácticas</span>
-                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-dark); margin: 12px 0; line-height: 1.3;">La Guía para migrar de Fonasa a Isapre (y no perder beneficios)</h3>
-                        <p style="color: var(--color-text); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Una transición segura entre el sistema público y privado requiere entender la declaración de salud y el concepto de preexistencias. Así debes hacerlo.</p>
-                        <a href="https://wa.me/56958785580" class="button button--outline-blue" style="width: 100%; justify-content: center;" target="_blank" rel="noopener noreferrer">Leer Artículo</a>
-                    </div>
-                </article>
-
-                <!-- Artículo 3 -->
-                <article class="news-card" style="border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: transform 0.3s ease;">
-                    <div style="height: 200px; background-color: var(--color-primary-dark); display: flex; align-items: center; justify-content: center; padding: 20px; text-align: center;">
-                        <h3 style="color: white; font-family: var(--font-family-heading); font-size: 1.5rem; line-height: 1.2;">Excesos vs<br> Excedentes</h3>
-                    </div>
-                    <div style="padding: 24px;">
-                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--color-primary); text-transform: uppercase; letter-spacing: 0.5px;">Asesoría Legal</span>
-                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-text-dark); margin: 12px 0; line-height: 1.3;">La Gran Confusión: Diferencia Legal entre Excedentes y Excesos</h3>
-                        <p style="color: var(--color-text); font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px;">Descubre cómo el sistema previsional cataloga tu dinero retenido y qué mecanismos de cobro rápido ha habilitado la Superintendencia.</p>
-                        <a href="https://wa.me/56958785580" class="button button--outline-blue" style="width: 100%; justify-content: center;" target="_blank" rel="noopener noreferrer">Leer Artículo</a>
-                    </div>
-                </article>
-
+                </div>
             </div>
+        </section>
+
+        <section class="container noticias-feed-section" data-news-endpoint="https://ppnews.hentimes.workers.dev/">
+            <div class="noticias-toolbar" aria-label="Filtros de noticias">
+                <div class="noticias-toolbar__copy">
+                    <span class="noticias-eyebrow">Monitor de noticias</span>
+                    <h2>Últimas actualizaciones</h2>
+                </div>
+                <div class="noticias-filter-group" role="tablist" aria-label="Filtrar noticias por tema">
+                    <button type="button" class="noticias-filter is-active" data-news-filter="todo" role="tab" aria-selected="true">Todo</button>
+                    <button type="button" class="noticias-filter" data-news-filter="isapres" role="tab" aria-selected="false">Isapres</button>
+                    <button type="button" class="noticias-filter" data-news-filter="fonasa" role="tab" aria-selected="false">Fonasa/Salud</button>
+                    <button type="button" class="noticias-filter" data-news-filter="afp" role="tab" aria-selected="false">AFP</button>
+                </div>
+            </div>
+
+            <form class="noticias-search" data-news-search role="search" aria-label="Buscar noticias de los últimos 60 días">
+                <label class="noticias-search__field">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <span class="sr-only">Buscar noticias</span>
+                    <input type="search" name="q" placeholder="Busca por alza, excedentes, Fonasa, AFP..." autocomplete="off" data-news-search-input>
+                </label>
+                <button type="submit" class="noticias-search__button">Buscar</button>
+                <button type="button" class="noticias-search__clear" data-news-search-clear>Limpiar</button>
+            </form>
+
+            <div class="noticias-feed-status" data-news-status>Buscando noticias recientes...</div>
+            <div class="noticias-featured" data-news-featured aria-live="polite"></div>
+            <div class="noticias-feed" data-news-feed aria-live="polite"></div>
+            <div class="noticias-load-more-wrap">
+                <button type="button" class="noticias-load-more" data-news-load-more>Cargar más noticias</button>
+            </div>
+
         </section>
     </main>
 
@@ -202,7 +203,7 @@
     <div id="exit-confirm-modal-placeholder"></div>
 
     <a href="https://wa.me/56958785580" class="floating-whatsapp" aria-label="Contactar por WhatsApp" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
-    <script src="js/main.js?v=20260417_final" type="module"></script>
+    <script src="js/main.js?v=20260419_noticias_f5" type="module"></script>
 </body>
 </html>
 

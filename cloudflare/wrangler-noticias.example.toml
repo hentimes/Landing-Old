@@ -1,0 +1,20 @@
+name = "ppnews-worker"
+main = "cloudflare/noticias-worker.js"
+compatibility_date = "2026-04-19"
+
+[triggers]
+crons = ["0 */4 * * *"]
+
+[vars]
+PUBLIC_WORKER_URL = "https://ppnews-worker.hentimes.workers.dev/"
+
+# Configurar como secreto, no como variable pública:
+# wrangler secret put NEWSAPI_KEY
+
+# Crear D1 y reemplazar database_id:
+# wrangler d1 create planespro-noticias
+# wrangler d1 migrations apply planespro-noticias
+[[d1_databases]]
+binding = "DB"
+database_name = "planespro-noticias"
+database_id = "REEMPLAZAR_CON_DATABASE_ID"

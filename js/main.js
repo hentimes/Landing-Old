@@ -21,6 +21,7 @@ import { initAccordion } from './modules/accordion.js'; // Inicializa el acorde�
 import { initAnalytics } from './modules/analytics.js'; // Carga los scripts de analítica.
 import { initHeroTypewriter } from './modules/typewriter.js'; // Efecto tipeado en el eyebrow del hero.
 import { initAsistenteFAQ } from './modules/asistente-faq.js'; // Inicializa el asistente de preguntas frecuentes.
+import { initNoticiasFeed } from './modules/noticias-loader.js'; // Carga noticias desde el Worker de Cloudflare.
 import { loadModules } from '../formulario/js/_module-loader.js'; // Carga el HTML de los modales del formulario.
 import { setElements } from '../formulario/js/_dom-elements.js'; // Asigna las referencias a los elementos del DOM.
 import {
@@ -63,6 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initAsesores();
     initNosotrosAsesores();
     initAsistenteFAQ();
+    initNoticiasFeed();
     console.log('Componentes de la página principal inicializados.');
 
     loadModules()

@@ -64,14 +64,12 @@ main {
 }
 
 #casos-exito .page-section-full {
-    min-height: calc(100vh - var(--header-height) - 24px);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 #casos-exito .container {
-    flex: 1;
     display: flex;
     align-items: center;
 }
@@ -698,8 +696,8 @@ main {
 }
 
 .proceso__media--person::before {
-    inset: -26%;
-    opacity: 0.75;
+    inset: -10%;
+    opacity: 0.58;
 }
 
 .proceso__person {
@@ -731,12 +729,12 @@ main {
 .proceso__media::before {
     content: "";
     position: absolute;
-    inset: -18%;
+    inset: -8%;
     background:
-        radial-gradient(circle at 40% 35%, rgba(37, 99, 235, 0.22) 0%, transparent 62%),
-        radial-gradient(circle at 70% 70%, rgba(16, 185, 129, 0.16) 0%, transparent 60%);
-    filter: blur(22px);
-    opacity: 0.65;
+        radial-gradient(circle at 40% 35%, rgba(37, 99, 235, 0.15) 0%, transparent 56%),
+        radial-gradient(circle at 70% 70%, rgba(16, 185, 129, 0.10) 0%, transparent 58%);
+    filter: blur(16px);
+    opacity: 0.56;
     border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
     animation: blob-morph 14s ease-in-out infinite;
     z-index: 0;

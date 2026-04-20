@@ -1,97 +1,215 @@
 /* ===================================
    _nosotros-page.css
-   Estilos específicos para la página "Nosotros" (Versión Final Definitiva)
+   Estilos específicos para la página "Nosotros"
    =================================== */
 
-/* --- AJUSTE GLOBAL PARA ESTA PÁGINA --- */
-/* Añadimos el padding superior directamente al 'main' en desktop para evitar el corte del header */
 @media (min-width: 768px) {
     .page-nosotros main {
-        padding-top: 30px;
+        padding-top: 36px;
     }
 }
 
-/* Reducción del espaciado entre secciones */
 .page-nosotros .screen {
-    padding-top: var(--spacing-md);
-    padding-bottom: var(--spacing-lg);
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
 }
 
-/* --- 1. Hero Section --- */
+.page-nosotros main > .screen:first-child {
+    padding-bottom: var(--spacing-md);
+}
+
+.page-nosotros main > .screen:first-child + .screen {
+    padding-top: var(--spacing-md);
+}
+
+.page-nosotros .section__title {
+    max-width: 980px;
+    margin-left: auto;
+    margin-right: auto;
+    letter-spacing: -0.025em;
+}
+
+/* --- 1. Hero Institucional --- */
 .hero-nosotros__container {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--spacing-md);
+    gap: var(--spacing-xl);
     align-items: center;
     text-align: center;
-    /* En móvil, este padding crea el espacio necesario bajo el header fijo */
     padding-top: 80px;
 }
 
 .hero-nosotros__text-content {
-    order: 2; /* Texto va después de la imagen en móvil */
-}
-
-.hero-nosotros__illustration-content {
-    order: 1; /* Imagen va primero en móvil */
+    order: 2;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
 }
 
-.hero-nosotros__illustration-content .hero__illustration {
-    max-width: 300px;
-}
-
-/* Ajustes de los títulos */
 .hero-nosotros__text-content .hero__title {
-    font-size: 1.9rem; /* Tamaño para el H1 */
-    margin-bottom: var(--spacing-sm);
+    max-width: 720px;
+    margin: 0 auto var(--spacing-lg);
+    font-size: clamp(2.2rem, 4.2vw, 3.65rem);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
 }
 
 .hero-nosotros__text-content .hero__subtitle {
-    font-size: 1.1rem; /* Tamaño para el H2 (subtítulo) */
+    max-width: 720px;
+    margin: 0 auto;
+    font-size: clamp(1rem, 1.5vw, 1.14rem);
     font-weight: 400;
     color: var(--color-text-light);
-    line-height: 1.6;
+    line-height: 1.68;
 }
 
+.hero-nosotros__trust-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-top: var(--spacing-md);
+    max-width: 620px;
+}
 
-/* --- 2. Sección de Pilares --- */
+.hero-nosotros__trust-list span {
+    flex: 0 0 auto;
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border: 1px solid rgba(37, 99, 235, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--color-text-dark);
+    font-size: 0.82rem;
+    font-weight: 700;
+    box-shadow: var(--shadow-sm);
+}
+
+.hero-nosotros__trust-list i {
+    color: var(--color-primary);
+}
+
+.hero-nosotros__illustration-content {
+    order: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-nosotros__image-card {
+    position: relative;
+    width: min(100%, 430px);
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+    isolation: isolate;
+}
+
+.hero-nosotros__image-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 4%;
+    background:
+        radial-gradient(circle at 42% 34%, rgba(37, 99, 235, 0.13) 0%, transparent 58%),
+        radial-gradient(circle at 66% 68%, rgba(16, 185, 129, 0.10) 0%, transparent 60%);
+    filter: blur(18px);
+    opacity: 0.75;
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.hero-nosotros__illustration-content .hero__illustration {
+    position: relative;
+    z-index: 1;
+    max-width: min(100%, 390px);
+    filter: drop-shadow(0 18px 34px rgba(15, 23, 42, 0.12));
+}
+
+/* --- 2. Forma de Asesorar --- */
 .pilares__grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--spacing-lg);
-    margin-top: var(--spacing-md);
+    margin-top: var(--spacing-xl);
 }
 
 .pilar-card {
-    text-align: center;
-    padding: var(--spacing-lg);
-    background-color: var(--color-white);
+    position: relative;
+    min-height: 100%;
+    text-align: left;
+    padding: 0;
+    background: rgba(255, 255, 255, 0.92);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-border);
+    box-shadow: none;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    overflow: hidden;
+}
+
+.pilar-card::before {
+    content: none;
+}
+
+.pilar-card__header {
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    background: linear-gradient(180deg, #4f93ee 0%, #2f78df 100%);
 }
 
 .pilar-card__icon {
-    font-size: 2.5rem;
+    position: relative;
+    flex: 0 0 36px;
+    width: 36px;
+    height: 36px;
+    display: block;
+    margin: 0;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.92);
     color: var(--color-primary);
-    margin-bottom: var(--spacing-md);
+    font-size: 0.95rem;
+    line-height: 1;
+    text-align: center;
+}
+
+.pilar-card__icon::before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    line-height: 1;
+    transform: translate(-50%, -50%);
 }
 
 .pilar-card__title {
-    font-size: 1.25rem;
-    color: var(--color-text-dark);
-    margin-bottom: var(--spacing-sm);
+    margin: 0;
+    color: var(--color-white);
+    font-size: 1rem;
+    line-height: 1.25;
 }
 
 .pilar-card__text {
     color: var(--color-text-light);
-    line-height: 1.6;
+    line-height: 1.62;
     margin: 0;
+    padding: 16px 18px 18px;
 }
 
-/* --- 3. Sección de Ética Profesional --- */
+/* --- 3. Ética Profesional --- */
+.etica-section {
+    position: relative;
+}
+
 .insignia-container {
     text-align: center;
     margin-bottom: var(--spacing-xl);
@@ -100,13 +218,14 @@
 .insignia-etica {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    padding: 12px 24px;
-    border-radius: var(--radius-md);
+    gap: 10px;
+    background: rgba(37, 99, 235, 0.10);
+    color: var(--color-primary-dark);
+    padding: 10px 18px;
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    border-radius: 999px;
     font-weight: var(--font-weight-bold);
-    font-size: 1rem;
+    font-size: 0.98rem;
 }
 
 .etica__grid {
@@ -115,10 +234,19 @@
     gap: var(--spacing-xl);
 }
 
-.etica__columna h4 {
-    font-size: 1.2rem;
-    margin-bottom: var(--spacing-md);
+.etica__columna {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.etica__columna h3 {
     color: var(--color-text-dark);
+    font-size: clamp(1.35rem, 2vw, 1.75rem);
+    line-height: 1.15;
+    margin-bottom: var(--spacing-md);
 }
 
 .etica__columna p {
@@ -126,12 +254,6 @@
     color: var(--color-text);
 }
 
-.etica__columna .benefits-accordion .accordion-item__header h4 {
-    font-size: 1.1rem;
-    color: var(--color-secondary);
-}
-
-/* --- Estilos para la lista de riesgos en la sección de Ética --- */
 .riesgos-lista {
     list-style: none;
     padding: 0;
@@ -142,74 +264,185 @@
 }
 
 .riesgo-item {
-    display: flex;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 40px 1fr;
     gap: 12px;
-    line-height: 1.6;
+    align-items: start;
+    line-height: 1.55;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    background: rgba(248, 251, 255, 0.92);
+    border: 1px solid rgba(226, 232, 240, 0.86);
 }
 
 .riesgo-item i {
-    font-size: 1.2rem;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 14px;
+    background: rgba(37, 99, 235, 0.10);
     color: var(--color-primary);
-    margin-top: 4px;
-    width: 20px;
-    text-align: center;
+    font-size: 1.05rem;
 }
 
 .riesgo-item strong {
     color: var(--color-text-dark);
 }
 
-/* --- 4. Sección Conoce al Equipo --- */
+.etica__columna .benefits-accordion {
+    margin-top: var(--spacing-lg) !important;
+}
+
+.etica__columna .accordion-item {
+    border-radius: 18px;
+    border: 1px solid rgba(226, 232, 240, 0.92);
+    background: rgba(248, 251, 255, 0.95);
+    box-shadow: none;
+}
+
+.etica__columna .accordion-item__header h3 {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.35;
+}
+
+.etica__columna .accordion-item__content p {
+    font-size: 0.95rem;
+}
+
+/* --- 4. Equipo --- */
+.equipo-section .section__subtitle {
+    color: var(--color-text-light);
+    line-height: 1.65;
+}
+
 .equipo__grid {
     display: flex;
-    flex-direction: column; /* Apilados en móvil */
+    flex-direction: column;
     align-items: center;
     gap: var(--spacing-lg);
 }
 
-/* --- Media Queries para TABLET Y ESCRITORIO --- */
+.equipo-section .asesor-card {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.96));
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.07);
+    overflow: hidden;
+}
+
+.equipo-section .asesor-card__header {
+    height: 118px;
+    background:
+        radial-gradient(circle at 22% 25%, rgba(255, 255, 255, 0.18) 0%, transparent 32%),
+        linear-gradient(135deg, #1764ea 0%, #0f4fbf 100%);
+}
+
+.equipo-section .asesor-card__img-container {
+    top: 46px;
+    width: 126px;
+    height: 126px;
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.16);
+}
+
+.equipo-section .asesor-card__info {
+    padding-top: 78px;
+}
+
+.equipo-section .asesor-card__cargo {
+    display: inline-flex;
+    align-self: center;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.08);
+    color: var(--color-primary-dark);
+    font-weight: 700;
+}
+
+.equipo-section .asesor-card__especialidades li {
+    align-items: flex-start;
+}
+
+.equipo-section .asesor-card__cta {
+    border-radius: 14px;
+    min-height: 46px;
+}
+
+.equipo-section .button {
+    box-shadow: 0 16px 32px rgba(37, 99, 235, 0.18);
+}
+
+/* --- Media Queries --- */
 @media (min-width: 768px) {
     .hero-nosotros__container {
-        grid-template-columns: 1fr 1fr;
-        gap: var(--spacing-xl);
+        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+        gap: clamp(32px, 5vw, 72px);
         text-align: left;
-        padding-top: 0; /* Reseteamos el padding porque ahora lo controla el 'main' */
-        min-height: 400px;
+        padding-top: 0;
+        min-height: 430px;
+        align-items: stretch;
     }
-    
+
     .hero-nosotros__text-content {
         order: 1;
+        align-self: center;
+        min-height: 100%;
+        padding-top: 44px;
+        box-sizing: border-box;
     }
-     .hero-nosotros__illustration-content {
+
+    .hero-nosotros__text-content .hero-nosotros__trust-list {
+        margin-top: var(--spacing-lg);
+        padding-top: 0;
+    }
+
+    .hero-nosotros__text-content .hero__title,
+    .hero-nosotros__text-content .hero__subtitle {
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .hero-nosotros__trust-list {
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        max-width: 720px;
+    }
+
+    .hero-nosotros__trust-list span {
+        flex: 0 0 auto;
+    }
+
+    .hero-nosotros__illustration-content {
         order: 2;
-        align-self: center; /* ¡Alineación corregida! */
-    }
-    .hero-nosotros__illustration-content .hero__illustration {
-        max-width: 400px;
+        align-self: stretch;
+        justify-content: center;
     }
 
     .pilares__grid {
         grid-template-columns: repeat(3, 1fr);
-        margin-top: var(--spacing-xl);
     }
 
     .etica__grid {
-        grid-template-columns: 1fr 1fr;
-        gap: var(--spacing-xxl);
+        grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+        gap: var(--spacing-xl);
+        align-items: start;
     }
 
     .equipo__grid {
-        flex-direction: row; /* En línea para desktop */
+        flex-direction: row;
         justify-content: center;
     }
 }
 
 @media (min-width: 992px) {
-    .hero-nosotros__container {
-         grid-template-columns: 60% 40%;
+    .hero-nosotros__image-card {
+        width: min(100%, 767px);
+        margin-top: -22px;
     }
-    .insignia-etica {
-        font-size: 1.1rem;
+
+    .hero-nosotros__illustration-content .hero__illustration {
+        max-width: min(100%, 689px);
     }
 }
