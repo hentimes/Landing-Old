@@ -26,7 +26,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/styles.css?v=20260417_final" />
+    <link rel="stylesheet" href="css/styles.css?v=20260420_refinement" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script type="application/ld+json" id="ebook-jsonld">
     {
@@ -74,7 +74,7 @@
             </nav>
 
             <div class="header__actions">
-                <a class="button button--primary header__cta" href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer">Comprar Ahora</a>
+                <a class="button button--coral header__cta" href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer" data-track="PurchaseInterest">Comprar Ahora</a>
                 <button class="header__nav-toggle" id="nav-toggle" aria-label="Abrir menú" aria-controls="nav-mobile" aria-expanded="false">
                     <span></span>
                     <span></span>
@@ -90,30 +90,154 @@
         <a href="noticias.html" class="nav-mobile__link">Noticias</a>
         <a href="asesores.html" class="nav-mobile__link">Nuestros Asesores</a>
         <a href="ebook.html" class="nav-mobile__link nav-mobile__link--active">E-book</a>
-        <a class="button button--primary nav-mobile__cta" href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer">Comprar Ahora</a>
+        <a class="button button--coral nav-mobile__cta" href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer" data-track="PurchaseInterest">Comprar Ahora</a>
     </div>
 
     <main class="ebook-page-main">
         <section class="ebook-hero">
             <div class="container ebook-hero__container">
                 <div class="ebook-hero__copy">
-                    <span class="ebook-hero__eyebrow">Para técnicos extranjeros que cotizaron en Chile</span>
-                    <h1><span>Retiro de</span><span>Fondos AFP</span></h1>
-                    <h2 class="ebook-hero__subtitle">Haz el proceso tú mismo, evita pagar de más y avanza con una ruta clara.</h2>
-                    <p class="ebook-hero__lead">Una guía práctica para entender si tu caso tiene base, ordenar tu expediente y reducir errores antes de pagar comisiones innecesarias.</p>
-                    <div class="ebook-hero__bullets">
-                        <span>Entiende requisitos y documentos clave</span>
-                        <span>Ordena el trámite paso a paso</span>
-                        <span>Reduce dependencia de terceros</span>
+                    <h1 class="ebook-hero__animated-title">
+                        <span class="typewriter-text">Retiro de Fondos AFP</span>
+                        <span id="rotating-subtitle" class="ebook-hero__subtitle fade-in-subtitle">Para técnicos extranjeros</span>
+                    </h1>
+                    <p class="ebook-hero__lead" style="max-width: 85ch;">Una guía práctica para entender si tu caso tiene base, ordenar tu expediente y reducir errores antes de pagar comisiones innecesarias.</p>
+
+                    <!-- Nuevo Sistema de Conversión: Tarjetas de Comparación de Alto Impacto -->
+                    <!-- Nuevo Sistema de Beneficios: Badges + Grilla de Impacto -->
+                    <p class="ebook-hero__subheadline fade-in-up">
+                        Acceso inmediato &bull; Formato digital &bull; Consulta cuando lo necesites
+                    </p>
+
+                    <div class="hero-benefits-grid fade-in-up">
+                        <div class="benefit-card">
+                            <div class="benefit-card__icon"><i class="fas fa-check" aria-hidden="true"></i></div>
+                            <div class="benefit-card__content">
+                                <strong>Entiende los requisitos clave</strong>
+                                <p>Conoce mejor la lógica del trámite y la documentación más importante.</p>
+                            </div>
+                        </div>
+                        <div class="benefit-card">
+                            <div class="benefit-card__icon"><i class="fas fa-check" aria-hidden="true"></i></div>
+                            <div class="benefit-card__content">
+                                <strong>Ordena tu proceso</strong>
+                                <p>Reduce improvisaciones y evita perder tiempo con una ruta más clara.</p>
+                            </div>
+                        </div>
+                        <div class="benefit-card">
+                            <div class="benefit-card__icon"><i class="fas fa-check" aria-hidden="true"></i></div>
+                            <div class="benefit-card__content">
+                                <strong>Evita errores costosos</strong>
+                                <p>Identifica antes los fallos que suelen retrasar o debilitar un caso.</p>
+                            </div>
+                        </div>
+                        <div class="benefit-card">
+                            <div class="benefit-card__icon"><i class="fas fa-check" aria-hidden="true"></i></div>
+                            <div class="benefit-card__content">
+                                <strong>Gasta menos en terceros</strong>
+                                <p>Infórmate primero y decide con más criterio antes de pagar asesorías caras.</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="ebook-hero__actions" id="comprar">
-                        <a href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer" class="button button--primary button--large ebook-hero__cta-main">Comprar por <span data-ebook-price></span></a>
-                        <a href="#incluye" class="button button--outline-blue button--large">Ver contenido</a>
+
+                    <!-- Bloque de Conversión y Comparación de Costos -->
+                    <div class="hero-action-group fade-in-up">
+                        <div class="hero-buttons-row">
+                            <a href="#precios" class="button button--secondary">Quiero acceder a la guía</a>
+                            <a href="#toc" class="button button--secondary">Ver qué incluye</a>
+                        </div>
+
+                        <div class="hero-comparison-card">
+                            <div class="comparison-card__header">
+                                <div class="comparison-card__title-box">
+                                    <h4 class="comparison-card__title">¿Cuánto podrías gastar si delegas todo desde el comienzo?</h4>
+                                    <p class="comparison-card__subtitle">Muchos pagan montos altos antes de entender su situación. Esta guía te ayuda a dar el primer paso con claridad y a un costo mínimo.</p>
+                                </div>
+                                <span class="comparison-card__badge">Compara antes de pagar</span>
+                            </div>
+                            
+                            <div class="comparison-cols">
+                                <div class="comparison-col">
+                                    <span class="comparison-col__label">GESTORES / ASESORES</span>
+                                    <strong class="comparison-col__value" data-count-to="20" data-count-type="percent">0%</strong>
+                                    <p class="comparison-col__desc">En muchos casos cobran comisión sobre el monto recuperado o tarifas de acompañamiento.</p>
+                                </div>
+                                <div class="comparison-col">
+                                    <span class="comparison-col__label">ABOGADOS</span>
+                                    <strong class="comparison-col__value" data-count-to="500000" data-count-type="currency">$0</strong>
+                                    <p class="comparison-col__desc">El costo sube con la revisión estratégica y muchas veces no es necesario.</p>
+                                </div>
+                                <div class="comparison-col comparison-col--featured">
+                                    <span class="comparison-col__label">ESTE E-BOOK</span>
+                                    <strong class="comparison-col__value" data-count-from="500000" data-count-to="24990" data-count-type="currency">$500.000</strong>
+                                    <p class="comparison-col__desc">Una forma más económica de entender tu caso y decidir mejor antes de pagar de más.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="savings-banner">
+                                <div class="savings-banner__icon"><i class="fas fa-dollar-sign" aria-hidden="true"></i></div>
+                                <div class="savings-banner__text">
+                                    <span>Ahorro estimado promedio con la guía</span>
+                                    <strong>Entre $150.000 a más de $5.000.000 dependiendo de tu monto a retirar</strong>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <p class="ebook-hero__microcopy">Sin promesas mágicas. Sin humo. Con una ruta concreta para entender mejor tu caso y actuar con más fundamento.</p>
                 </div>
+
                 <div class="ebook-hero__media">
-                    <img src="assets/ilustraciones/ebook-retiro-afp.webp" alt="Portada del ebook Retiro de Fondos AFP" class="ebook-hero__image" fetchpriority="high" decoding="async">
+                    <div class="ebook-product-card fade-in-up">
+                        <div class="product-card__header">
+                            <img src="assets/ilustraciones/ebook-retiro-afp.webp" alt="Portada del ebook Retiro de Fondos AFP" class="ebook-hero__image" fetchpriority="high" decoding="async" width="393" height="334">
+                        </div>
+                        <div class="product-card__content">
+                            <span class="product-card__badge">PRODUCTO DIGITAL</span>
+                            <h3 class="product-card__title">Una guía para entender mejor tu caso antes de gastar de más</h3>
+                            <p class="product-card__desc">Infórmate a tu ritmo y usa esta guía para decidir con seguridad antes de pagar asesorías costosas.</p>
+                            
+                            <div class="product-step-grid">
+                                <div class="step-item">
+                                    <span class="step-number">1</span>
+                                    <span class="step-text">Paso a paso más claro</span>
+                                </div>
+                                <div class="step-item">
+                                    <span class="step-number">2</span>
+                                    <span class="step-text">Menos errores evitables</span>
+                                </div>
+                                <div class="step-item">
+                                    <span class="step-number">3</span>
+                                    <span class="step-text">Mayor control del proceso</span>
+                                </div>
+                                <div class="step-item">
+                                    <span class="step-number">4</span>
+                                    <span class="step-text">Mejor relación costo-beneficio</span>
+                                </div>
+                            </div>
+                            
+                            <a href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer" class="button button--coral product-card__cta" data-track="PurchaseInterest">Comprar ebook ahora</a>
+                            
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Cinta de Autoridad: Carrusel de AFPs (Fuera del contenedor flex para ocupar todo el ancho) -->
+            <div class="container">
+                <div class="afp-marquee-group fade-in-up">
+                    <p class="section-logos__title"><strong>Te asesoramos en todas las AFP</strong></p>
+                    <div class="afp-marquee-container" id="afp-carousel">
+                        <div class="afp-marquee-track">
+                            <img src="assets/logos_afp/provida.webp" alt="AFP Provida" class="afp-marquee-img">
+                            <img src="assets/logos_afp/habitat.webp" alt="AFP Habitat" class="afp-marquee-img">
+                            <img src="assets/logos_afp/capital.webp" alt="AFP Capital" class="afp-marquee-img">
+                            <img src="assets/logos_afp/cuprum.webp" alt="AFP Cuprum" class="afp-marquee-img">
+                            <img src="assets/logos_afp/planvital.webp" alt="AFP PlanVital" class="afp-marquee-img">
+                            <img src="assets/logos_afp/modelo.webp" alt="AFP Modelo" class="afp-marquee-img">
+                            <img src="assets/logos_afp/uno.webp" alt="AFP Uno" class="afp-marquee-img">
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -162,7 +286,7 @@
             <div class="container ebook-fit">
                 <div class="ebook-fit__panel">
                     <span class="ebook-section-label">Para quién es</span>
-                    <h2 class="ebook-fit__title">Esta guía es para ti si quieres entender el trámite antes de pagar de más.</h2>
+                    <h3 class="ebook-fit__title">Esta guía es para ti si quieres entender el trámite antes de pagar de más.</h3>
                     <ul class="ebook-fit__list">
                         <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Cotizaste en Chile como técnico extranjero y quieres entender si tu caso tiene base real.</span></li>
                         <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>No quieres seguir pagando por explicaciones básicas, comisiones altas o pasos mal orientados.</span></li>
@@ -171,7 +295,7 @@
                 </div>
                 <div class="ebook-fit__panel ebook-fit__panel--not-fit">
                     <span class="ebook-section-label">Para quién no es</span>
-                    <h2 class="ebook-fit__title">Esta guía no es para ti si buscas atajos o promesas irreales.</h2>
+                    <h3 class="ebook-fit__title">Esta guía no es para ti si buscas atajos o promesas irreales.</h3>
                     <ul class="ebook-fit__list">
                         <li><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i><span>Si esperas una garantía automática de aprobación, este no es el producto correcto.</span></li>
                         <li><i class="fa-solid fa-circle-xmark" aria-hidden="true"></i><span>Si no quieres revisar requisitos ni entender tu caso, la guía te va a sobrar.</span></li>
@@ -204,12 +328,12 @@
                     <span class="ebook-section-label">La oportunidad</span>
                     <h3>Paga una vez por claridad y evita seguir perdiendo en comisiones, dudas y tiempos muertos.</h3>
                     <p>Esta guía te ayuda a entrar mejor preparado, entender qué revisar y decidir con más criterio antes de delegar o gastar de más.</p>
-                    <a href="#incluye" class="button button--light-blue">Ver lo que incluye</a>
+                    <a href="#incluye" class="button button--secondary">Ver lo que incluye</a>
                 </aside>
             </div>
         </section>
 
-        <section class="screen screen--light-bg">
+        <section class="screen screen--light-bg" id="precios">
             <div class="container ebook-warning">
                 <div class="ebook-warning__copy">
                     <span class="ebook-section-label">No pagues de más</span>
@@ -232,7 +356,14 @@
                         <div class="ebook-warning__price" data-ebook-price-animated></div>
                         <p class="ebook-warning__price-copy">Pago único. Sin porcentajes. Sin adelantos.</p>
                         <p class="ebook-warning__price-note">Mucho menos que una comisión, un adelanto o un porcentaje de tu retiro.</p>
-                        <a href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer" class="button button--primary">Comprar la guía por <span data-ebook-price></span></a>
+                        <a href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer" class="button button--coral" data-track="PurchaseInterest">Comprar la guía por <span data-ebook-price></span></a>
+                        <div class="ebook-guarantee" style="margin-top: 1rem; display: flex; align-items: center; gap: 12px; background: rgba(10, 116, 218, 0.05); padding: 12px; border-radius: 8px; text-align: left;">
+                            <i class="fas fa-shield-alt" style="font-size: 1.8rem; color: var(--color-primary);"></i>
+                            <div>
+                                <strong style="display: block; font-size: 0.95rem; color: var(--color-text); margin-bottom: 2px;">Garantía de Satisfacción</strong>
+                                <span style="font-size: 0.85rem; color: var(--color-text-light); line-height: 1.3; display: block;">Tienes 7 días de prueba. Si la guía no te aporta valor, te devolvemos el 100% de tu dinero.</span>
+                            </div>
+                        </div>
                     </div>
                 </aside>
             </div>
@@ -249,7 +380,7 @@
                         <li>Modelos y apoyos prácticos para ejecutar con más seguridad y menos fricción.</li>
                         <li>Casos y criterios reales para evaluar mejor tu situación antes de seguir gastando tiempo o dinero.</li>
                     </ul>
-                    <a href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer" class="button button--primary">Comprar la guía por <span data-ebook-price></span></a>
+                    <a href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer" class="button button--coral" data-track="PurchaseInterest">Comprar la guía por <span data-ebook-price></span></a>
                 </div>
                 <div class="ebook-includes__media">
                     <img src="assets/ilustraciones/ebook-retiro-afp-bonus.webp" alt="Mockup del ebook con checklist, formularios y materiales de apoyo" class="ebook-includes__image" loading="lazy" decoding="async">
@@ -257,7 +388,7 @@
             </div>
         </section>
 
-        <section class="screen screen--light-bg">
+        <section class="screen screen--light-bg" id="toc">
             <div class="container ebook-index-preview">
                 <span class="ebook-section-label">Tabla de contenido</span>
                 <h2 class="section__title">Explora la estructura completa del e-book.</h2>
@@ -413,7 +544,7 @@
                 </div>
                 <div class="ebook-index-preview__cta">
                     <p>Ya viste la estructura completa. Si quieres dejar de improvisar y avanzar con una guía realmente útil, este es el momento de comprar.</p>
-                    <a href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer" class="button button--primary">Comprar la guía por <span data-ebook-price></span></a>
+                    <a href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer" class="button button--coral" data-track="PurchaseInterest">Comprar la guía por <span data-ebook-price></span></a>
                 </div>
             </div>
         </section>
@@ -515,7 +646,7 @@
             <div class="container cta-final__container">
                 <h2>Compra claridad una vez. Evita seguir pagando por confusión, intermediación y errores evitables.</h2>
                 <p>Si tu objetivo es entender mejor tu caso, ordenar tu trámite y dejar de regalar margen en asesorías innecesarias, esta guía está hecha para ti.</p>
-                <a href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer" class="button button--light-blue button--large">Comprar la guía por <span data-ebook-price></span></a>
+                <a href="https://pay.hotmart.com/J105395747S?off=4bgrkh84" target="_blank" rel="noopener noreferrer" class="button button--coral button--large" data-track="PurchaseInterest">Comprar la guía por <span data-ebook-price></span></a>
             </div>
         </section>
     </main>
@@ -624,8 +755,111 @@
 
             observer.observe(animatedPrice);
         }
+
+        // Animación de la Tarjeta Comparativa
+        const initComparativeCard = () => {
+            const columns = document.querySelectorAll('.comparison-col__value[data-count-to]');
+            if (!columns.length) return;
+
+            const animateValue = (el) => {
+                const target = parseInt(el.dataset.countTo);
+                const startValue = el.dataset.countFrom ? parseInt(el.dataset.countFrom) : 0;
+                const type = el.dataset.countType;
+                const duration = 2000;
+                const startTime = performance.now();
+
+                const update = (now) => {
+                    const elapsed = now - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const eased = 1 - Math.pow(1 - progress, 4); // OutQuart easing
+                    
+                    const current = Math.round(startValue + (target - startValue) * eased);
+                    
+                    if (type === 'percent') {
+                        el.textContent = `${current}%`;
+                    } else {
+                        el.textContent = `$${current.toLocaleString('es-CL')}`;
+                        if (target === 500000) el.textContent += '+';
+                    }
+
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
+                    }
+                };
+                requestAnimationFrame(update);
+            };
+
+            const comparativeObserver = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        columns.forEach(col => animateValue(col));
+                        obs.disconnect();
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            comparativeObserver.observe(document.querySelector('.hero-comparison-card'));
+        };
+
+        const priceNodes = document.querySelectorAll('[data-ebook-price]');
+        priceNodes.forEach(node => {
+            node.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = e.target.getAttribute('href');
+                if (targetId && targetId.startsWith('#')) {
+                    const el = document.querySelector(targetId);
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Lógica de Rotación de Subtítulos con Efecto Fade-In-Up
+        const initSubtitleRotation = () => {
+            const subtitleEl = document.getElementById('rotating-subtitle');
+            if (!subtitleEl) return;
+
+            const texts = [
+                "Para técnicos extranjeros",
+                "Sin pagar de más desde el inicio",
+                "La guía definitiva",
+                "Para profesionales extranjeros",
+                "Manual con casos reales"
+            ];
+            
+            let currentIndex = 1; // Empezamos en el segundo porque el primero ya está en el HTML
+
+            setInterval(() => {
+                // 1. Fade Out (Desaparece hacia arriba)
+                subtitleEl.classList.remove('subtitle-animate-in', 'fade-in-subtitle');
+                subtitleEl.classList.add('subtitle-fade-out');
+                
+                setTimeout(() => {
+                    // 2. Cambiar Texto mientras es invisible
+                    subtitleEl.textContent = texts[currentIndex];
+                    subtitleEl.classList.remove('subtitle-fade-out');
+                    
+                    // 3. Reiniciar Animación de Entrada
+                    // Forzamos un reflow para que el navegador reinicie la animación CSS
+                    void subtitleEl.offsetWidth; 
+                    subtitleEl.classList.add('subtitle-animate-in');
+                    
+                    currentIndex = (currentIndex + 1) % texts.length;
+                }, 500); // Duración sincronizada con el fade-out de CSS
+            }, 5000); 
+        };
+
+        // Inicializar todas las funciones
+        const init = () => {
+            initComparativeCard();
+            initSubtitleRotation();
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
     </script>
-    <script src="js/main.js?v=20260417_final" type="module"></script>
+    <script src="js/main.js?v=20260420_refinement" type="module"></script>
 </body>
 </html>
-

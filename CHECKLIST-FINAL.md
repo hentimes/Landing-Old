@@ -31,7 +31,9 @@ Este documento es la fuente única de verdad para el estado del proyecto. Compac
 - [ ] **Prueba Social por Asesor**: Incluir contador de casos exitosos o testimonios específicos dentro del perfil del asesor.
 
 ## 📖 Fase 5: Optimización - Ebook Retiro AFP
-- [ ] **Ajuste Heading Hierarchy**: Revisar que el eBook no abuse de `h2` y mantenga una estructura `h1 > h2 > h3` fluida.
+- [x] **Ajuste Heading Hierarchy**: Revisado y optimizado con clases de soporte para subtítulos dinámicos.
+- [x] **Estandarización de Botones**: Unificación de CTAs en Rojo Coral y Non-CTAs en estilo secundario para mejor CRO.
+- [x] **Rotación de Subtítulos**: Implementación de sistema dinámico de 5 frases con animaciones controladas (Fade-In-Up).
 - [ ] **Conversión CRO**: Implementar un bloque de "Garantía de Satisfacción" o "Muestra Gratuita" para reducir la fricción antes de la compra.
 - [ ] **Tracking Específico**: Asegurar que el evento `PurchaseInterest` se dispare correctamente al hacer clic en el botón de Hotmart.
 - [ ] **Internal Linking**: Crear bloques de "Artículos relacionados" en la sección de noticias que apunten directamente al Ebook.

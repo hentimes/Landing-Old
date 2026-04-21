@@ -200,7 +200,7 @@
   .ebook-hero__actions { flex-direction: column; }
   .ebook-hero__actions .button { width: 100%; }
   .ebook-hero__actions .button { white-space: normal; }
-  .ebook-hero__media { padding: 18px 14px 0; border-radius: 24px; }
+  .ebook-hero__media { padding: 18px 14px 0; }
   .ebook-hero__media { min-height: auto; }
   .ebook-hero__image { max-width: 320px; transform: none; }
   .ebook-objection,

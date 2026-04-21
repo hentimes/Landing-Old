@@ -14,6 +14,7 @@
 @import url('_asesores-page.css');   /* 7. Estilos para la página de asesores */
 @import url('_nosotros-page.css');    /* 8. Estilos para la página de nosotros */
 @import url('_noticias-page.css');   /* 9. Estilos para la página de noticias */
+@import url('_ebook-page.css');      /* 10. Estilos para la página de Ebook */
 @import url('_modal.css');           /* 10. Estilos para la ventana modal */
 @import url('_responsive.css');      /* 10. Media queries para diseño adaptable */
 @import url('_asistente-faq.css');   /* 11. Estilos para el asistente FAQ (Overrides) */
