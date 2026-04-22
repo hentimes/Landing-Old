@@ -52,6 +52,7 @@ function initializeFormApp() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initAnalytics();
+    initAccordion();
 
     initNavigation();
     initHeroTypewriter();
@@ -60,12 +61,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initCasosDeExitoSlider();
     initTestimonials();
     initLogoFader();
-    initAccordion();
     initAsesores();
     initNosotrosAsesores();
     initAsistenteFAQ();
     initAfpCarousel();
-    initNoticiasFeed();
     console.log('Componentes de la página principal inicializados.');
 
     loadModules()

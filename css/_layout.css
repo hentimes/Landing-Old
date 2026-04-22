@@ -952,7 +952,9 @@ main {
     flex-direction: column;
     justify-content: flex-end;
 }
-.section-cta-final {
+.section-cta-final.ebook-final-cta {
+   padding: 50px 0 !important; /* Compactación solicitada V20 */
+   min-height: auto !important;
    background:
      radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 28%),
      radial-gradient(circle at 82% 78%, rgba(125, 211, 252, 0.2) 0%, rgba(125, 211, 252, 0) 24%),
@@ -962,8 +964,6 @@ main {
    display: flex;
    align-items: center;
    justify-content: center;
-   min-height: 296px;
-   padding: 42px 0 34px;
    overflow: hidden;
 }
 .cta-final__container {
@@ -991,7 +991,7 @@ main {
    text-wrap: balance;
 }
 .cta-final__container .button {
-   margin-top: 24px;
+   margin-top: 20px; /* Reducido de 32px para compacidad V20 */
    min-width: 300px;
    min-height: 62px;
    padding: 0 30px;

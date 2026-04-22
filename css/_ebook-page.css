@@ -9,9 +9,14 @@ la conversión sin romper el diseño aprobado por el usuario.
 /* --- 1. Optimización de Espaciado (Hero Original) --- */
 .ebook-hero {
     padding-top: calc(var(--header-height) + 25px) !important;
-    padding-bottom: 80px !important; /* Más espacio al final para el carrusel */
+    padding-bottom: 20px !important; /* Reducido drásticamente para acercar a la siguiente sección */
     position: relative;
     z-index: 1;
+}
+
+/* Espaciado entre Hero y siguiente sección (Valor/Oportunidad) */
+.ebook-hero + .screen {
+    padding-top: 20px !important;
 }
 
 .ebook-hero__container {
@@ -647,3 +652,326 @@ la conversión sin romper el diseño aprobado por el usuario.
         align-self: flex-start;
     }
 }
+
+/* --- 5. Rediseño de Secciones de Valor (V2 Premium) --- */
+
+/* Introducción de Sección */
+.ebook-section-intro {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.ebook-section-intro .section__title {
+    font-size: clamp(2rem, 3.5vw, 3.6rem);
+    margin: 12px 0 16px;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+}
+
+.ebook-section-intro .section__subtitle {
+    font-size: 1.15rem;
+    color: var(--color-text-light);
+    max-width: 60ch;
+    margin: 0 auto;
+}
+
+/* Métricas: Tarjetas con Header (Estilo Planes) */
+.ebook-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.ebook-metric {
+    background: var(--color-white);
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid rgba(37, 99, 235, 0.1);
+    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.06);
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.ebook-metric:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 25px 60px rgba(37, 99, 235, 0.15);
+    border-color: var(--color-primary);
+}
+
+.ebook-metric__header {
+    height: 125px; /* Un poco más alto para alojar el título */
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.03) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.4s ease;
+    border-bottom: 1px solid rgba(37, 99, 235, 0.05);
+}
+
+.ebook-metric__header i {
+    font-size: 2.2rem;
+    color: var(--color-primary);
+    transition: all 0.4s ease;
+}
+
+.ebook-metric__header strong {
+    font-size: 1.25rem;
+    color: var(--color-text-dark);
+    letter-spacing: -0.02em;
+    transition: all 0.4s ease;
+}
+
+.ebook-metric:hover .ebook-metric__header {
+    background: var(--color-primary);
+}
+
+.ebook-metric:hover .ebook-metric__header i,
+.ebook-metric:hover .ebook-metric__header strong {
+    color: var(--color-white);
+}
+
+.ebook-metric__content {
+    padding: 25px 25px 35px;
+    text-align: center;
+}
+
+.ebook-metric__content p {
+    font-size: 0.98rem;
+    color: var(--color-text-light);
+    line-height: 1.65;
+    margin: 0;
+}
+
+.screen--compact-top { padding-top: 40px !important; }
+.screen--compact-bottom { padding-bottom: 0 !important; }
+
+/* Estabilización de Acordeones V10 (Compacto) */
+.ebook-toc {
+    min-height: 700px; /* Reducido de 800px para eliminar aire muerto */
+}
+
+.ebook-faq__accordion {
+    min-height: 360px; /* Reducido de 520px para un ajuste más ceñido */
+}
+
+/* Reducción de Espacios (Alineación de Pills) */
+.benefits-accordion {
+    margin-top: 8px !important;
+}
+
+.ebook-section-narrow .ebook-section-label {
+    margin-bottom: 4px; /* Unir más la pill al título alternativo si existiera */
+}
+
+/* Espacio pills globales en Ebook */
+/* Espacio pills globales en Ebook - Ajustados en _components.css V12 */
+.ebook-objection__pill {
+    margin-bottom: 8px !important;
+}
+
+/* Proceso: Blobs y Sombras Difuminadas V3 (Vitalidad) */
+.ebook-outcomes {
+    position: relative;
+    overflow: visible;
+    padding: 20px 0 0; 
+}
+
+/* Blobs dinámicos para reforzar los colores de las tarjetas */
+.ebook-outcomes::before,
+.ebook-outcomes::after {
+    content: '';
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(140px);
+    opacity: 0.12;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.ebook-outcomes::before {
+    background: radial-gradient(circle, var(--color-primary) 0%, var(--color-secondary) 100%);
+    top: -100px;
+    left: -10%;
+}
+
+.ebook-outcomes::after {
+    background: radial-gradient(circle, var(--color-coral) 0%, var(--color-primary) 100%);
+    bottom: -100px;
+    right: -10%;
+}
+
+.ebook-outcomes__title {
+    margin-bottom: 25px; /* Margen reducido */
+    font-size: clamp(2.4rem, 4.5vw, 3.2rem); /* Título más grande */
+    line-height: 1.1;
+    max-width: 25ch;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ebook-outcomes__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-bottom: 0;
+}
+
+/* Estilo Esmerilado (Glassmorphism) con Vitalidad Cromática */
+.ebook-outcome {
+    padding: 45px 35px;
+    border-radius: 35px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 10px 40px rgba(15, 23, 42, 0.05);
+    backdrop-filter: blur(24px) saturate(180%);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+}
+
+/* Tonos Tenues Diferenciados */
+.ebook-outcome:nth-child(1) { background: rgba(223, 77, 77, 0.04); } /* Antes: Rojo Coral */
+.ebook-outcome:nth-child(2) { background: rgba(37, 99, 235, 0.04); } /* Durante: Azul Primario */
+.ebook-outcome:nth-child(3) { background: rgba(16, 185, 129, 0.04); } /* Después: Verde Secundario */
+
+.ebook-outcome:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
+    border-color: rgba(255, 255, 255, 1);
+}
+
+.ebook-outcome:nth-child(1):hover { background: rgba(223, 77, 77, 0.08); }
+.ebook-outcome:nth-child(2):hover { background: rgba(37, 99, 235, 0.08); }
+.ebook-outcome:nth-child(3):hover { background: rgba(16, 185, 129, 0.08); }
+
+.outcome-badge {
+    display: inline-block;
+    padding: 6px 18px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 22px;
+}
+
+.ebook-outcome:nth-child(1) .outcome-badge { background: rgba(223, 77, 77, 0.1); color: #b9251f; }
+.ebook-outcome:nth-child(2) .outcome-badge { background: rgba(37, 99, 235, 0.1); color: var(--color-primary); }
+.ebook-outcome:nth-child(3) .outcome-badge { background: rgba(16, 185, 129, 0.1); color: var(--color-secondary); }
+
+.ebook-outcome p {
+    font-size: 1.05rem;
+    color: var(--color-text-dark);
+    line-height: 1.5; /* Ajuste ligero */
+}
+
+/* Perfil Fit: Ajuste Final de Aire y Espaciado */
+.ebook-fit {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-top: 0;
+}
+
+.ebook-fit__panel {
+    padding: 35px 25px; /* Compactación final optimizada V6.1 */
+    background: var(--color-white);
+    border-radius: 40px;
+    border: 1px solid rgba(226, 232, 240, 0.7);
+    box-shadow: 0 16px 40px rgba(15, 23, 42, 0.03);
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.ebook-fit__panel:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 30px 70px rgba(15, 23, 42, 0.1);
+}
+
+.ebook-fit__panel--not-fit {
+    background: linear-gradient(135deg, #ffffff 0%, #fff9f8 100%);
+    border-color: rgba(223, 77, 77, 0.08);
+}
+
+.ebook-fit__panel .ebook-section-label {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-secondary);
+    width: fit-content;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.ebook-fit__panel--not-fit .ebook-section-label {
+    background: rgba(223, 77, 77, 0.1);
+    color: var(--color-coral);
+}
+
+.ebook-fit__title {
+    margin: 20px 0 40px; 
+    font-size: 1.85rem;
+    line-height: 1.25;
+    letter-spacing: -0.03em;
+    color: var(--color-text-dark);
+}
+
+.ebook-fit__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 15px; /* Reducción de 25px a 15px para más densidad */
+}
+
+.ebook-fit__list li {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    font-size: 1.08rem;
+    line-height: 1.6; /* Aire optimizado */
+    color: var(--color-text);
+}
+
+.ebook-section-narrow {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Adaptación Mobile V3 */
+.ebook-section-narrow .ebook-section-label {
+    align-self: flex-start; /* Se alinea a la izquierda de la columna de 900px */
+}
+
+/* Fix definitivo para visibilidad de acordeones V10. Compactación de aire. */
+.page-ebook .accordion-item.is-open .accordion-item__content,
+.page-ebook .accordion-item.active .accordion-item__content {
+    max-height: 1500px !important;
+    height: auto !important;
+    padding-bottom: 15px !important; /* Reducido de 25px */
+    opacity: 1 !important;
+    visibility: visible !important;
+    overflow: visible !important;
+    transition: all 0.3s ease-in-out !important;
+}
+
+.page-ebook .accordion-item__header {
+    padding: 12px 18px !important; /* Más esbelto: vertical 12px, horizontal 18px */
+}
+
+.page-ebook .accordion-item.is-open .accordion-item__icon,
+.page-ebook .accordion-item.active .accordion-item__icon {
+    transform: rotate(180deg) !important;
+}
+
+/* Estilos de Tooltip de Información (TOC) V8.1 - Migrados a _components.css */
