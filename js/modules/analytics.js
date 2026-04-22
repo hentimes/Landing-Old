@@ -7,13 +7,12 @@
  * Reemplaza los valores de abajo por tus IDs reales para activar el seguimiento.
  */
 const TRACKING_IDS = {
-    META_PIXEL: 'TU_PIXEL_ID_AQUI',
+    META_PIXEL: '2795536600793741',
+    // Pending: replace with the GA4 Measurement ID when available.
     GA4: 'G-TU_ID_AQUI'
 };
 
 export function initAnalytics() {
-    console.log('PlanesPro Analytics: Inicializando módulo...');
-
     // 1. Inicialización de Meta Pixel
     if (TRACKING_IDS.META_PIXEL && TRACKING_IDS.META_PIXEL !== 'TU_PIXEL_ID_AQUI') {
         initMetaPixel(TRACKING_IDS.META_PIXEL);
@@ -40,7 +39,6 @@ function initMetaPixel(id) {
     
     fbq('init', id);
     fbq('track', 'PageView');
-    console.log('PlanesPro Analytics: Meta Pixel activo.');
 }
 
 function initGA4(id) {
@@ -53,7 +51,6 @@ function initGA4(id) {
     window.gtag = function(){ dataLayer.push(arguments); };
     gtag('js', new Date());
     gtag('config', id);
-    console.log('PlanesPro Analytics: GA4 activo.');
 }
 
 /**
@@ -69,6 +66,23 @@ function setupEventTracking() {
             trackEvent('Contact', { method: 'WhatsApp', location: target.id || 'floating' });
         }
 
+        if (target.href && target.href.includes('pay.hotmart.com')) {
+            trackEvent('HotmartClick', {
+                label: target.textContent.trim(),
+                href: target.href,
+                location: target.dataset.trackLocation || target.id || target.className || 'hotmart_link'
+            });
+        }
+
+        const trackedEventName = target.getAttribute('data-track');
+        if (trackedEventName) {
+            trackEvent(trackedEventName, {
+                label: target.textContent.trim(),
+                href: target.href || '',
+                location: target.dataset.trackLocation || target.id || target.className || 'tracked_element'
+            });
+        }
+
         // Clic en CTA de Formulario
         if (target.hasAttribute('data-modal-trigger') || target.id === 'cta_hero') {
             trackEvent('LeadStarted', { label: target.textContent.trim() });
@@ -80,8 +94,6 @@ function setupEventTracking() {
  * Función auxiliar para enviar eventos a todas las plataformas activas.
  */
 export function trackEvent(name, params = {}) {
-    console.log(`PlanesPro Event: ${name}`, params);
-    
     if (window.fbq) fbq('trackCustom', name, params);
     if (window.gtag) gtag('event', name, params);
 }

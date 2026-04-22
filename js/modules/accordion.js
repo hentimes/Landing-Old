@@ -1,11 +1,9 @@
+import { trackEvent } from './analytics.js';
+
 export function initAccordion() {
-    console.log('Accordion Module [V7.1]: Inicializando...');
     const accordions = document.querySelectorAll('.benefits-accordion');
     
-    if (accordions.length === 0) {
-        console.warn('Accordion Module: No se encontraron elementos .benefits-accordion.');
-        return;
-    }
+    if (accordions.length === 0) return;
 
     accordions.forEach((accordion) => {
         const items = accordion.querySelectorAll('.accordion-item');
@@ -30,9 +28,14 @@ export function initAccordion() {
                 if (!isOpen) {
                     item.classList.add('is-open');
                     item.classList.add('active');
-                    console.log('Accordion [V7.1]: Item abierto');
-                } else {
-                    console.log('Accordion [V7.1]: Item cerrado');
+
+                    if (accordion.classList.contains('ebook-toc')) {
+                        trackEvent('EbookTOCOpen', { label: header.textContent.trim() });
+                    }
+
+                    if (accordion.classList.contains('ebook-faq__accordion')) {
+                        trackEvent('EbookFAQOpen', { label: header.textContent.trim() });
+                    }
                 }
             });
         });

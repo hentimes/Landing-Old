@@ -69,7 +69,7 @@ const fallbackArticles = [
     ,{
         title: 'Cuándo una noticia de Isapre debería llevarte a revisar tu plan',
         link: 'https://wa.me/56958785580',
-        imageUrl: 'assets/ilustraciones/asesor-person.webp',
+        imageUrl: 'assets/ilustraciones/asesores.webp',
         summary: 'Si una actualización afecta precio, red o beneficios, conviene contrastarla con tu contrato y tu uso real de salud.',
         portalName: 'Guía PlanesPro',
         category: 'isapres',
@@ -355,6 +355,16 @@ export const initNoticiasFeed = () => {
         updateLoadMore();
     };
 
+    const renderLocalFallback = (message) => {
+        const fallback = getLocalFallback();
+        if (!fallback.length) {
+            renderEmptyState('No hay resultados para esta busqueda en la seleccion local.');
+            return;
+        }
+
+        renderPage(fallback, { message });
+    };
+
     const loadNews = ({ append = false } = {}) => {
         if (!endpoint) {
             renderPage(getLocalFallback(), { append, message: 'Selección base de contenidos PlanesPro.' });
@@ -385,9 +395,9 @@ export const initNoticiasFeed = () => {
                     : [];
 
                 if (!validArticles.length && !append) {
-                    renderEmptyState(currentQuery
-                        ? 'No hay resultados para esta búsqueda en el histórico.'
-                        : 'El Worker no devolvió noticias para mostrar.');
+                    renderLocalFallback(currentQuery
+                        ? 'No hay resultados remotos para esta busqueda. Mostrando seleccion local relacionada.'
+                        : 'El Worker no devolvio noticias. Mostrando seleccion local PlanesPro.');
                     return;
                 }
 
@@ -428,7 +438,7 @@ export const initNoticiasFeed = () => {
                 bindImageFallbacks();
             })
             .catch(() => {
-                renderEmptyState('No se pudo conectar con el Worker de noticias. Revisa la URL del endpoint.');
+                renderLocalFallback('No se pudo conectar con el Worker. Mostrando seleccion local PlanesPro.');
             })
             .finally(() => setLoading(false));
     };
