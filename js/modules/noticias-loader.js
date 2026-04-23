@@ -256,7 +256,7 @@ export const initNoticiasFeed = () => {
     const endpoint = section.getAttribute('data-news-endpoint');
     let currentCategory = DEFAULT_CATEGORY;
     let currentQuery = '';
-    let currentDays = 30;
+    let currentDays = 7;
     let currentOffset = 0;
     let renderedCount = 0;
     let hasMore = false;
@@ -452,8 +452,8 @@ export const initNoticiasFeed = () => {
         const dayButtons = daysControls.querySelectorAll('[data-news-days-value]');
         dayButtons.forEach((button) => {
             button.addEventListener('click', () => {
-                const value = Number(button.getAttribute('data-news-days-value') || '30');
-                currentDays = value === 7 || value === 30 || value === 60 ? value : 30;
+                const value = Number(button.getAttribute('data-news-days-value') || '7');
+                currentDays = value === 5 || value === 7 || value === 30 ? value : 7;
                 dayButtons.forEach((dayButton) => dayButton.classList.toggle('is-active', dayButton === button));
                 loadNews();
             });
