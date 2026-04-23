@@ -195,13 +195,6 @@ const renderMeta = (article) => {
     `;
 };
 
-const renderCompactMeta = (article) => `
-    <div class="noticia-card__meta">
-        <span class="noticia-card__source">${escapeHtml(getPortalShortName(article))}</span>
-        <span class="noticia-card__category">${escapeHtml(getCompactCategory(article))}</span>
-    </div>
-`;
-
 const getPortalShortName = (article) => {
     const candidates = [article.link, article.portalName].filter(Boolean);
 
@@ -226,12 +219,35 @@ const getCompactCategory = (article) => (
     article.category === 'afp' ? 'AFP' : 'Salud'
 );
 
-const renderMediaTags = (article) => `
-    <div class="noticia-media-tags" aria-label="Fuente y categoría">
-        <span class="noticia-media-tag">${escapeHtml(getPortalShortName(article))}</span>
-        <span class="noticia-media-tag">${escapeHtml(getCompactCategory(article))}</span>
-    </div>
-`;
+const renderMediaTags = (article) => {
+    const date = formatDate(article.publishedAt);
+
+    return `
+        ${date ? `
+            <div class="noticia-media-tags noticia-media-tags--top-left" aria-label="Fecha">
+                <span class="noticia-media-tag noticia-media-tag--date">${escapeHtml(date)}</span>
+            </div>
+        ` : ''}
+        <div class="noticia-media-tags noticia-media-tags--bottom-right" aria-label="Fuente y tópico">
+            <span class="noticia-media-tag">${escapeHtml(getPortalShortName(article))}</span>
+            <span class="noticia-media-tag">${escapeHtml(getCompactCategory(article))}</span>
+        </div>
+    `;
+};
+
+const renderCarouselMeta = (article) => {
+    const date = formatDate(article.publishedAt);
+    const portal = getPortalShortName(article);
+    const topic = getCompactCategory(article);
+
+    return `
+        <div class="noticia-carousel-meta" aria-label="Fecha, medio y tópico">
+            ${date ? `<span class="noticia-carousel-tag noticia-carousel-tag--date">${escapeHtml(date)}</span>` : ''}
+            <span class="noticia-carousel-tag">${escapeHtml(portal)}</span>
+            <span class="noticia-carousel-tag">${escapeHtml(topic)}</span>
+        </div>
+    `;
+};
 
 const renderFeaturedArticle = (article) => `
     <article class="noticia-featured-card">
@@ -240,7 +256,6 @@ const renderFeaturedArticle = (article) => `
             ${renderMediaTags(article)}
         </div>
         <div class="noticia-featured-card__body">
-            ${renderMeta(article)}
             <h3 class="noticia-featured-card__title">${escapeHtml(article.title)}</h3>
             <p class="noticia-featured-card__summary">${escapeHtml(article.summary)}</p>
             <a class="noticia-card__link" href="${escapeHtml(article.link)}" target="_blank" rel="noopener noreferrer">
@@ -279,28 +294,13 @@ const renderMidGridArticle = (article) => `
     </a>
 `;
 
-const renderCarouselArticle = (article) => `
-    <article class="noticia-card noticia-card--carousel">
-        <div class="noticia-card__media">
-            <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" loading="lazy" decoding="async">
-        </div>
-        <div class="noticia-card__body">
-            ${renderMeta(article)}
-            <h3 class="noticia-card__title">${escapeHtml(article.title)}</h3>
-            <a class="noticia-card__link" href="${escapeHtml(article.link)}" target="_blank" rel="noopener noreferrer">
-                Leer <i class="fas fa-arrow-right" aria-hidden="true"></i>
-            </a>
-        </div>
-    </article>
-`;
-
 const renderCarouselItem = (article) => `
     <a class="noticia-carousel-item" href="${escapeHtml(article.link)}" target="_blank" rel="noopener noreferrer">
         <span class="noticia-carousel-item__media" aria-hidden="true">
             <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" loading="lazy" decoding="async">
         </span>
         <div class="noticia-carousel-item__body">
-            ${renderCompactMeta(article)}
+            ${renderCarouselMeta(article)}
             <div class="noticia-carousel-item__title">${escapeHtml(article.title)}</div>
         </div>
     </a>

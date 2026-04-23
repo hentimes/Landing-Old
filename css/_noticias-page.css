@@ -497,23 +497,26 @@
     gap: 6px;
 }
 
-.noticia-carousel-item__body .noticia-card__meta {
-    margin-bottom: 0;
+.noticia-carousel-meta {
+    display: flex;
+    flex-wrap: wrap;
     gap: 6px;
+    margin: 0;
 }
 
-.noticia-carousel-item__body .noticia-card__date {
-    display: none;
-}
-
-.noticia-carousel-item__body .noticia-card__source,
-.noticia-carousel-item__body .noticia-card__category {
+.noticia-carousel-tag {
+    display: inline-flex;
+    align-items: center;
     padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(100, 116, 139, 0.14);
+    border: 1px solid rgba(100, 116, 139, 0.2);
+    color: rgba(15, 23, 42, 0.82);
+    font-weight: 800;
     font-size: 0.6rem;
     line-height: 1;
-    background: rgba(100, 116, 139, 0.14);
-    color: rgba(15, 23, 42, 0.82);
-    border: 1px solid rgba(100, 116, 139, 0.2);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
 }
 
 .noticia-carousel-item__title {
@@ -530,12 +533,20 @@
 
 .noticia-media-tags {
     position: absolute;
-    right: 8px;
-    bottom: 8px;
     display: flex;
     gap: 6px;
     z-index: 2;
     pointer-events: none;
+}
+
+.noticia-media-tags--top-left {
+    left: 8px;
+    top: 8px;
+}
+
+.noticia-media-tags--bottom-right {
+    right: 8px;
+    bottom: 8px;
 }
 
 .noticia-media-tag {
@@ -543,15 +554,15 @@
     align-items: center;
     padding: 2px 6px;
     border-radius: 999px;
-    background: rgba(0, 0, 0, 0.46);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    color: rgba(255, 255, 255, 0.92);
-    font-weight: 700;
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(100, 116, 139, 0.22);
+    color: rgba(15, 23, 42, 0.72);
+    font-weight: 800;
     font-size: 0.64rem;
     line-height: 1;
     letter-spacing: 0.02em;
-    text-transform: lowercase;
     backdrop-filter: blur(8px);
+    white-space: nowrap;
 }
 
 @media (min-width: 641px) {
@@ -1031,6 +1042,15 @@
         width: 60px;
         height: 60px;
         border-radius: 14px;
+    }
+
+    .noticia-carousel-meta {
+        gap: 5px;
+    }
+
+    .noticia-carousel-tag {
+        padding: 2px 5px;
+        font-size: 0.56rem;
     }
 
     .noticia-carousel-item__body .noticia-card__source,
