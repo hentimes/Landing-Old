@@ -753,7 +753,7 @@
         margin-top: 0;
         width: 100%;
         justify-content: space-between;
-        gap: 10px;
+        gap: 6px;
     }
 
     .noticias-toolbar__search-pill {
@@ -789,6 +789,7 @@
     .noticias-search__field {
         padding: 0 12px;
         border-radius: 16px;
+        min-height: 42px;
     }
 
     .noticias-search__field input {
@@ -806,6 +807,13 @@
         bottom: 3px;
         width: 40px;
         border-radius: 12px;
+        background: transparent;
+        box-shadow: none;
+        color: var(--color-primary);
+    }
+
+    .noticias-search__inside-button:hover {
+        background: rgba(10, 116, 218, 0.08);
     }
 
     .noticias-feed-status {
