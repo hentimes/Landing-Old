@@ -131,6 +131,6 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
 
 - [x] Scripts sueltos fueron movidos a `tools/`.
 - [x] Rama `sections` existe para los cambios actuales.
-- [ ] Revisar archivos temporales antes de publicar (`tmp_downloads_sheet.jpg`, scratch, tools no usados).
+- [x] Revisar archivos temporales antes de publicar (`tmp_downloads_sheet.jpg`, scratch, tools no usados).
 - [ ] Crear commits por bloque: fixes, docs, modularizacion, SEO/performance.
 - [ ] Mantener este archivo como unica fuente de estado.
