@@ -324,7 +324,7 @@ const renderCarouselSlides = (articles = []) => (
         .join('')
 );
 
-const buildEndpoint = ({ endpoint, category, query, offset, pageSize }) => {
+const buildEndpoint = ({ endpoint, category, query, offset, pageSize, days }) => {
     const url = new URL(endpoint, window.location.href);
     const categoryQueries = {
         isapres: 'isapre',
@@ -335,8 +335,7 @@ const buildEndpoint = ({ endpoint, category, query, offset, pageSize }) => {
 
     url.searchParams.set('limit', String(pageSize));
     url.searchParams.set('offset', String(offset));
-    url.searchParams.set('dias', '60');
-    if (category && category !== DEFAULT_CATEGORY) url.searchParams.set('categoria', category);
+    url.searchParams.set('dias', String(days));
     if (effectiveQuery) url.searchParams.set('q', effectiveQuery);
     return url.toString();
 };
@@ -352,6 +351,7 @@ export const initNoticiasFeed = () => {
     const status = document.querySelector('[data-news-status]');
     const filterButtons = document.querySelectorAll('[data-news-filter]');
     const filterSelect = document.querySelector('[data-news-filter-select]');
+    const daysControls = document.querySelector('[data-news-days]');
     const searchForm = document.querySelector('[data-news-search]');
     const searchInput = document.querySelector('[data-news-search-input]');
     const clearSearchButton = document.querySelector('[data-news-search-clear]');
@@ -359,6 +359,7 @@ export const initNoticiasFeed = () => {
     const endpoint = section.getAttribute('data-news-endpoint');
     let currentCategory = DEFAULT_CATEGORY;
     let currentQuery = '';
+    let currentDays = 30;
     let currentOffset = 0;
     let renderedCount = 0;
     let hasMore = false;
@@ -513,7 +514,7 @@ export const initNoticiasFeed = () => {
             renderedArticleKeys = new Set();
         }
 
-        fetch(buildEndpoint({ endpoint, category: currentCategory, query: currentQuery, offset, pageSize }), { cache: 'no-store' })
+        fetch(buildEndpoint({ endpoint, category: currentCategory, query: currentQuery, offset, pageSize, days: currentDays }), { cache: 'no-store' })
             .then((response) => {
                 if (!response.ok) throw new Error(`Noticias no disponibles: ${response.status}`);
                 return response.json();
@@ -598,6 +599,18 @@ export const initNoticiasFeed = () => {
         filterSelect.addEventListener('change', () => {
             setActiveCategory(filterSelect.value || DEFAULT_CATEGORY);
             loadNews();
+        });
+    }
+
+    if (daysControls) {
+        const dayButtons = daysControls.querySelectorAll('[data-news-days-value]');
+        dayButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const value = Number(button.getAttribute('data-news-days-value') || '30');
+                currentDays = value === 7 || value === 30 || value === 60 ? value : 30;
+                dayButtons.forEach((dayButton) => dayButton.classList.toggle('is-active', dayButton === button));
+                loadNews();
+            });
         });
     }
 
