@@ -195,10 +195,42 @@ const renderMeta = (article) => {
     `;
 };
 
+const getPortalShortName = (article) => {
+    const candidates = [article.link, article.portalName].filter(Boolean);
+
+    for (const candidate of candidates) {
+        try {
+            const url = new URL(candidate, window.location.href);
+            const hostname = (url.hostname || '').replace(/^www\./, '');
+            if (!hostname) continue;
+            return hostname.split('.')[0];
+        } catch {
+            const value = String(candidate).trim().toLowerCase();
+            if (!value) continue;
+            if (value.includes('.')) return value.split('.')[0].replace(/^www\./, '');
+            return value.split(/\s+/)[0];
+        }
+    }
+
+    return 'portal';
+};
+
+const getCompactCategory = (article) => (
+    article.category === 'afp' ? 'AFP' : 'Salud'
+);
+
+const renderMediaTags = (article) => `
+    <div class="noticia-media-tags" aria-label="Fuente y categoría">
+        <span class="noticia-media-tag">${escapeHtml(getPortalShortName(article))}</span>
+        <span class="noticia-media-tag">${escapeHtml(getCompactCategory(article))}</span>
+    </div>
+`;
+
 const renderFeaturedArticle = (article) => `
     <article class="noticia-featured-card">
         <div class="noticia-featured-card__media">
             <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" loading="lazy" decoding="async">
+            ${renderMediaTags(article)}
         </div>
         <div class="noticia-featured-card__body">
             ${renderMeta(article)}
@@ -231,6 +263,7 @@ const renderMidGridArticle = (article) => `
     <a class="noticia-mid-card" href="${escapeHtml(article.link)}" target="_blank" rel="noopener noreferrer">
         <span class="noticia-mid-card__media" aria-hidden="true">
             <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" loading="lazy" decoding="async">
+            ${renderMediaTags(article)}
         </span>
         <span class="noticia-mid-card__body">
             <span class="noticia-mid-card__title">${escapeHtml(article.title)}</span>
@@ -258,6 +291,7 @@ const renderCarouselItem = (article) => `
     <a class="noticia-carousel-item" href="${escapeHtml(article.link)}" target="_blank" rel="noopener noreferrer">
         <span class="noticia-carousel-item__media" aria-hidden="true">
             <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" loading="lazy" decoding="async">
+            ${renderMediaTags(article)}
         </span>
         <div class="noticia-carousel-item__body">
             ${renderMeta(article)}
