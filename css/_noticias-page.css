@@ -645,31 +645,35 @@
 
     .noticias-hero__grid {
         grid-template-columns: minmax(148px, 40vw) minmax(0, 1fr);
-        gap: 16px;
+        grid-template-areas:
+            "media title"
+            "media eyebrow"
+            "subtitle subtitle";
+        gap: 10px 16px;
         align-items: stretch;
     }
 
     .noticias-hero__content {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 8px;
+        display: contents;
     }
 
     .noticias-eyebrow {
-        order: 2;
+        grid-area: eyebrow;
+        align-self: start;
         margin: 0;
         font-size: 0.78rem;
     }
 
     .noticias-hero__title {
-        order: 1;
+        grid-area: title;
+        align-self: end;
         font-size: clamp(1.65rem, 7.6vw, 2.2rem);
         line-height: 1.02;
         margin: 0;
     }
 
     .noticias-hero__media {
+        grid-area: media;
         justify-content: center;
         align-items: center;
     }
@@ -680,7 +684,7 @@
     }
 
     .noticias-hero__subtitle {
-        order: 3;
+        grid-area: subtitle;
         font-size: 0.95rem;
         margin: 6px 0 0;
     }
