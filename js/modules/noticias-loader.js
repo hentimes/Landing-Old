@@ -453,7 +453,7 @@ export const initNoticiasFeed = () => {
         dayButtons.forEach((button) => {
             button.addEventListener('click', () => {
                 const value = Number(button.getAttribute('data-news-days-value') || '7');
-                currentDays = value === 5 || value === 7 || value === 30 ? value : 7;
+                currentDays = value === 7 || value === 15 || value === 30 ? value : 7;
                 dayButtons.forEach((dayButton) => dayButton.classList.toggle('is-active', dayButton === button));
                 loadNews();
             });
