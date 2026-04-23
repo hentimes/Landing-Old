@@ -537,6 +537,7 @@
     gap: 6px;
     z-index: 2;
     pointer-events: none;
+    align-items: flex-start;
 }
 
 .noticia-media-tags--top-left {
@@ -1011,9 +1012,18 @@
         -webkit-line-clamp: 2;
     }
 
-    .noticia-media-tags {
+    .noticia-media-tags--top-left {
+        left: 6px;
+        top: 6px;
+        right: auto;
+        bottom: auto;
+    }
+
+    .noticia-media-tags--bottom-right {
         right: 6px;
         bottom: 6px;
+        left: auto;
+        top: auto;
         gap: 5px;
     }
 
