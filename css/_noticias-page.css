@@ -357,40 +357,54 @@
     margin: 0 0 18px;
 }
 
-.noticia-headline {
+.noticia-mid-card {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 14px;
+    flex-direction: column;
+    overflow: hidden;
     border-radius: 18px;
     border: 1px solid rgba(226, 232, 240, 0.92);
     background: rgba(255, 255, 255, 0.94);
     box-shadow: 0 14px 30px rgba(7, 24, 61, 0.06);
     text-decoration: none;
     color: inherit;
+    min-height: 100%;
 }
 
-.noticia-headline__thumb {
-    flex: 0 0 52px;
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    overflow: hidden;
+.noticia-mid-card__media {
+    aspect-ratio: 16 / 9;
     background: #e8f1ff;
+    overflow: hidden;
 }
 
-.noticia-headline__thumb img {
+.noticia-mid-card__media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
 
-.noticia-headline__title {
+.noticia-mid-card__body {
+    padding: 12px 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.noticia-mid-card__title {
     font-family: var(--font-family-heading);
     font-weight: 800;
     line-height: 1.12;
     color: var(--color-text-dark);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.noticia-mid-card__summary {
+    color: var(--color-text);
+    font-size: 0.9rem;
+    line-height: 1.35;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -791,28 +805,28 @@
 
     .noticias-headlines {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 10px;
-        margin: 0 0 14px;
+        gap: 12px;
+        margin: 0 0 16px;
     }
 
-    .noticia-headline {
-        gap: 10px;
-        padding: 10px 12px;
+    .noticia-mid-card {
         border-radius: 16px;
         box-shadow: 0 10px 22px rgba(7, 24, 61, 0.05);
     }
 
-    .noticia-headline__thumb {
-        flex: 0 0 44px;
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
+    .noticia-mid-card__body {
+        padding: 10px 10px 12px;
     }
 
-    .noticia-headline__title {
-        font-size: 0.9rem;
+    .noticia-mid-card__title {
+        font-size: 0.92rem;
         letter-spacing: -0.01em;
         -webkit-line-clamp: 3;
+    }
+
+    .noticia-mid-card__summary {
+        font-size: 0.82rem;
+        -webkit-line-clamp: 2;
     }
 }
 

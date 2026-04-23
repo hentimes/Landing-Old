@@ -227,12 +227,15 @@ const renderArticle = (article) => `
     </article>
 `;
 
-const renderHeadlineArticle = (article) => `
-    <a class="noticia-headline" href="${escapeHtml(article.link)}" target="_blank" rel="noopener noreferrer">
-        <span class="noticia-headline__thumb">
+const renderMidGridArticle = (article) => `
+    <a class="noticia-mid-card" href="${escapeHtml(article.link)}" target="_blank" rel="noopener noreferrer">
+        <span class="noticia-mid-card__media" aria-hidden="true">
             <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" loading="lazy" decoding="async">
         </span>
-        <span class="noticia-headline__title">${escapeHtml(article.title)}</span>
+        <span class="noticia-mid-card__body">
+            <span class="noticia-mid-card__title">${escapeHtml(article.title)}</span>
+            <span class="noticia-mid-card__summary">${escapeHtml(article.summary || '')}</span>
+        </span>
     </a>
 `;
 
@@ -305,7 +308,7 @@ export const initNoticiasFeed = () => {
     };
 
     const bindImageFallbacks = () => {
-        document.querySelectorAll('.noticia-card img, .noticia-featured-card img, .noticia-headline img').forEach((image) => {
+        document.querySelectorAll('.noticia-card img, .noticia-featured-card img, .noticia-mid-card img').forEach((image) => {
             image.addEventListener('error', createImageFallback, { once: true });
         });
     };
@@ -364,7 +367,7 @@ export const initNoticiasFeed = () => {
         const headlineArticles = secondaryArticles.slice(0, 6);
         const carouselArticles = secondaryArticles.slice(6, 12);
 
-        if (headlines) headlines.innerHTML = headlineArticles.map(renderHeadlineArticle).join('');
+        if (headlines) headlines.innerHTML = headlineArticles.map(renderMidGridArticle).join('');
 
         if (carousel) {
             carousel.innerHTML = carouselArticles.length
