@@ -136,7 +136,27 @@
   #planes.screen { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
   #planes .section__title { margin-bottom: var(--spacing-md); }
   .attention-card { margin-top: var(--spacing-md); margin-bottom: 0; }
-  .attention-card { flex-wrap: wrap; border-radius: 24px; }
+  .attention-card {
+    flex-wrap: wrap;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 18% 30%, rgba(10, 116, 218, 0.12) 0%, rgba(10, 116, 218, 0) 46%),
+      rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .attention-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0));
+    pointer-events: none;
+  }
+  .attention-card > * { position: relative; }
   .attention-card p { white-space: normal; overflow-wrap: anywhere; min-width: 0; line-height: 1.35; }
 
   /* Index (móvil): evitar “saltos” y cualquier desborde horizontal */
