@@ -65,7 +65,7 @@
           "url": "https://planespro.cl/",
           "logo": {
             "@type": "ImageObject",
-            "url": "https://planespro.cl/assets/logos_pp/logo-planespro.cla.png"
+            "url": "https://planespro.cl/assets/logos_pp/logo-planespro.cla.webp"
           }
         }
       ]
@@ -77,7 +77,7 @@
     <header class="header">
         <div class="container header__container">
             <a href="index.html" class="header__brand">
-                <img src="assets/logos_pp/logo-planespro.obs.png" alt="PlanesPro.cl Logo" class="header__logo-img" />
+                <img src="assets/logos_pp/logo-planespro.obs.webp" alt="PlanesPro.cl Logo" class="header__logo-img" />
                 <span class="header__brand-name">PlanesPro.cl</span>
             </a>
             <nav class="header__nav">
@@ -115,8 +115,8 @@
                 </div>
                 <div class="noticias-hero__content">
                     <span class="noticias-eyebrow"><i class="fas fa-newspaper"></i> Actualidad de salud en Chile</span>
-                    <h1 class="noticias-hero__title">Noticias para entender mejor tu salud previsional.</h1>
-                    <p class="noticias-hero__subtitle">Seguimos fuentes chilenas y ordenamos la información relevante sobre Isapres, Fonasa, salud y previsión para que puedas decidir con más contexto.</p>
+                    <h1 class="noticias-hero__title">Entiende tu salud previsional.</h1>
+                    <p class="noticias-hero__subtitle">Resumimos titulares de los principales portales del sector salud y previsional para que decidas con más contexto.</p>
                     <div class="noticias-hero__meta" aria-label="Frecuencia y cobertura">
                         <span><i class="fas fa-rotate"></i> Actualización cada 4 horas</span>
                         <span><i class="fas fa-clock-rotate-left"></i> Histórico preparado para 60 días</span>
@@ -131,7 +131,23 @@
                     <span class="noticias-eyebrow">Monitor de noticias</span>
                     <h2>Últimas actualizaciones</h2>
                 </div>
-                <div class="noticias-filter-group" role="tablist" aria-label="Filtrar noticias por tema">
+
+                <div class="noticias-toolbar__controls" aria-label="Buscar y filtrar noticias">
+                    <div class="noticias-toolbar__search-pill" aria-hidden="true">Buscador de noticias</div>
+                    <form class="noticias-search noticias-search--compact" data-news-search role="search" aria-label="Buscar noticias de los últimos 60 días">
+                        <label class="noticias-search__field">
+                            <span class="sr-only">Buscar noticias</span>
+                            <input type="search" name="q" placeholder="Buscar..." autocomplete="off" data-news-search-input>
+                            <button type="submit" class="noticias-search__inside-button" aria-label="Buscar">
+                                <i class="fas fa-search" aria-hidden="true"></i>
+                            </button>
+                        </label>
+                    </form>
+                </div>
+
+                <div class="noticias-toolbar__hint" aria-hidden="true">Las noticias más relevantes del sector salud y previsional.</div>
+
+                <div class="noticias-filter-group noticias-filter-group--desktop" role="tablist" aria-label="Filtrar noticias por tema">
                     <button type="button" class="noticias-filter is-active" data-news-filter="todo" role="tab" aria-selected="true">Todo</button>
                     <button type="button" class="noticias-filter" data-news-filter="isapres" role="tab" aria-selected="false">Isapres</button>
                     <button type="button" class="noticias-filter" data-news-filter="fonasa" role="tab" aria-selected="false">Fonasa/Salud</button>
@@ -139,23 +155,38 @@
                 </div>
             </div>
 
-            <form class="noticias-search" data-news-search role="search" aria-label="Buscar noticias de los últimos 60 días">
-                <label class="noticias-search__field">
-                    <i class="fas fa-search" aria-hidden="true"></i>
-                    <span class="sr-only">Buscar noticias</span>
-                    <input type="search" name="q" placeholder="Busca por alza, excedentes, Fonasa, AFP..." autocomplete="off" data-news-search-input>
-                </label>
-                <button type="submit" class="noticias-search__button">Buscar</button>
-                <button type="button" class="noticias-search__clear" data-news-search-clear>Limpiar</button>
-            </form>
-
             <div class="noticias-feed-status" data-news-status>Buscando noticias recientes...</div>
             <div class="noticias-featured" data-news-featured aria-live="polite"></div>
+
+            <div class="noticias-mobile-stack" data-news-mobile-stack aria-label="Noticias en formato compacto">
+                <div class="noticias-headlines" data-news-headlines aria-live="polite"></div>
+                <div class="noticias-carousel" data-news-carousel aria-live="polite"></div>
+                <div class="noticias-days" data-news-days aria-label="Rango de noticias">
+                    <div class="noticias-days__label" aria-hidden="true">Ver titulares de los últimos</div>
+                    <button type="button" class="noticias-days__btn is-active" data-news-days-value="7">7 días</button>
+                    <button type="button" class="noticias-days__btn" data-news-days-value="15">15 días</button>
+                    <button type="button" class="noticias-days__btn" data-news-days-value="30">30 días</button>
+                </div>
+            </div>
+
             <div class="noticias-feed" data-news-feed aria-live="polite"></div>
             <div class="noticias-load-more-wrap">
                 <button type="button" class="noticias-load-more" data-news-load-more>Cargar más noticias</button>
             </div>
 
+        </section>
+
+        <section class="section-cta-final noticias-final-cta" aria-label="Cierre de noticias">
+            <div class="container cta-final__container">
+                <h2>Recibe contexto claro antes de tomar decisiones en salud.</h2>
+                <p>Si algo cambia en Isapres, Fonasa o AFP, te ayudamos a entender el impacto real en tu caso y qué pasos tomar sin presión.</p>
+                <button class="button button--coral button--large" data-modal-trigger="formModal" id="cta_noticias_final">Analizar Mi Plan</button>
+                <div class="cta-benefits" aria-label="Beneficios">
+                    <div class="cta-benefit-item"><i class="fas fa-check-circle"></i><span>Revisión objetiva</span></div>
+                    <div class="cta-benefit-item"><i class="fas fa-shield-halved"></i><span>Sin letra chica</span></div>
+                    <div class="cta-benefit-item"><i class="fas fa-clock"></i><span>Respuesta en 24 hrs</span></div>
+                </div>
+            </div>
         </section>
     </main>
 
@@ -163,7 +194,7 @@
         <div class="container footer__container">
             <div class="footer__left-column">
                 <a href="index.html" class="header__brand footer__brand">
-                    <img src="assets/logos_pp/logo-planespro.cla.png" alt="PlanesPro.cl Logo Oscuro" class="footer__logo-img" loading="lazy" decoding="async" />
+                    <img src="assets/logos_pp/logo-planespro.cla.webp" alt="PlanesPro.cl Logo Oscuro" class="footer__logo-img" loading="lazy" decoding="async" />
                     <span class="header__brand-name">PlanesPro.cl</span>
                 </a>
                 <div class="footer__contact">
@@ -183,10 +214,10 @@
                 <h4 class="footer__title">Links de interés:</h4>
                 <div class="footer__institutional-logos">
                     <a href="https://www.fonasa.cl" target="_blank" rel="noopener noreferrer">
-                        <img src="assets/logos_isapre/fonasa-bn.png" alt="Logo Fonasa" class="footer-link-logo" loading="lazy" decoding="async">
+                        <img src="assets/logos_isapre/fonasa-bn.webp" alt="Logo Fonasa" class="footer-link-logo" loading="lazy" decoding="async">
                     </a>
                     <a href="https://www.superdesalud.gob.cl/" target="_blank" rel="noopener noreferrer">
-                        <img src="assets/logos_isapre/gob-bn.png" alt="Logo Superintendencia de Salud" class="footer-link-logo" loading="lazy" decoding="async">
+                        <img src="assets/logos_isapre/gob-bn.webp" alt="Logo Superintendencia de Salud" class="footer-link-logo" loading="lazy" decoding="async">
                     </a>
                 </div>
             </div>

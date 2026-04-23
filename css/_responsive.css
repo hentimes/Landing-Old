@@ -16,6 +16,11 @@
 }
 
 @media (max-width: 768px) {
+  html { overflow-x: hidden; overscroll-behavior-x: none; }
+  .body-wrapper { overflow-x: hidden; overscroll-behavior-x: none; }
+  .screen,
+  main { overflow-x: hidden; }
+
   /* --- Hero en movil: apilado vertical, foto oculta --- */
   .hero {
     background: #f8faff;
@@ -113,6 +118,7 @@
   #proceso .section__title { margin-top: 0; margin-bottom: var(--spacing-md); }
   #proceso .container { padding-left: var(--spacing-md); padding-right: var(--spacing-md); }
   .proceso__layout { grid-template-columns: 1fr; gap: var(--spacing-lg); }
+  #proceso .proceso__media--person { display: none; }
   .proceso__header { margin-bottom: var(--spacing-md); }
   .proceso__cards { max-width: none; text-align: center; padding: 0; height: auto; align-self: auto; }
   .proceso__cards-kicker,
@@ -130,6 +136,40 @@
   #planes.screen { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
   #planes .section__title { margin-bottom: var(--spacing-md); }
   .attention-card { margin-top: var(--spacing-md); margin-bottom: 0; }
+  .attention-card {
+    flex-wrap: wrap;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 18% 30%, rgba(10, 116, 218, 0.12) 0%, rgba(10, 116, 218, 0) 46%),
+      rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 16px 34px rgba(15, 23, 42, 0.06);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .attention-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0));
+    pointer-events: none;
+  }
+  .attention-card > * { position: relative; }
+  .attention-card p { white-space: normal; overflow-wrap: anywhere; min-width: 0; line-height: 1.35; }
+
+  /* Index (móvil): evitar “saltos” y cualquier desborde horizontal */
+  body.page-index { overflow-x: clip; }
+  body.page-index #planes,
+  body.page-index #casos-exito,
+  body.page-index #testimonios,
+  body.page-index #cta-final {
+    content-visibility: visible;
+    contain-intrinsic-size: auto;
+  }
+
+  /* Index (móvil): “Planes” mantiene carrusel original (scroll horizontal) */
   #casos-exito.screen { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
   #casos-exito .page-section-full,
   #casos-exito .container { min-height: auto; display: block; }
@@ -140,10 +180,41 @@
   .case-study-right { display: none; }
   .case-study-slider { min-height: 0; }
   .case-study-panel { height: auto; min-height: 0; }
-  .case-study-panel__grid { grid-template-columns: 1fr; gap: var(--spacing-md); }
+  .case-study-panel__top { margin-bottom: var(--spacing-md); padding-bottom: 10px; }
+  .case-title { grid-template-columns: 48px 1fr; gap: 12px; }
+  .case-avatar { width: 48px; height: 48px; }
+  .case-title__row h3 { font-size: 1.08rem; }
+  .case-meta { gap: 6px 8px; margin-top: 4px; }
+  .case-meta__pill { font-size: 0.78rem; padding: 5px 9px; }
+  .case-study-panel__grid { grid-template-columns: 1fr; gap: 10px; margin-bottom: 14px; }
+  .case-study-panel__col { padding: 14px 14px; border-radius: 18px; }
+  .case-study-panel__col--before {
+    background: rgba(148, 163, 184, 0.08);
+    border-color: rgba(148, 163, 184, 0.28);
+  }
+  .case-study-panel__col--after {
+    background:
+      radial-gradient(circle at 18% 22%, rgba(34, 197, 94, 0.18) 0%, rgba(34, 197, 94, 0) 52%),
+      rgba(34, 197, 94, 0.06);
+    border-color: rgba(34, 197, 94, 0.22);
+  }
+  .case-study-panel__col h4 { font-size: 0.96rem; margin-bottom: 6px; }
+  .case-study-panel__col p { font-size: 0.92rem; line-height: 1.45; }
   .case-study-panel__wins-list { grid-template-columns: 1fr; }
   .case-study-tabs { justify-content: flex-start; }
   .case-study-tabs-desc { min-height: 0; }
+
+  /* Index (móvil): eliminar scroll horizontal interno en “Casos Reales” (tabs/puntos) */
+  body.page-index #casos-exito .case-study-tabs {
+    max-width: 100%;
+    overflow-x: hidden;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+    mask-image: none;
+    scroll-snap-type: none;
+  }
   #testimonios.screen { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
   #testimonios .section__title { margin-bottom: 0; }
   .testimonials-section__subtitle { font-size: 0.96rem; line-height: 1.55; }
@@ -158,10 +229,31 @@
   #testimonios .trust-box__text h3 { grid-area: title; margin: 0 0 4px 0; font-size: 0.95rem; }
   #testimonios .trust-box__text p { grid-area: body; margin: 0; font-size: 0.85rem; line-height: 1.4; white-space: normal; word-break: normal; overflow-wrap: break-word; min-width: 0; }
 
+  /* ---------- EBOOK TOC TOOLTIP (MÓVIL) ---------- */
+  .ebook-toc .accordion-item__header {
+      position: relative;
+  }
+  .ebook-toc__tooltip-wrapper {
+      position: static;
+  }
+  .ebook-toc__tooltip {
+      left: 50%;
+      right: auto;
+      top: calc(100% - 5px);
+      transform: translateX(-50%);
+      width: 260px;
+      max-width: 85vw !important; /* Evita que herede max-width: 100% del contenedor padre pequeño */
+      z-index: 50;
+      text-align: center;
+  }
+  .ebook-toc__tooltip::after {
+      display: none;
+  }
+
   /* ---------- CTA FINAL (MÓVIL) ---------- */
   .section-cta-final {
       min-height: auto;
-      padding: 34px 0 28px;
+      padding: 40px 0; /* Balance premium optimizado V26.3 */
   }
   .section-cta-final p { margin: 12px 0 0; }
   .cta-final__container .button { min-width: 260px; min-height: 56px; margin-top: 20px; }
@@ -183,38 +275,6 @@
       align-items: center; /* Centra los items en móvil */
       justify-content: center;
   }
-  .ebook-hero { padding-top: calc(var(--header-height) + var(--spacing-lg)); padding-bottom: var(--spacing-xl); }
-  .ebook-hero__container,
-  .ebook-outcomes__grid,
-  .ebook-fit,
-  .ebook-cost-band,
-  .ebook-warning,
-  .ebook-includes,
-  .ebook-toc,
-  .ebook-objections__grid,
-  .ebook-testimonials__grid,
-  .ebook-metrics { grid-template-columns: 1fr; }
-  .ebook-hero h1 { max-width: none; font-size: 2.2rem; }
-  .ebook-hero__subtitle { max-width: none; font-size: 1.15rem; }
-  .ebook-outcomes__title { max-width: none; font-size: 1.9rem; line-height: 1.12; }
-  .ebook-hero__actions { flex-direction: column; }
-  .ebook-hero__actions .button { width: 100%; }
-  .ebook-hero__actions .button { white-space: normal; }
-  .ebook-hero__media { padding: 18px 14px 0; border-radius: 24px; }
-  .ebook-hero__media { min-height: auto; }
-  .ebook-hero__image { max-width: 320px; transform: none; }
-  .ebook-objection,
-  .ebook-metric { padding: var(--spacing-lg); }
-  .ebook-cost-band__copy,
-  .ebook-cost-band__cta { padding: var(--spacing-lg); }
-  .ebook-warning__price-box,
-  .ebook-warning__highlight { padding: var(--spacing-lg); }
-  .ebook-toc .accordion-item__header { padding: 18px; }
-  .ebook-toc .accordion-item.is-open .accordion-item__content { padding: 0 18px 18px; }
-  .ebook-toc .accordion-item__content { padding: 0 18px; }
-  .ebook-faq__accordion .accordion-item__header { padding: 18px; }
-  .ebook-faq__accordion .accordion-item.is-open .accordion-item__content { padding: 0 18px 18px; }
-  .ebook-faq__accordion .accordion-item__content { padding: 0 18px; }
   .floating-whatsapp { display: flex; }
 }
 

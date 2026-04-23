@@ -21,7 +21,9 @@ import { initAccordion } from './modules/accordion.js'; // Inicializa el acorde�
 import { initAnalytics } from './modules/analytics.js'; // Carga los scripts de analítica.
 import { initHeroTypewriter } from './modules/typewriter.js'; // Efecto tipeado en el eyebrow del hero.
 import { initAsistenteFAQ } from './modules/asistente-faq.js'; // Inicializa el asistente de preguntas frecuentes.
+import { initAfpCarousel } from './modules/afp-carousel.js'; // Carrusel de AFPs para la sección Ebook.
 import { initNoticiasFeed } from './modules/noticias-loader.js'; // Carga noticias desde el Worker de Cloudflare.
+import { initEbookPage } from './modules/ebook-page.js';
 import { loadModules } from '../formulario/js/_module-loader.js'; // Carga el HTML de los modales del formulario.
 import { setElements } from '../formulario/js/_dom-elements.js'; // Asigna las referencias a los elementos del DOM.
 import {
@@ -47,11 +49,11 @@ function initializeFormApp() {
     loadProgress();
     updateActionButtonState();
 
-    console.log('Lógica interna del formulario inicializada correctamente.');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     initAnalytics();
+    initAccordion();
 
     initNavigation();
     initHeroTypewriter();
@@ -60,19 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initCasosDeExitoSlider();
     initTestimonials();
     initLogoFader();
-    initAccordion();
     initAsesores();
     initNosotrosAsesores();
     initAsistenteFAQ();
+    initAfpCarousel();
     initNoticiasFeed();
-    console.log('Componentes de la página principal inicializados.');
-
+    initEbookPage();
     loadModules()
         .then(() => {
-            console.log('HTML del formulario cargado en la página.');
-
             initModal();
-            console.log('Botones CTA conectados al modal.');
 
             initializeFormApp();
 

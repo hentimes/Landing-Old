@@ -45,7 +45,7 @@ function createTestimonialHTML(testimonial, slotIndex) {
     const authorLabel = formatAuthorName(testimonial.author);
     const avatarHtml = `<img src="${avatarSrc}" alt="Usuario PlanesPro" class="testimonial-card__avatar-img">`;
     const starsHtml = createStarsHtml(testimonial.stars);
-    const googleLogoHtml = `<img src="assets/logos_varios/google.png" alt="Google" class="testimonial-card__google-logo-img">`;
+    const googleLogoHtml = `<img src="assets/logos_varios/google.webp" alt="Google" class="testimonial-card__google-logo-img">`;
     const reviewDate = generateReviewDate(slotIndex);
 
     return `
