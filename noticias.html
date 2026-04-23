@@ -135,13 +135,12 @@
                 <div class="noticias-toolbar__controls" aria-label="Buscar y filtrar noticias">
                     <form class="noticias-search noticias-search--compact" data-news-search role="search" aria-label="Buscar noticias de los últimos 60 días">
                         <label class="noticias-search__field">
-                            <i class="fas fa-search" aria-hidden="true"></i>
                             <span class="sr-only">Buscar noticias</span>
                             <input type="search" name="q" placeholder="Busca por alza, excedentes, Fonasa, AFP..." autocomplete="off" data-news-search-input>
+                            <button type="submit" class="noticias-search__inside-button" aria-label="Buscar">
+                                <i class="fas fa-search" aria-hidden="true"></i>
+                            </button>
                         </label>
-                        <button type="submit" class="noticias-search__icon-button" aria-label="Buscar">
-                            <i class="fas fa-search" aria-hidden="true"></i>
-                        </button>
                     </form>
 
                     <label class="noticias-filter-select" aria-label="Filtrar noticias por tema">
