@@ -195,6 +195,13 @@ const renderMeta = (article) => {
     `;
 };
 
+const renderCompactMeta = (article) => `
+    <div class="noticia-card__meta">
+        <span class="noticia-card__source">${escapeHtml(getPortalShortName(article))}</span>
+        <span class="noticia-card__category">${escapeHtml(getCompactCategory(article))}</span>
+    </div>
+`;
+
 const getPortalShortName = (article) => {
     const candidates = [article.link, article.portalName].filter(Boolean);
 
@@ -294,7 +301,7 @@ const renderCarouselItem = (article) => `
             ${renderMediaTags(article)}
         </span>
         <div class="noticia-carousel-item__body">
-            ${renderMeta(article)}
+            ${renderCompactMeta(article)}
             <div class="noticia-carousel-item__title">${escapeHtml(article.title)}</div>
         </div>
     </a>
