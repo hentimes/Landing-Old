@@ -458,7 +458,7 @@
 
     .asistente-faq__header {
         min-height: auto;
-        margin-bottom: 12px;
+        margin-bottom: 6px;
     }
 
     .asistente-faq__stage {
@@ -466,7 +466,7 @@
     }
 
     .asistente-faq__list {
-        top: -28px;
+        top: -64px;
     }
 
     .asistente-faq__img {
