@@ -659,9 +659,11 @@
     }
 
     .noticias-toolbar {
-        padding: 12px;
-        gap: 14px;
-        border-radius: 22px 22px 16px 16px;
+        padding: 0;
+        gap: 10px;
+        border-radius: 0;
+        border: 0;
+        background: transparent;
         box-shadow: none;
     }
 
@@ -681,19 +683,6 @@
 
     .noticias-filter-group--desktop {
         display: none;
-    }
-
-    .noticias-filter-select {
-        display: inline-flex;
-        flex: 0 0 150px;
-        min-height: 48px;
-        border-radius: 18px;
-        padding: 0 14px;
-        box-shadow: none;
-    }
-
-    .noticias-filter-select select {
-        font-size: 0.92rem;
     }
 
     .noticias-search--compact {
@@ -730,7 +719,7 @@
     }
 
     .noticias-feed-section {
-        padding: 34px 0 58px;
+        padding: 22px 0 58px;
     }
 
     .noticias-mobile-stack {
