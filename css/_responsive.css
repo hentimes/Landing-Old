@@ -16,6 +16,11 @@
 }
 
 @media (max-width: 768px) {
+  html { overflow-x: hidden; overscroll-behavior-x: none; }
+  .body-wrapper { overflow-x: hidden; overscroll-behavior-x: none; }
+  .screen,
+  main { overflow-x: hidden; }
+
   /* --- Hero en movil: apilado vertical, foto oculta --- */
   .hero {
     background: #f8faff;
@@ -113,6 +118,7 @@
   #proceso .section__title { margin-top: 0; margin-bottom: var(--spacing-md); }
   #proceso .container { padding-left: var(--spacing-md); padding-right: var(--spacing-md); }
   .proceso__layout { grid-template-columns: 1fr; gap: var(--spacing-lg); }
+  #proceso .proceso__media--person { display: none; }
   .proceso__header { margin-bottom: var(--spacing-md); }
   .proceso__cards { max-width: none; text-align: center; padding: 0; height: auto; align-self: auto; }
   .proceso__cards-kicker,
@@ -130,6 +136,20 @@
   #planes.screen { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
   #planes .section__title { margin-bottom: var(--spacing-md); }
   .attention-card { margin-top: var(--spacing-md); margin-bottom: 0; }
+  .attention-card { flex-wrap: wrap; border-radius: 24px; }
+  .attention-card p { white-space: normal; overflow-wrap: anywhere; min-width: 0; line-height: 1.35; }
+
+  /* Index (móvil): evitar “saltos” y cualquier desborde horizontal */
+  body.page-index { overflow-x: clip; }
+  body.page-index #planes,
+  body.page-index #casos-exito,
+  body.page-index #testimonios,
+  body.page-index #cta-final {
+    content-visibility: visible;
+    contain-intrinsic-size: auto;
+  }
+
+  /* Index (móvil): “Planes” mantiene carrusel original (scroll horizontal) */
   #casos-exito.screen { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
   #casos-exito .page-section-full,
   #casos-exito .container { min-height: auto; display: block; }
@@ -144,6 +164,18 @@
   .case-study-panel__wins-list { grid-template-columns: 1fr; }
   .case-study-tabs { justify-content: flex-start; }
   .case-study-tabs-desc { min-height: 0; }
+
+  /* Index (móvil): eliminar scroll horizontal interno en “Casos Reales” (tabs/puntos) */
+  body.page-index #casos-exito .case-study-tabs {
+    max-width: 100%;
+    overflow-x: hidden;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+    mask-image: none;
+    scroll-snap-type: none;
+  }
   #testimonios.screen { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
   #testimonios .section__title { margin-bottom: 0; }
   .testimonials-section__subtitle { font-size: 0.96rem; line-height: 1.55; }

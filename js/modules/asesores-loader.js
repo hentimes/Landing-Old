@@ -312,6 +312,13 @@ export function initAsesores() {
  * Crea el HTML para una tarjeta de asesor simplificada para la página "Nosotros".
  */
 function createNosotrosAsesorCard(asesor) {
+    const fortalezaHtml = asesor.fortaleza ? `
+        <p class="asesor-card__fortaleza">
+            <i class="fas ${asesor.fortaleza.icon}"></i>
+            <span>${asesor.fortaleza.text}</span>
+        </p>
+    ` : '';
+
     return `
         <div class="asesor-card" id="${asesor.id}" data-asesor-id="${asesor.id}">
             <div class="asesor-card__header">
@@ -331,6 +338,9 @@ function createNosotrosAsesorCard(asesor) {
                     <h3 class="asesor-card__nombre">${asesor.nombre}</h3>
                     <p class="asesor-card__cargo">${asesor.cargo}</p>
                 </div>
+            </div>
+            <div class="asesor-card__body-mobile">
+                ${fortalezaHtml}
             </div>
         </div>
     `;

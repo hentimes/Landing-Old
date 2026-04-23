@@ -134,6 +134,69 @@
     filter: drop-shadow(0 18px 34px rgba(15, 23, 42, 0.12));
 }
 
+@media (max-width: 768px) {
+    .page-nosotros {
+        overflow-x: clip;
+    }
+
+    .page-nosotros .hero-nosotros__container {
+        gap: var(--spacing-lg);
+        padding-top: 10px;
+    }
+
+    .page-nosotros .hero-nosotros__text-content .hero__title {
+        margin-bottom: var(--spacing-md);
+    }
+
+    /* Hacer la imagen realmente más grande que el ancho del container (márgenes más cortos). */
+    .page-nosotros .hero-nosotros__illustration-content {
+        margin-left: calc(var(--spacing-md) * -1);
+        margin-right: calc(var(--spacing-md) * -1);
+    }
+
+    .page-nosotros .hero-nosotros__image-card {
+        width: calc(100% + (var(--spacing-md) * 2));
+        max-width: none;
+    }
+
+    .page-nosotros .hero-nosotros__illustration-content .hero__illustration {
+        width: min(100%, 390px);
+        max-width: none;
+        transform: scaleX(-1);
+    }
+
+    /* Equipo (Nosotros): solo ajustar color del cargo para contraste en móvil */
+    .page-nosotros .equipo-section .asesor-card__header-mobile .asesor-card__cargo {
+        color: rgba(255, 255, 255, 0.82);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        line-height: 1.2;
+        font-size: 0.82rem;
+        opacity: 0.85;
+    }
+
+    /* Subir título “Conoce al equipo...” (menos aire entre secciones) */
+    .page-nosotros .equipo-section {
+        margin-top: calc(var(--spacing-lg) * -1);
+    }
+
+    /* Subir título “Una asesoría seria...” (menos aire entre secciones) */
+    .page-nosotros .etica-section {
+        margin-top: calc(var(--spacing-lg) * -1);
+    }
+
+    /* CTA azul final (Nosotros): mismo aire arriba/abajo que en ebook */
+    .page-nosotros .section-cta-final {
+        padding: 50px 0 !important;
+        min-height: auto !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
 /* --- 2. Forma de Asesorar --- */
 .pilares__grid {
     display: grid;
@@ -351,7 +414,7 @@
     padding-top: 78px;
 }
 
-.equipo-section .asesor-card__cargo {
+.equipo-section .asesor-card__info .asesor-card__cargo {
     display: inline-flex;
     align-self: center;
     padding: 6px 12px;
