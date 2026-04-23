@@ -465,6 +465,10 @@
         min-height: 340px;
     }
 
+    .asistente-faq__list {
+        top: -28px;
+    }
+
     .asistente-faq__img {
         width: min(270px, 100%);
     }
