@@ -10,109 +10,6 @@ const getPageSize = () => (
         : DESKTOP_PAGE_SIZE
 );
 
-const fallbackArticles = [
-    {
-        title: 'Cómo leer una noticia de salud sin perder de vista tu cobertura',
-        link: 'https://wa.me/56958785580',
-        imageUrl: FALLBACK_IMAGE,
-        summary: 'Antes de tomar decisiones por una noticia aislada, conviene revisar cómo puede afectar tu plan, tus beneficios y tu situación familiar.',
-        portalName: 'PlanesPro.cl',
-        category: 'salud',
-        publishedAt: new Date().toISOString()
-    },
-    {
-        title: 'Isapre, Fonasa y cobertura: conceptos que conviene revisar',
-        link: 'https://wa.me/56958785580',
-        imageUrl: 'assets/ilustraciones/news1.webp',
-        summary: 'Una buena decisión requiere entender precios, beneficios, cobertura hospitalaria y condiciones reales antes de comparar alternativas.',
-        portalName: 'Guía PlanesPro',
-        category: 'isapres',
-        publishedAt: new Date().toISOString()
-    },
-    {
-        title: 'AFP y previsión: por qué conviene separar ahorro, salud y cobertura',
-        link: 'https://wa.me/56958785580',
-        imageUrl: 'assets/ilustraciones/ebook-retiro-afp.webp',
-        summary: 'Las noticias previsionales pueden afectar decisiones de largo plazo. Conviene mirar el contexto antes de actuar por urgencia.',
-        portalName: 'Análisis PlanesPro',
-        category: 'afp',
-        publishedAt: new Date().toISOString()
-    },
-    {
-        title: 'Qué revisar si una noticia anuncia cambios en beneficios de salud',
-        link: 'https://wa.me/56958785580',
-        imageUrl: 'assets/ilustraciones/news.webp',
-        summary: 'Los cambios regulatorios o comerciales no siempre impactan igual a cada persona. La clave es revisar cobertura, red y costo real.',
-        portalName: 'PlanesPro.cl',
-        category: 'salud',
-        publishedAt: new Date().toISOString()
-    },
-    {
-        title: 'Cómo comparar noticias de Isapres sin tomar decisiones apresuradas',
-        link: 'https://wa.me/56958785580',
-        imageUrl: FALLBACK_IMAGE,
-        summary: 'Una noticia puede ser relevante, pero tu decisión debe considerar edad, cargas, preexistencias, presupuesto y uso esperado.',
-        portalName: 'Guía PlanesPro',
-        category: 'isapres',
-        publishedAt: new Date().toISOString()
-    },
-    {
-        title: 'Fonasa y sistema privado: cuándo conviene volver a comparar',
-        link: 'https://wa.me/56958785580',
-        imageUrl: 'assets/ilustraciones/proceso-person.webp',
-        summary: 'Cambios familiares, ingresos o uso de prestaciones pueden modificar la conveniencia entre Fonasa, Isapre o mantener tu cobertura.',
-        portalName: 'Análisis PlanesPro',
-        category: 'salud',
-        publishedAt: new Date().toISOString()
-    },
-    {
-        title: 'Previsión y salud: dos decisiones distintas que conviene ordenar',
-        link: 'https://wa.me/56958785580',
-        imageUrl: 'assets/ilustraciones/ebook-retiro-afp-bonus.webp',
-        summary: 'Las noticias sobre AFP no reemplazan una revisión previsional completa, pero ayudan a detectar temas que conviene entender a tiempo.',
-        portalName: 'PlanesPro.cl',
-        category: 'afp',
-        publishedAt: new Date().toISOString()
-    }
-    ,{
-        title: 'Cuándo una noticia de Isapre debería llevarte a revisar tu plan',
-        link: 'https://wa.me/56958785580',
-        imageUrl: 'assets/ilustraciones/asesores.webp',
-        summary: 'Si una actualización afecta precio, red o beneficios, conviene contrastarla con tu contrato y tu uso real de salud.',
-        portalName: 'Guía PlanesPro',
-        category: 'isapres',
-        publishedAt: new Date().toISOString()
-    },
-    {
-        title: 'Cambios en Fonasa: qué mirar antes de comparar alternativas',
-        link: 'https://wa.me/56958785580',
-        imageUrl: 'assets/ilustraciones/proceso-person.webp',
-        summary: 'No todos los cambios del sistema público impactan de la misma forma. Edad, cargas y frecuencia de uso siguen siendo claves.',
-        portalName: 'Análisis PlanesPro',
-        category: 'salud',
-        publishedAt: new Date().toISOString()
-    },
-    {
-        title: 'Cotización de salud: señales que conviene monitorear',
-        link: 'https://wa.me/56958785580',
-        imageUrl: FALLBACK_IMAGE,
-        summary: 'Las noticias sobre precios o adecuaciones deben revisarse junto con cobertura, topes, red preferente y beneficios usados.',
-        portalName: 'PlanesPro.cl',
-        category: 'isapres',
-        publishedAt: new Date().toISOString()
-    },
-    {
-        title: 'AFP, salud y presupuesto familiar: cómo ordenar prioridades',
-        link: 'https://wa.me/56958785580',
-        imageUrl: 'assets/ilustraciones/ebook-retiro-afp.webp',
-        summary: 'Las decisiones previsionales y de salud comparten presupuesto, pero responden a riesgos distintos y requieren análisis separado.',
-        portalName: 'Guía PlanesPro',
-        category: 'afp',
-        publishedAt: new Date().toISOString()
-    }
-
-];
-
 const categoryLabels = {
     todo: 'Todo',
     isapres: 'Isapres',
@@ -396,42 +293,6 @@ export const initNoticiasFeed = () => {
         articles.forEach((article) => renderedArticleKeys.add(makeArticleKey(article)));
     };
 
-    const getLocalFallback = () => fallbackArticles
-        .map(normalizeArticle)
-        .filter(matchesCurrentCategory)
-        .filter((article) => {
-            if (!currentQuery) return true;
-            const haystack = `${article.title} ${article.summary} ${article.portalName} ${article.category}`.toLowerCase();
-            return haystack.includes(currentQuery.toLowerCase());
-        });
-
-    const getSupplementArticles = (existingArticles = [], limit) => {
-        if (currentQuery || limit <= 0) return [];
-
-        const seen = new Set([
-            ...renderedArticleKeys,
-            ...existingArticles.map(makeArticleKey)
-        ]);
-
-        return getLocalFallback()
-            .filter((article) => !seen.has(makeArticleKey(article)))
-            .slice(0, limit);
-    };
-
-    const completeInitialPage = (articles, pageSize) => {
-        const normalizedArticles = articles.map(normalizeArticle);
-        if (currentQuery || normalizedArticles.length >= pageSize) return normalizedArticles;
-
-        const completedArticles = [...normalizedArticles];
-
-        completedArticles.push(...getSupplementArticles(
-            completedArticles,
-            pageSize - completedArticles.length
-        ));
-
-        return completedArticles;
-    };
-
     const renderMobileBlocks = (secondaryArticles = []) => {
         if (!headlines && !carousel) return;
 
@@ -484,20 +345,13 @@ export const initNoticiasFeed = () => {
     };
 
     const renderLocalFallback = (message) => {
-        const pageSize = getPageSize();
-        const fallback = getLocalFallback();
-        if (!fallback.length) {
-            renderEmptyState('No hay resultados para esta busqueda en la seleccion local.');
-            return;
-        }
-
-        renderPage(fallback, { message, pageSize });
+        renderEmptyState(message);
     };
 
     const loadNews = ({ append = false } = {}) => {
         const pageSize = getPageSize();
         if (!endpoint) {
-            renderPage(getLocalFallback(), { append, message: 'Selección base de contenidos PlanesPro.', pageSize });
+            renderEmptyState('Feed de noticias no configurado.');
             return;
         }
 
@@ -527,9 +381,9 @@ export const initNoticiasFeed = () => {
                     : [];
 
                 if (!validArticles.length && !append) {
-                    renderLocalFallback(currentQuery
-                        ? 'No hay resultados remotos para esta busqueda. Mostrando seleccion local relacionada.'
-                        : 'El Worker no devolvio noticias. Mostrando seleccion local PlanesPro.');
+                    renderEmptyState(currentQuery
+                        ? 'No hay resultados para esta búsqueda en este rango.'
+                        : 'No hay noticias nuevas para este rango.');
                     return;
                 }
 
@@ -538,18 +392,10 @@ export const initNoticiasFeed = () => {
                     .filter(matchesCurrentCategory)
                     .filter((article) => !append || !renderedArticleKeys.has(makeArticleKey(article)));
 
-                let articlesToRender = append ? normalizedValidArticles : completeInitialPage(normalizedValidArticles, pageSize);
-
-                if (append && articlesToRender.length < pageSize) {
-                    articlesToRender = [
-                        ...articlesToRender,
-                        ...getSupplementArticles(articlesToRender, pageSize - articlesToRender.length)
-                    ];
-                }
+                const articlesToRender = normalizedValidArticles;
 
                 const remoteHasMore = total ? offset + validArticles.length < total : validArticles.length === pageSize;
-                const localHasMore = getSupplementArticles(articlesToRender, 1).length > 0;
-                hasMore = remoteHasMore || localHasMore;
+                hasMore = remoteHasMore;
 
                 if (!append) {
                     const [featuredArticle, ...secondaryArticles] = articlesToRender;
@@ -571,7 +417,7 @@ export const initNoticiasFeed = () => {
                 bindImageFallbacks();
             })
             .catch(() => {
-                renderLocalFallback('No se pudo conectar con el Worker. Mostrando seleccion local PlanesPro.');
+                renderLocalFallback('No se pudo conectar con el feed de noticias en este momento.');
             })
             .finally(() => setLoading(false));
     };

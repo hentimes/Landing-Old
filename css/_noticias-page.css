@@ -443,6 +443,15 @@
     flex-wrap: wrap;
 }
 
+.noticias-days__label {
+    width: 100%;
+    text-align: center;
+    color: var(--color-text-light);
+    font-weight: 700;
+    font-size: 0.82rem;
+    letter-spacing: -0.01em;
+}
+
 .noticias-days__btn {
     border: 1px solid rgba(100, 116, 139, 0.22);
     background: rgba(255, 255, 255, 0.86);
