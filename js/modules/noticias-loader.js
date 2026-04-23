@@ -298,7 +298,6 @@ const renderCarouselItem = (article) => `
     <a class="noticia-carousel-item" href="${escapeHtml(article.link)}" target="_blank" rel="noopener noreferrer">
         <span class="noticia-carousel-item__media" aria-hidden="true">
             <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" loading="lazy" decoding="async">
-            ${renderMediaTags(article)}
         </span>
         <div class="noticia-carousel-item__body">
             ${renderCompactMeta(article)}
