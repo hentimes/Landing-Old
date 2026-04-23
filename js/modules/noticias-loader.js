@@ -254,6 +254,36 @@ const renderCarouselArticle = (article) => `
     </article>
 `;
 
+const renderCarouselItem = (article) => `
+    <a class="noticia-carousel-item" href="${escapeHtml(article.link)}" target="_blank" rel="noopener noreferrer">
+        <span class="noticia-carousel-item__media" aria-hidden="true">
+            <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" loading="lazy" decoding="async">
+        </span>
+        <div class="noticia-carousel-item__body">
+            ${renderMeta(article)}
+            <div class="noticia-carousel-item__title">${escapeHtml(article.title)}</div>
+        </div>
+    </a>
+`;
+
+const chunk = (items, size) => {
+    const result = [];
+    for (let index = 0; index < items.length; index += size) {
+        result.push(items.slice(index, index + size));
+    }
+    return result;
+};
+
+const renderCarouselSlides = (articles = []) => (
+    chunk(articles, 2)
+        .map((pair) => `
+            <div class="noticias-carousel__slide">
+                ${pair.map(renderCarouselItem).join('')}
+            </div>
+        `)
+        .join('')
+);
+
 const buildEndpoint = ({ endpoint, category, query, offset, pageSize }) => {
     const url = new URL(endpoint, window.location.href);
     const categoryQueries = {
@@ -308,7 +338,7 @@ export const initNoticiasFeed = () => {
     };
 
     const bindImageFallbacks = () => {
-        document.querySelectorAll('.noticia-card img, .noticia-featured-card img, .noticia-mid-card img').forEach((image) => {
+        document.querySelectorAll('.noticia-card img, .noticia-featured-card img, .noticia-mid-card img, .noticia-carousel-item img').forEach((image) => {
             image.addEventListener('error', createImageFallback, { once: true });
         });
     };
@@ -371,7 +401,7 @@ export const initNoticiasFeed = () => {
 
         if (carousel) {
             carousel.innerHTML = carouselArticles.length
-                ? `<div class="noticias-carousel__track">${carouselArticles.map(renderCarouselArticle).join('')}</div>`
+                ? `<div class="noticias-carousel__track">${renderCarouselSlides(carouselArticles)}</div>`
                 : '';
         }
     };
