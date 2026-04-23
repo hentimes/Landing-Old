@@ -1,6 +1,6 @@
 # Checklist Maestro PlanesPro
 
-Fecha de consolidacion: 2026-04-22  
+Fecha de consolidacion: 2026-04-23  
 Rama revisada: `sections`
 
 Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como fuente unica para priorizar estabilizacion, SEO, noticias, conversion y mantenimiento.
@@ -26,7 +26,7 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
 - [ ] Separar CSS y JS por seccion de forma consistente, sin romper cache ni orden de carga.
 - [ ] Eliminar duplicacion de markup entre paginas cuando exista una fuente unica.
 - [ ] Consolidar estrategia de versionado de assets (`?v=`) para CSS y JS.
-- [ ] Revisar assets duplicados (`png`, `jpg`, `webp`) y eliminar solo los que no esten referenciados.
+- [x] Revisar assets duplicados (`png`, `jpg`, `webp`) y eliminar solo los que no esten referenciados.
 
 ## 3. Noticias
 
@@ -37,6 +37,7 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
 - [x] Worker preparado para consultar noticias, clasificar y normalizar campos.
 - [x] Migracion SQL D1 creada.
 - [x] Frontend preparado para `limit`, `offset`, `dias`, `categoria` y `q`.
+- [x] Rediseño móvil del feed (buscador + dropdown, 6 titulares + 6 carrusel, CTA azul final).
 - [ ] Crear la base D1 real en Cloudflare.
 - [ ] Aplicar migracion D1 en Cloudflare.
 - [ ] Confirmar URL final del Worker y reemplazar endpoints antiguos si corresponde.
