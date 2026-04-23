@@ -5,7 +5,7 @@ export const asesoresData = [
     id: 'betzabet-pereira',
     nombre: 'Betzabeth Pereira',
     cargo: 'Asesora de Salud y Previsión',
-    foto: 'assets/avatares/asesores/betzabeth-pereira.jpg',
+    foto: 'assets/avatares/asesores/betzabeth-pereira.webp',
     isapre: 'Nueva Masvida',
     fortaleza: {
       icon: 'fa-heart-pulse',
@@ -34,7 +34,7 @@ export const asesoresData = [
     id: 'henry-farias',
     nombre: 'Henry Farias',
     cargo: 'Asesor de Salud y Previsión',
-    foto: 'assets/avatares/asesores/henry-farias.jpg',
+    foto: 'assets/avatares/asesores/henry-farias.webp',
     isapre: 'Consalud',
     fortaleza: {
       icon: 'fa-hand-holding-usd',

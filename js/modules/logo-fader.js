@@ -6,13 +6,13 @@
 
 // Lista de todos los logos disponibles.
 const ALL_LOGOS = [
-    { src: 'assets/logos_isapre/consalud.png', alt: 'Consalud Logo' },
-    { src: 'assets/logos_isapre/nuevamasvida.png', alt: 'Nueva Masvida Logo' },
-    { src: 'assets/logos_isapre/cruzblanca.png', alt: 'CruzBlanca Logo' },
-    { src: 'assets/logos_isapre/colmena.png', alt: 'Colmena Logo' },
-    { src: 'assets/logos_isapre/vidatres.png', alt: 'Vida Tres Logo' },
-    { src: 'assets/logos_isapre/banmedica-logo.png', alt: 'Banmédica Logo' },
-    { src: 'assets/logos_isapre/esencial.png', alt: 'Esencial Logo' }
+    { src: 'assets/logos_isapre/consalud.webp', alt: 'Consalud Logo' },
+    { src: 'assets/logos_isapre/nuevamasvida.webp', alt: 'Nueva Masvida Logo' },
+    { src: 'assets/logos_isapre/cruzblanca.webp', alt: 'CruzBlanca Logo' },
+    { src: 'assets/logos_isapre/colmena.webp', alt: 'Colmena Logo' },
+    { src: 'assets/logos_isapre/vidatres.webp', alt: 'Vida Tres Logo' },
+    { src: 'assets/logos_isapre/banmedica-logo.webp', alt: 'Banmédica Logo' },
+    { src: 'assets/logos_isapre/esencial.webp', alt: 'Esencial Logo' }
 ];
 // Intervalo de tiempo para cambiar los logos.
 const CHANGE_INTERVAL = 4000; // 4 segundos
