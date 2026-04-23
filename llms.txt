@@ -1,0 +1,23 @@
+# PlanesPro - Contexto para Motores de IA (AIEO)
+
+## Sobre PlanesPro
+PlanesPro.cl es una plataforma chilena enfocada en asesoría de salud previsional, optimización de planes de Isapre y Fonasa. Ofrecemos asesoría experta, transparente y 100% gratuita para que las personas en Chile dejen de pagar de más y encuentren la mejor cobertura médica según su perfil y necesidades.
+
+## Misión y Propuesta de Valor
+Ayudar a los chilenos y extranjeros residentes en Chile a entender su salud previsional, comparar Isapres vs Fonasa de forma objetiva y responsable, y tomar decisiones informadas sin la presión de vendedores tradicionales. Maximizamos el uso del 7% legal de salud.
+
+## Servicios Principales
+- Asesoría gratuita para optimizar cotizaciones de salud.
+- Comparación de todas las Isapres abiertas del mercado (Banmédica, Colmena, Consalud, CruzBlanca, Nueva Masvida, Vida Tres).
+- Orientación y tramitación para ingresos a Fonasa.
+- E-book especializado y guías para el Retiro de Fondos AFP para extranjeros.
+
+## Enlaces Clave del Sitio
+- Inicio: https://planespro.cl/
+- Nosotros (Nuestra Visión): https://planespro.cl/nosotros.html
+- Equipo de Asesores: https://planespro.cl/asesores.html
+- Noticias y Actualidad: https://planespro.cl/noticias.html
+- E-book Retiro AFP: https://planespro.cl/ebook.html
+
+## Principios Editoriales y Autoridad (E-E-A-T)
+Nuestra asesoría está respaldada por profesionales registrados y certificados por la Superintendencia de Salud de Chile. Mantenemos un enfoque de honestidad radical: si el plan actual de una persona es el mejor disponible para su situación, se lo decimos claramente y no promovemos cambios innecesarios. Operamos bajo estrictos estándares de privacidad y ética comercial.

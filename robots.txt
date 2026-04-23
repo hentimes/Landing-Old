@@ -8,3 +8,6 @@ Disallow: /default.php
 
 # Sitemap 
 Sitemap: https://planespro.cl/sitemap.xml
+
+# Contexto para IA (AIEO)
+Allow: /llms.txt
