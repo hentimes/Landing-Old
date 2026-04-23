@@ -278,6 +278,13 @@
     border-radius: 0;
 }
 
+.noticias-search__field input:focus,
+.noticias-search__field input:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    border: 0 !important;
+}
+
 .noticias-search__field input::placeholder {
     color: #94a3b8;
 }
