@@ -158,6 +158,27 @@
   #testimonios .trust-box__text h3 { grid-area: title; margin: 0 0 4px 0; font-size: 0.95rem; }
   #testimonios .trust-box__text p { grid-area: body; margin: 0; font-size: 0.85rem; line-height: 1.4; white-space: normal; word-break: normal; overflow-wrap: break-word; min-width: 0; }
 
+  /* ---------- EBOOK TOC TOOLTIP (MÓVIL) ---------- */
+  .ebook-toc .accordion-item__header {
+      position: relative;
+  }
+  .ebook-toc__tooltip-wrapper {
+      position: static;
+  }
+  .ebook-toc__tooltip {
+      left: 50%;
+      right: auto;
+      top: calc(100% - 5px);
+      transform: translateX(-50%);
+      width: 260px;
+      max-width: 85vw !important; /* Evita que herede max-width: 100% del contenedor padre pequeño */
+      z-index: 50;
+      text-align: center;
+  }
+  .ebook-toc__tooltip::after {
+      display: none;
+  }
+
   /* ---------- CTA FINAL (MÓVIL) ---------- */
   .section-cta-final {
       min-height: auto;

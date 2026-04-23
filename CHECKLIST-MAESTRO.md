@@ -92,6 +92,7 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
 - [x] Revisar mobile del hero del ebook despues de los ajustes recientes.
 - [x] Corregir H1 del ebook para que no quede truncado por animacion de tipeo.
 - [x] Corregir responsive movil de secciones `cambios`, `preparacion`, `para-quien`, `problema` y precio del ebook.
+- [x] Refinar espaciados verticales, centrado del hero, tooltips y logos del footer en vista mobile del ebook.
 - [ ] Agregar GA4 Measurement ID cuando este disponible.
 - [ ] Crear articulos relacionados en noticias que apunten al ebook.
 

@@ -96,7 +96,11 @@ const animateComparisonValue = (element) => {
             if (target === 500000) element.textContent += '+';
         }
 
-        if (progress < 1) requestAnimationFrame(update);
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        } else {
+            element.classList.add('pulse-animation');
+        }
     };
 
     requestAnimationFrame(update);

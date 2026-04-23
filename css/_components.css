@@ -1061,8 +1061,9 @@ textarea:focus-visible {
     color: var(--color-primary);
     font-size: 0.75rem; /* Tamaño optimizado solicitado */
     font-weight: 700;
-    line-height: 1.25;
-    white-space: nowrap;
+    line-height: 1.35;
+    white-space: normal;
+    text-align: left;
     border: 1px solid rgba(10, 116, 218, 0.1);
     align-self: flex-start;
 }
@@ -1072,8 +1073,7 @@ textarea:focus-visible {
     background: var(--color-white);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    overflow: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     margin-bottom: 12px;
 }
 
@@ -1106,14 +1106,14 @@ textarea:focus-visible {
 .accordion-item__icon {
     font-size: 0.9rem;
     color: var(--color-primary);
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
 .accordion-item__content {
     max-height: 0;
     overflow: hidden;
     padding: 0 20px;
-    transition: max-height 0.3s ease, padding 0.3s ease;
+    transition: max-height 0.2s ease, padding 0.2s ease;
 }
 
 .accordion-item.is-open .accordion-item__icon {
@@ -1444,7 +1444,8 @@ textarea:focus-visible {
     box-shadow: var(--shadow-lg);
 }
 
-.ebook-index-preview__intro {
+.ebook-index-preview__intro,
+.ebook-faq__intro {
     max-width: 760px;
     margin: -12px auto var(--spacing-xl);
     text-align: center;
@@ -1460,7 +1461,6 @@ textarea:focus-visible {
     margin: 0 auto;
     border: 1px solid rgba(10, 116, 218, 0.12);
     border-radius: var(--radius-lg);
-    overflow: hidden;
     box-shadow: var(--shadow-sm);
     background-color: var(--color-white);
 }
@@ -1478,6 +1478,14 @@ textarea:focus-visible {
 .ebook-toc .accordion-item:last-child,
 .ebook-faq__accordion .accordion-item:last-child {
     border-bottom: 0;
+    border-bottom-left-radius: var(--radius-lg);
+    border-bottom-right-radius: var(--radius-lg);
+}
+
+.ebook-toc .accordion-item:first-child,
+.ebook-faq__accordion .accordion-item:first-child {
+    border-top-left-radius: var(--radius-lg);
+    border-top-right-radius: var(--radius-lg);
 }
 
 .ebook-toc .accordion-item__header,
@@ -1501,16 +1509,13 @@ textarea:focus-visible {
 }
 
 .ebook-toc__title-with-tooltip {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    display: block;
 }
 
 .ebook-toc__tooltip-wrapper {
     position: relative;
-    display: inline-flex;
-    align-items: center;
+    display: inline-block;
+    margin-left: 6px;
 }
 
 .ebook-toc__tooltip-trigger {
@@ -1524,18 +1529,19 @@ textarea:focus-visible {
     top: 50%;
     bottom: auto;
     transform: translateY(-50%);
-    width: min(300px, 32vw);
-    padding: 10px 12px;
+    width: 250px;
+    padding: 10px 14px;
     border-radius: var(--radius-md);
     background-color: #0f172a; /* Azul pizarra muy oscuro */
     color: #ffffff !important; /* Blanco puro forzado para legibilidad */
     font-size: 0.84rem;
+    line-height: 1.4;
     box-shadow: var(--shadow-md);
-    font-weight: 400 !important;
+    font-weight: normal !important;
     opacity: 0;
     visibility: hidden;
     transition: opacity var(--transition-base), visibility var(--transition-base);
-    z-index: 3;
+    z-index: 50;
 }
 
 .ebook-toc__tooltip::after {
