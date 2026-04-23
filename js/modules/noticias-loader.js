@@ -1,6 +1,14 @@
 const FALLBACK_IMAGE = 'assets/ilustraciones/noticias-salud.webp';
 const DEFAULT_CATEGORY = 'todo';
-const PAGE_SIZE = 7;
+const DESKTOP_PAGE_SIZE = 7;
+const MOBILE_PAGE_SIZE = 13;
+const MOBILE_BREAKPOINT = 640;
+
+const getPageSize = () => (
+    window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches
+        ? MOBILE_PAGE_SIZE
+        : DESKTOP_PAGE_SIZE
+);
 
 const fallbackArticles = [
     {
@@ -219,7 +227,31 @@ const renderArticle = (article) => `
     </article>
 `;
 
-const buildEndpoint = ({ endpoint, category, query, offset }) => {
+const renderHeadlineArticle = (article) => `
+    <a class="noticia-headline" href="${escapeHtml(article.link)}" target="_blank" rel="noopener noreferrer">
+        <span class="noticia-headline__thumb">
+            <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" loading="lazy" decoding="async">
+        </span>
+        <span class="noticia-headline__title">${escapeHtml(article.title)}</span>
+    </a>
+`;
+
+const renderCarouselArticle = (article) => `
+    <article class="noticia-card noticia-card--carousel">
+        <div class="noticia-card__media">
+            <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" loading="lazy" decoding="async">
+        </div>
+        <div class="noticia-card__body">
+            ${renderMeta(article)}
+            <h3 class="noticia-card__title">${escapeHtml(article.title)}</h3>
+            <a class="noticia-card__link" href="${escapeHtml(article.link)}" target="_blank" rel="noopener noreferrer">
+                Leer <i class="fas fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        </div>
+    </article>
+`;
+
+const buildEndpoint = ({ endpoint, category, query, offset, pageSize }) => {
     const url = new URL(endpoint, window.location.href);
     const categoryQueries = {
         isapres: 'isapre',
@@ -228,7 +260,7 @@ const buildEndpoint = ({ endpoint, category, query, offset }) => {
     };
     const effectiveQuery = query || categoryQueries[category] || '';
 
-    url.searchParams.set('limit', String(PAGE_SIZE));
+    url.searchParams.set('limit', String(pageSize));
     url.searchParams.set('offset', String(offset));
     url.searchParams.set('dias', '60');
     if (category && category !== DEFAULT_CATEGORY) url.searchParams.set('categoria', category);
@@ -239,11 +271,14 @@ const buildEndpoint = ({ endpoint, category, query, offset }) => {
 export const initNoticiasFeed = () => {
     const feed = document.querySelector('[data-news-feed]');
     const featured = document.querySelector('[data-news-featured]');
+    const headlines = document.querySelector('[data-news-headlines]');
+    const carousel = document.querySelector('[data-news-carousel]');
     const section = document.querySelector('[data-news-endpoint]');
     if (!feed || !featured || !section) return;
 
     const status = document.querySelector('[data-news-status]');
     const filterButtons = document.querySelectorAll('[data-news-filter]');
+    const filterSelect = document.querySelector('[data-news-filter-select]');
     const searchForm = document.querySelector('[data-news-search]');
     const searchInput = document.querySelector('[data-news-search-input]');
     const clearSearchButton = document.querySelector('[data-news-search-clear]');
@@ -270,7 +305,7 @@ export const initNoticiasFeed = () => {
     };
 
     const bindImageFallbacks = () => {
-        document.querySelectorAll('.noticia-card img, .noticia-featured-card img').forEach((image) => {
+        document.querySelectorAll('.noticia-card img, .noticia-featured-card img, .noticia-headline img').forEach((image) => {
             image.addEventListener('error', createImageFallback, { once: true });
         });
     };
@@ -296,7 +331,7 @@ export const initNoticiasFeed = () => {
             return haystack.includes(currentQuery.toLowerCase());
         });
 
-    const getSupplementArticles = (existingArticles = [], limit = PAGE_SIZE) => {
+    const getSupplementArticles = (existingArticles = [], limit) => {
         if (currentQuery || limit <= 0) return [];
 
         const seen = new Set([
@@ -309,30 +344,47 @@ export const initNoticiasFeed = () => {
             .slice(0, limit);
     };
 
-    const completeInitialPage = (articles) => {
+    const completeInitialPage = (articles, pageSize) => {
         const normalizedArticles = articles.map(normalizeArticle);
-        if (currentQuery || normalizedArticles.length >= PAGE_SIZE) return normalizedArticles;
+        if (currentQuery || normalizedArticles.length >= pageSize) return normalizedArticles;
 
         const completedArticles = [...normalizedArticles];
 
         completedArticles.push(...getSupplementArticles(
             completedArticles,
-            PAGE_SIZE - completedArticles.length
+            pageSize - completedArticles.length
         ));
 
         return completedArticles;
     };
 
-    const renderPage = (articles, { append = false, message = '' } = {}) => {
+    const renderMobileBlocks = (secondaryArticles = []) => {
+        if (!headlines && !carousel) return;
+
+        const headlineArticles = secondaryArticles.slice(0, 6);
+        const carouselArticles = secondaryArticles.slice(6, 12);
+
+        if (headlines) headlines.innerHTML = headlineArticles.map(renderHeadlineArticle).join('');
+
+        if (carousel) {
+            carousel.innerHTML = carouselArticles.length
+                ? `<div class="noticias-carousel__track">${carouselArticles.map(renderCarouselArticle).join('')}</div>`
+                : '';
+        }
+    };
+
+    const renderPage = (articles, { append = false, message = '', pageSize } = {}) => {
+        const effectivePageSize = pageSize ?? getPageSize();
         const normalizedArticles = articles.map(normalizeArticle);
-        const visibleArticles = normalizedArticles.slice(0, PAGE_SIZE);
+        const visibleArticles = normalizedArticles.slice(0, effectivePageSize);
         const totalAvailable = normalizedArticles.length;
-        hasMore = totalAvailable > PAGE_SIZE;
+        hasMore = totalAvailable > effectivePageSize;
 
         if (!append) {
             const [featuredArticle, ...secondaryArticles] = visibleArticles;
             featured.innerHTML = featuredArticle ? renderFeaturedArticle(featuredArticle) : '';
             feed.innerHTML = secondaryArticles.map(renderArticle).join('');
+            renderMobileBlocks(secondaryArticles);
             renderedCount = visibleArticles.length;
         } else {
             feed.insertAdjacentHTML('beforeend', visibleArticles.map(renderArticle).join(''));
@@ -348,6 +400,8 @@ export const initNoticiasFeed = () => {
     const renderEmptyState = (message) => {
         featured.innerHTML = '';
         feed.innerHTML = '';
+        if (headlines) headlines.innerHTML = '';
+        if (carousel) carousel.innerHTML = '';
         renderedCount = 0;
         currentOffset = 0;
         hasMore = false;
@@ -356,18 +410,20 @@ export const initNoticiasFeed = () => {
     };
 
     const renderLocalFallback = (message) => {
+        const pageSize = getPageSize();
         const fallback = getLocalFallback();
         if (!fallback.length) {
             renderEmptyState('No hay resultados para esta busqueda en la seleccion local.');
             return;
         }
 
-        renderPage(fallback, { message });
+        renderPage(fallback, { message, pageSize });
     };
 
     const loadNews = ({ append = false } = {}) => {
+        const pageSize = getPageSize();
         if (!endpoint) {
-            renderPage(getLocalFallback(), { append, message: 'Selección base de contenidos PlanesPro.' });
+            renderPage(getLocalFallback(), { append, message: 'Selección base de contenidos PlanesPro.', pageSize });
             return;
         }
 
@@ -377,12 +433,14 @@ export const initNoticiasFeed = () => {
             setStatus('Buscando noticias recientes...');
             featured.innerHTML = '';
             feed.innerHTML = '';
+            if (headlines) headlines.innerHTML = '';
+            if (carousel) carousel.innerHTML = '';
             currentOffset = 0;
             renderedCount = 0;
             renderedArticleKeys = new Set();
         }
 
-        fetch(buildEndpoint({ endpoint, category: currentCategory, query: currentQuery, offset }), { cache: 'no-store' })
+        fetch(buildEndpoint({ endpoint, category: currentCategory, query: currentQuery, offset, pageSize }), { cache: 'no-store' })
             .then((response) => {
                 if (!response.ok) throw new Error(`Noticias no disponibles: ${response.status}`);
                 return response.json();
@@ -406,16 +464,16 @@ export const initNoticiasFeed = () => {
                     .filter(matchesCurrentCategory)
                     .filter((article) => !append || !renderedArticleKeys.has(makeArticleKey(article)));
 
-                let articlesToRender = append ? normalizedValidArticles : completeInitialPage(normalizedValidArticles);
+                let articlesToRender = append ? normalizedValidArticles : completeInitialPage(normalizedValidArticles, pageSize);
 
-                if (append && articlesToRender.length < PAGE_SIZE) {
+                if (append && articlesToRender.length < pageSize) {
                     articlesToRender = [
                         ...articlesToRender,
-                        ...getSupplementArticles(articlesToRender, PAGE_SIZE - articlesToRender.length)
+                        ...getSupplementArticles(articlesToRender, pageSize - articlesToRender.length)
                     ];
                 }
 
-                const remoteHasMore = total ? offset + validArticles.length < total : validArticles.length === PAGE_SIZE;
+                const remoteHasMore = total ? offset + validArticles.length < total : validArticles.length === pageSize;
                 const localHasMore = getSupplementArticles(articlesToRender, 1).length > 0;
                 hasMore = remoteHasMore || localHasMore;
 
@@ -423,6 +481,7 @@ export const initNoticiasFeed = () => {
                     const [featuredArticle, ...secondaryArticles] = articlesToRender;
                     featured.innerHTML = featuredArticle ? renderFeaturedArticle(featuredArticle) : '';
                     feed.innerHTML = secondaryArticles.map(renderArticle).join('');
+                    renderMobileBlocks(secondaryArticles);
                     renderedCount = articlesToRender.length;
                 } else {
                     feed.insertAdjacentHTML('beforeend', articlesToRender.map(renderArticle).join(''));
@@ -443,17 +502,31 @@ export const initNoticiasFeed = () => {
             .finally(() => setLoading(false));
     };
 
+    const setActiveCategory = (category) => {
+        currentCategory = category || DEFAULT_CATEGORY;
+
+        filterButtons.forEach((filterButton) => {
+            const isActive = (filterButton.getAttribute('data-news-filter') || DEFAULT_CATEGORY) === currentCategory;
+            filterButton.classList.toggle('is-active', isActive);
+            filterButton.setAttribute('aria-selected', String(isActive));
+        });
+
+        if (filterSelect) filterSelect.value = currentCategory;
+    };
+
     filterButtons.forEach((button) => {
         button.addEventListener('click', () => {
-            currentCategory = button.getAttribute('data-news-filter') || DEFAULT_CATEGORY;
-            filterButtons.forEach((filterButton) => {
-                const isActive = filterButton === button;
-                filterButton.classList.toggle('is-active', isActive);
-                filterButton.setAttribute('aria-selected', String(isActive));
-            });
+            setActiveCategory(button.getAttribute('data-news-filter') || DEFAULT_CATEGORY);
             loadNews();
         });
     });
+
+    if (filterSelect) {
+        filterSelect.addEventListener('change', () => {
+            setActiveCategory(filterSelect.value || DEFAULT_CATEGORY);
+            loadNews();
+        });
+    }
 
     if (searchForm) {
         searchForm.addEventListener('submit', (event) => {
@@ -475,5 +548,6 @@ export const initNoticiasFeed = () => {
         loadMoreButton.addEventListener('click', () => loadNews({ append: true }));
     }
 
+    setActiveCategory(currentCategory);
     loadNews();
 };
