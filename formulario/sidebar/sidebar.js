@@ -355,14 +355,20 @@ function injectHTML() {
 
 // ─── Triggers ─────────────────────────────────────────────────
 function bindTriggers() {
-    document.body.addEventListener('click', (e) => {
-        const trigger = e.target.closest('[data-modal-trigger="formModal"]');
-        if (!trigger) return;
-        e.preventDefault();
-        ctaSource = trigger.id || 'CTA';
-        setCTASource(ctaSource);
-        openSidebar();
-    });
+    // Usamos capture=true para que funcione incluso dentro del menú móvil,
+    // donde `navMobile` detiene la propagación en fase bubble.
+    document.addEventListener(
+        'click',
+        (e) => {
+            const trigger = e.target.closest('[data-modal-trigger="formModal"]');
+            if (!trigger) return;
+            e.preventDefault();
+            ctaSource = trigger.id || 'CTA';
+            setCTASource(ctaSource);
+            openSidebar();
+        },
+        true
+    );
 }
 
 // ─── Abrir / Cerrar ───────────────────────────────────────────
