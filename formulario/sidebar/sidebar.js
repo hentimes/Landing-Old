@@ -56,6 +56,9 @@ function injectHTML() {
 <aside id="sb-panel" class="sb-panel" role="dialog" aria-modal="true"
        aria-label="Formulario de contacto" tabindex="-1">
 
+  <!-- Drag handle (visible solo en móvil) -->
+  <div class="sb-drag-handle" aria-hidden="true"></div>
+
   <!-- ══ HEADER premium ══════════════════════════════════════ -->
   <div class="sb-header">
     <div class="sb-header-left">
@@ -334,6 +337,18 @@ function injectHTML() {
     </div>
   </div>
 
+  <!-- Sticky footer móvil (CTA siempre visible) -->
+  <div class="sb-sticky-footer">
+    <button type="button" id="sb-sticky-submit" class="sb-sticky-submit">
+      <i class="fas fa-paper-plane" aria-hidden="true"></i>
+      Obtener análisis gratuito
+    </button>
+    <p class="sb-sticky-legal">
+      <i class="fas fa-lock" aria-hidden="true"></i>
+      Tus datos están seguros · Sin spam
+    </p>
+  </div>
+
 </aside>
     `);
 }
@@ -404,14 +419,22 @@ function hideAbandModal() {
 
 // ─── Submit ───────────────────────────────────────────────────
 function bindFormSubmit() {
-    document.getElementById('sb-form')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!validateSidebar(e.currentTarget)) {
-            e.currentTarget.querySelector('.sb-has-error .sb-input')?.focus();
+    const form = document.getElementById('sb-form');
+
+    const doSubmit = async () => {
+        if (!validateSidebar(form)) {
+            form.querySelector('.sb-has-error .sb-input, .sb-has-error select')?.focus();
+            // Scroll hasta el primer error
+            form.querySelector('.sb-has-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
-        await submitSidebarForm(e.currentTarget);
-    });
+        await submitSidebarForm(form);
+    };
+
+    form?.addEventListener('submit', (e) => { e.preventDefault(); doSubmit(); });
+
+    // Botón sticky móvil → mismo flujo
+    document.getElementById('sb-sticky-submit')?.addEventListener('click', doSubmit);
 }
 
 // ─── Archivo ──────────────────────────────────────────────────

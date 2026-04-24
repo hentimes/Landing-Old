@@ -544,12 +544,173 @@ select.sb-input {
 }
 .sb-abandon-exit-btn:hover { color: var(--sb-coral); }
 
-/* ─── Responsive ─────────────────────────────────────────────── */
-@media (max-width: 500px) {
+/* ─── Drag handle (solo móvil) ──────────────────────── */
+.sb-drag-handle {
+    display: none;                  /* visible solo en móvil */
+    width: 36px;
+    height: 4px;
+    background: rgba(100,116,139,.3);
+    border-radius: 2px;
+    margin: 0 auto;
+    flex-shrink: 0;
+}
+
+/* ─── Sticky footer del CTA en móvil ──────────────────── */
+.sb-sticky-footer {
+    display: none;                  /* visible solo en móvil */
+}
+
+/* ─── BREAKPOINT: Móvil < 600px ───────────────────── */
+@media (max-width: 599px) {
+
+    /* Panel: sube desde abajo (sheet nativa iOS) */
+    #sb-panel {
+        --sb-w: 100vw;
+        --sb-in-h: 50px;            /* tap targets grandes */
+        top: auto;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        height: 92dvh;              /* deja ver el overlay arriba */
+        border-radius: 24px 24px 0 0;
+        transform: translateY(100%);
+        transition: transform .42s cubic-bezier(.32,0,.08,1);
+    }
+    .sb-panel--open {
+        transform: translateY(0);
+    }
+
+    /* Drag handle visible */
+    .sb-drag-handle {
+        display: block;
+        padding: 10px 0 2px;
+    }
+
+    /* Header móvil: más compacto */
+    .sb-header {
+        height: 58px;
+        padding: 0 14px;
+        border-radius: 24px 24px 0 0;   /* esquinas superiores del sheet */
+    }
+    .sb-header-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        font-size: .84rem;
+    }
+    .sb-header-title { font-size: .94rem; }
+    .sb-header-sub   { font-size: .68rem; }
+
+    /* Body con espacio para el footer sticky */
+    .sb-body {
+        padding: 14px 14px 90px;    /* 90px = altura del sticky footer */
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Secciones más compactas */
+    .sb-section { padding: 14px 12px; margin-bottom: 8px; }
+
+    /* Filas en 2 columnas MANTIENEN en móvil cuando tienen sentido */
+    /* Fila 1 (comuna + sistema): colapsa a 1 col en pantallas muy pequeñas */
+    .sb-row--2 { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* ← Para pantallas muy pequeñas (≤ 380px) sí colapsa */
+    @media (max-width: 380px) {
+        .sb-row--2 { grid-template-columns: 1fr; }
+    }
+
+    /* Inputs: 16px mínimo para evitar zoom en iOS */
+    .sb-input,
+    .sb-input--phone,
+    .sb-textarea {
+        font-size: 16px;
+    }
+    select.sb-input { font-size: 16px; }
+
+    /* Labels más pequeaños para compensar inputs grandes */
+    .sb-label { font-size: .74rem; }
+
+    /* Autocomplete: menos alto para no tapar el form */
+    .sb-autocomplete-list { max-height: 140px; }
+
+    /* Archivo: tap target cómodo */
+    .sb-file-label { padding: 12px 14px; font-size: .86rem; }
+
+    /* CTA: en móvil se mueve al sticky footer */
+    #sb-submit-btn,
+    .sb-legal {
+        display: none;
+    }
+
+    /* Sticky footer visible */
+    .sb-sticky-footer {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        background: rgba(255,255,255,.88);
+        backdrop-filter: saturate(180%) blur(20px);
+        -webkit-backdrop-filter: saturate(180%) blur(20px);
+        border-top: 1px solid rgba(37,99,235,.1);
+        padding: 12px 14px;
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+        z-index: 6;
+    }
+
+    .sb-sticky-submit {
+        width: 100%;
+        padding: 15px 20px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: #fff;
+        border: none;
+        font-size: 1rem;
+        font-weight: 800;
+        font-family: var(--font-heading, 'Outfit', sans-serif);
+        letter-spacing: -.01em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 10px 28px rgba(29,78,216,.32);
+        transition: transform .18s, opacity .18s;
+        -webkit-tap-highlight-color: transparent;
+    }
+    .sb-sticky-submit:active { transform: scale(.97); opacity: .9; }
+    .sb-sticky-submit:disabled { opacity: .6; cursor: not-allowed; }
+
+    .sb-sticky-legal {
+        text-align: center;
+        font-size: .7rem;
+        color: var(--sb-txt-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    /* Modal interno: ocupa más en móvil */
+    .sb-inner-modal-box {
+        max-width: 100%;
+        max-height: 70dvh;
+        border-radius: 16px;
+    }
+
+    /* Boton de cierre más grande (tap target) */
+    .sb-close-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+    }
+}
+
+/* ─── BREAKPOINT: Tablet 600-768px ──────────────────── */
+@media (min-width: 600px) and (max-width: 768px) {
     #sb-panel { --sb-w: 100vw; }
-
-    .sb-row--2 { grid-template-columns: 1fr; }
-
-    .sb-body { padding: 14px 12px 48px; }
-    .sb-header { padding: 0 14px; }
+    .sb-body { padding: 16px 16px 48px; }
+    .sb-input { font-size: 15px; }
+    select.sb-input { font-size: 15px; }
 }
