@@ -95,6 +95,9 @@ main {
         radial-gradient(ellipse at 75% 40%, rgba(37, 99, 235, 0.07) 0%, transparent 55%),
         radial-gradient(ellipse at 15% 70%, rgba(16, 185, 129, 0.05) 0%, transparent 45%),
         #f8faff;
+    /* Fix: aísla el hero en su propio layer para que los filter/transform
+       internos no contaminen el stacking del header position:fixed */
+    isolation: isolate;
 }
 .hero__container {
     display: grid;
@@ -365,7 +368,7 @@ main {
     display: grid;
     place-items: center;
     position: relative;
-    isolation: isolate;
+    /* Eliminado isolation:isolate — ya no necesario; el hero padre lo maneja */
     background: transparent;
     border: none;
     box-shadow: none;
@@ -795,6 +798,8 @@ main {
     background:
         radial-gradient(circle at top left, rgba(10, 116, 218, 0.1), transparent 26%),
         linear-gradient(180deg, #f6fbff 0%, #ffffff 24%, #f5f9ff 100%);
+    /* Fix: mismo aislamiento de stacking para el header fixed */
+    isolation: isolate;
 }
 
 .ebook-hero {

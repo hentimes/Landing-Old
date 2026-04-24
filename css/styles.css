@@ -7,15 +7,22 @@
 
 @import url('_variables.css');       /* 1. Variables globales (colores, fuentes) */
 @import url('_base.css');            /* 2. Reseteo y estilos base (body, html) */
-@import url('_layout.css');          /* 3. Estructura principal (container, sections) */
-@import url('_components.css');      /* 4. Componentes reutilizables (botones, tarjetas) */
+@import url('_layout.css');          /* 3. Estructura principal (container, hero, sections) */
+
+/* 4. Componentes reutilizables (divididos por responsabilidad) */
+@import url('_buttons.css');         /*    4a. Botones y estados de foco */
+@import url('_cards.css');           /*    4b. Tarjetas, sliders, logos, tabs */
+@import url('_testimonials.css');    /*    4c. Testimonios, trust-box, social proof */
+@import url('_ebook-offer.css');     /*    4d. Componentes de oferta Ebook */
+@import url('_accordion.css');       /*    4e. Acordeón genérico */
+
 @import url('_header-footer.css');   /* 5. Estilos específicos del header y footer */
 @import url('_animations.css');      /* 6. Animaciones (logos, whatsapp) */
 @import url('_asesores-page.css');   /* 7. Estilos para la página de asesores */
-@import url('_nosotros-page.css');    /* 8. Estilos para la página de nosotros */
+@import url('_nosotros-page.css');   /* 8. Estilos para la página de nosotros */
 @import url('_noticias-page.css');   /* 9. Estilos para la página de noticias */
 @import url('_ebook-page.css');      /* 10. Estilos para la página de Ebook */
-@import url('_modal.css');           /* 10. Estilos para la ventana modal */
-@import url('_responsive.css');      /* 10. Media queries para diseño adaptable */
-@import url('_asistente-faq.css');   /* 11. Estilos para el asistente FAQ (Overrides) */
-@import url('../formulario/styles/styles.css'); /* 12. Estilos del formulario */
+@import url('_modal.css');           /* 11. Estilos para la ventana modal */
+@import url('_responsive.css');      /* 12. Media queries para diseño adaptable */
+@import url('_asistente-faq.css');   /* 13. Estilos para el asistente FAQ (Overrides) */
+@import url('../formulario/styles/styles.css'); /* 14. Estilos del formulario */
