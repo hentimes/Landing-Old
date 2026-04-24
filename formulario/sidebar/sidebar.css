@@ -577,7 +577,7 @@ select.sb-input {
         transform: translateY(100%);
         transition: transform .42s cubic-bezier(.32,0,.08,1);
     }
-    .sb-panel--open {
+    #sb-panel.sb-panel--open {
         transform: translateY(0);
     }
 
