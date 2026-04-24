@@ -2,8 +2,7 @@
 ==================================================================
 ARCHIVO: formulario/sidebar/_fields.js
 Lógica de campos: autocomplete comunas, toggle Isapre/Fonasa,
-modal de cargas, teléfono con prefijo, validación inline.
-Portado y adaptado desde context/formulario-main/_form-logic.js
+modal de cargas (dentro del sidebar), teléfono +56, validación.
 ==================================================================
 */
 
@@ -35,24 +34,21 @@ const normalize = (t) =>
 // ─── Autocomplete de Comunas ──────────────────────────────────
 export function initComunaAutocomplete() {
     const input = document.getElementById('sb-comuna');
-    const regionInput = document.getElementById('sb-region');
-    if (!input || !regionInput) return;
+    const regionInput = document.getElementById('sb-region'); // hidden
+    if (!input) return;
 
     const allComunas = Object.keys(comunasRegiones).sort();
     let dropdown = null;
 
     const selectComuna = (name) => {
         input.value = name;
-        regionInput.value = comunasRegiones[name] || '';
+        if (regionInput) regionInput.value = comunasRegiones[name] || '';
         hideDropdown();
-        input.classList.remove('sb-error');
-        input.classList.add('sb-valid');
+        input.classList.remove('sb-input--error');
+        input.classList.add('sb-input--valid');
     };
 
-    const hideDropdown = () => {
-        dropdown?.remove();
-        dropdown = null;
-    };
+    const hideDropdown = () => { dropdown?.remove(); dropdown = null; };
 
     const showDropdown = (matches) => {
         hideDropdown();
@@ -62,21 +58,17 @@ export function initComunaAutocomplete() {
         matches.slice(0, 8).forEach((name) => {
             const li = document.createElement('li');
             li.textContent = name;
-            li.addEventListener('mousedown', (e) => {
-                e.preventDefault(); // evita blur antes del click
-                selectComuna(name);
-            });
+            li.addEventListener('mousedown', (e) => { e.preventDefault(); selectComuna(name); });
             dropdown.appendChild(li);
         });
-        input.parentElement.appendChild(dropdown);
+        input.closest('.sb-autocomplete-wrap').appendChild(dropdown);
     };
 
     input.addEventListener('input', () => {
         const val = input.value;
         if (!val) { hideDropdown(); return; }
         const norm = normalize(val);
-        const matches = allComunas.filter((c) => normalize(c).includes(norm));
-        showDropdown(matches);
+        showDropdown(allComunas.filter((c) => normalize(c).includes(norm)));
     });
 
     input.addEventListener('blur', () => {
@@ -84,7 +76,6 @@ export function initComunaAutocomplete() {
             hideDropdown();
             const val = input.value.trim();
             if (!val) return;
-            // Autocorrección con Levenshtein
             const normVal = normalize(val);
             let best = null, minDist = Infinity;
             for (const c of allComunas) {
@@ -92,174 +83,162 @@ export function initComunaAutocomplete() {
                 if (d < minDist) { minDist = d; best = c; }
                 if (d === 0) break;
             }
-            if (best && minDist <= 1) {
-                selectComuna(best);
-            } else {
-                input.classList.add('sb-error');
-                input.classList.remove('sb-valid');
-            }
+            if (best && minDist <= 1) { selectComuna(best); }
+            else { input.classList.add('sb-input--error'); }
         }, 160);
     });
 
     document.addEventListener('click', (e) => {
-        if (!input.contains(e.target) && !dropdown?.contains(e.target)) {
-            hideDropdown();
-        }
+        if (!input.contains(e.target) && !dropdown?.contains(e.target)) hideDropdown();
     });
 }
 
 // ─── Toggle Isapre / Fonasa ───────────────────────────────────
+// Fila 2a (isapre): sb-row-isapre  → cuál isapre + cargas
+// Fila 2b (fonasa): sb-row-fonasa  → cargas + renta
 export function initSistemaToggle() {
     const select = document.getElementById('sb-sistema');
-    const isapreRow = document.getElementById('sb-isapre-row');
-    if (!select || !isapreRow) return;
+    const rowIsapre = document.getElementById('sb-row-isapre');
+    const rowFonasa = document.getElementById('sb-row-fonasa');
+    if (!select) return;
 
     const isapreSelect = document.getElementById('sb-isapre');
+    const rentaSelect  = document.getElementById('sb-renta');
 
     const update = () => {
-        const isIsapre = select.value === 'Isapre';
-        isapreRow.classList.toggle('sb-field-hidden', !isIsapre);
+        const val = select.value;
+        const isIsapre = val === 'Isapre';
+        const isFonasa = val === 'Fonasa';
+
+        if (rowIsapre) rowIsapre.classList.toggle('sb-row-hidden', !isIsapre);
+        if (rowFonasa) rowFonasa.classList.toggle('sb-row-hidden', !isFonasa);
+
+        // required dinámico
         if (isapreSelect) isapreSelect.required = isIsapre;
+        if (rentaSelect)  rentaSelect.required  = isFonasa;
     };
 
     select.addEventListener('change', update);
-    update(); // estado inicial
+    update();
 }
 
-// ─── Modal de Cargas ──────────────────────────────────────────
+// ─── Modal de Cargas — dentro del sidebar ─────────────────────
 export function initCargasModal() {
-    const cargasSelect = document.getElementById('sb-cargas');
-    const hiddenEdades = document.getElementById('sb-edad-cargas');
-    if (!cargasSelect) return;
-
-    cargasSelect.addEventListener('change', () => {
-        const n = parseInt(cargasSelect.value, 10);
-        if (isNaN(n) || n === 0) {
-            if (hiddenEdades) hiddenEdades.value = '';
-            return;
+    // Puede haber dos selects de cargas (isapre y fonasa)
+    document.addEventListener('change', (e) => {
+        if (e.target.id === 'sb-cargas-isapre' || e.target.id === 'sb-cargas-fonasa') {
+            const n = parseInt(e.target.value, 10);
+            const hiddenInput = document.getElementById('sb-edad-cargas');
+            if (isNaN(n) || n === 0) {
+                if (hiddenInput) hiddenInput.value = '';
+                return;
+            }
+            openCargasModal(n, hiddenInput, e.target);
         }
-        openCargasModal(n, hiddenEdades);
     });
 }
 
-function openCargasModal(numCargas, hiddenInput) {
-    // Remove previous instance
+function openCargasModal(numCargas, hiddenInput, triggerSelect) {
+    // Inyectar el modal dentro del sb-panel para que quede en el sidebar
+    const panel = document.getElementById('sb-panel');
     document.getElementById('sb-cargas-modal')?.remove();
-
-    const modal = document.createElement('div');
-    modal.id = 'sb-cargas-modal';
-    modal.className = 'sb-cargas-modal-overlay';
-    modal.setAttribute('role', 'dialog');
-    modal.setAttribute('aria-modal', 'true');
 
     let inputsHtml = '';
     for (let i = 1; i <= numCargas; i++) {
         inputsHtml += `
         <div class="sb-field-group">
-            <label for="sb-carga-edad-${i}">Edad Carga ${i} <span class="sb-required">*</span></label>
-            <input type="number" id="sb-carga-edad-${i}" class="sb-carga-edad-input sb-input"
+            <label for="sb-carga-edad-${i}">Edad Carga ${i}</label>
+            <input type="number" id="sb-carga-edad-${i}"
+                   class="sb-carga-edad-input sb-input"
                    min="0" max="120" placeholder="Ej: 5" required />
             <span class="sb-field-error">Ingresa la edad</span>
         </div>`;
     }
 
+    const modal = document.createElement('div');
+    modal.id = 'sb-cargas-modal';
+    modal.className = 'sb-inner-modal';
+    modal.setAttribute('role', 'dialog');
+    modal.setAttribute('aria-modal', 'true');
     modal.innerHTML = `
-        <div class="sb-cargas-modal-box">
-            <div class="sb-cargas-modal-header">
-                <span><i class="fas fa-child" aria-hidden="true"></i> Edades de tus cargas</span>
-                <button type="button" class="sb-cargas-modal-close" aria-label="Cerrar">
+        <div class="sb-inner-modal-box">
+            <div class="sb-inner-modal-header">
+                <span><i class="fas fa-users" aria-hidden="true"></i> Edades de tus cargas</span>
+                <button type="button" class="sb-close-btn sb-cargas-close" aria-label="Cerrar">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
-            <div class="sb-cargas-modal-body">
-                <p class="sb-cargas-modal-hint">Ingresa la edad de cada carga familiar.</p>
+            <div class="sb-inner-modal-body">
+                <p class="sb-hint">Ingresa la edad de cada carga familiar.</p>
                 <form id="sb-cargas-form" novalidate>
                     ${inputsHtml}
                     <button type="submit" class="sb-submit-btn sb-cargas-confirm-btn">
-                        <i class="fas fa-check" aria-hidden="true"></i> Confirmar
+                        <i class="fas fa-check" aria-hidden="true"></i> Confirmar edades
                     </button>
                 </form>
             </div>
         </div>`;
 
-    document.body.appendChild(modal);
-
-    // Animar entrada
-    requestAnimationFrame(() => modal.classList.add('sb-cargas-modal-visible'));
-
-    // Focus en primer input
+    // Montar DENTRO del panel del sidebar
+    panel.appendChild(modal);
+    requestAnimationFrame(() => modal.classList.add('sb-inner-modal--visible'));
     modal.querySelector('.sb-carga-edad-input')?.focus();
 
-    // Cerrar con ✕
-    modal.querySelector('.sb-cargas-modal-close').addEventListener('click', () => {
-        modal.classList.remove('sb-cargas-modal-visible');
-        setTimeout(() => modal.remove(), 300);
-        // Resetear select si se cancela
-        document.getElementById('sb-cargas').value = '0';
+    modal.querySelector('.sb-cargas-close').addEventListener('click', () => {
+        modal.classList.remove('sb-inner-modal--visible');
+        setTimeout(() => modal.remove(), 280);
+        if (triggerSelect) triggerSelect.value = '0';
         if (hiddenInput) hiddenInput.value = '';
     });
 
-    // Confirm submit
     modal.querySelector('#sb-cargas-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const inputs = modal.querySelectorAll('.sb-carga-edad-input');
         let valid = true;
         const ages = [];
-
         inputs.forEach((inp) => {
             const grp = inp.closest('.sb-field-group');
-            if (!inp.value.trim()) {
-                grp.classList.add('sb-has-error');
-                valid = false;
-            } else {
-                grp.classList.remove('sb-has-error');
-                ages.push(inp.value);
-            }
+            if (!inp.value.trim()) { grp.classList.add('sb-has-error'); valid = false; }
+            else { grp.classList.remove('sb-has-error'); ages.push(inp.value); }
         });
-
         if (!valid) return;
         if (hiddenInput) hiddenInput.value = ages.join(', ');
-        modal.classList.remove('sb-cargas-modal-visible');
-        setTimeout(() => modal.remove(), 300);
+        modal.classList.remove('sb-inner-modal--visible');
+        setTimeout(() => modal.remove(), 280);
     });
 }
 
-// ─── Teléfono con prefijo +56 ─────────────────────────────────
+// ─── Teléfono +56 ─────────────────────────────────────────────
 export function initPhoneField() {
     const input = document.getElementById('sb-telefono');
     if (!input) return;
-
     input.addEventListener('input', () => {
-        // Solo dígitos, máximo 9
         input.value = input.value.replace(/\D/g, '').slice(0, 9);
     });
-
     input.addEventListener('blur', () => {
-        const val = input.value.replace(/\D/g, '');
         const grp = input.closest('.sb-field-group');
-        if (val.length !== 9) {
-            grp?.classList.add('sb-has-error');
-        } else {
-            grp?.classList.remove('sb-has-error');
-        }
+        const ok = input.value.replace(/\D/g, '').length === 9;
+        grp?.classList.toggle('sb-has-error', !ok);
     });
 }
 
-// ─── Validación general del form ──────────────────────────────
+// ─── Validación del formulario ────────────────────────────────
 export function validateSidebar(form) {
     let valid = true;
     form.querySelectorAll('[required]').forEach((field) => {
-        // Ignorar campos en filas ocultas
-        if (field.closest('.sb-field-hidden')) return;
+        if (field.closest('.sb-row-hidden') || field.closest('.sb-field-hidden')) return;
         const grp = field.closest('.sb-field-group');
-        if (!field.value.trim()) {
-            grp?.classList.add('sb-has-error');
-            valid = false;
-        } else {
-            grp?.classList.remove('sb-has-error');
-        }
+        const empty = !field.value.trim();
+        grp?.classList.toggle('sb-has-error', empty);
+        if (empty) valid = false;
     });
-    // Validar teléfono específicamente
+    // Email básico
+    const email = form.querySelector('#sb-email');
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+        email.closest('.sb-field-group')?.classList.add('sb-has-error');
+        valid = false;
+    }
+    // Teléfono
     const tel = form.querySelector('#sb-telefono');
     if (tel && tel.value.replace(/\D/g, '').length !== 9) {
         tel.closest('.sb-field-group')?.classList.add('sb-has-error');
