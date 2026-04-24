@@ -10,6 +10,11 @@ export const SIDEBAR_STORAGE_KEY = 'sidebarFormProgress';
 // Endpoint del Cloudflare Worker (placeholder hasta despliegue)
 export const WORKER_URL = 'https://form.planespro.cl/submit';
 
+// Endpoint actual (temporal) â€” Google Apps Script
+// Se usa mientras se monta el backend en Cloudflare.
+export const APPS_SCRIPT_URL =
+    'https://script.google.com/macros/s/AKfycbxvFi7_F5r0Q1ziw1qn_cSV7sCs4KM5Mp5Qx6KvkmzOZLaFPpnEqEz5v2BDLLRctgCPtA/exec';
+
 export const RANGOS_RENTA = [
     'Menos de $500.000',
     '$500.000 - $800.000',
