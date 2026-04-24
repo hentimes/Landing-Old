@@ -108,9 +108,9 @@ function injectHTML() {
                 Sistema <span class="sb-req">*</span>
               </label>
               <select id="sb-sistema" name="sistema_actual" class="sb-input" required>
-                <option value="" disabled selected>Selecciona…</option>
+                <option value="" disabled>Selecciona…</option>
                 <option value="Isapre">Isapre</option>
-                <option value="Fonasa">Fonasa</option>
+                <option value="Fonasa" selected>Fonasa</option>
               </select>
               <span class="sb-field-error">Selecciona un sistema</span>
             </div>

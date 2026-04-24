@@ -23,7 +23,6 @@ export const ISAPRES = [
     'Colmena',
     'Cruz Blanca',
     'Esencial',
-    'Más Vida',
     'Nueva Más Vida',
     'San Lorenzo',
     'Vida Tres',
