@@ -566,13 +566,13 @@ select.sb-input {
     /* Panel: sube desde abajo (sheet nativa iOS) */
     #sb-panel {
         --sb-w: 100vw;
-        --sb-in-h: 50px;            /* tap targets grandes */
+        --sb-in-h: 44px;            /* más compacto en móvil */
         top: auto;
         bottom: 0;
         right: 0;
         left: 0;
         width: 100%;
-        height: 92dvh;              /* deja ver el overlay arriba */
+        height: 96dvh;              /* más alto para reducir scroll */
         border-radius: 24px 24px 0 0;
         transform: translateY(100%);
         transition: transform .42s cubic-bezier(.32,0,.08,1);
@@ -589,13 +589,13 @@ select.sb-input {
 
     /* Header móvil: más compacto */
     .sb-header {
-        height: 58px;
-        padding: 0 14px;
+        height: 52px;
+        padding: 0 12px;
         border-radius: 24px 24px 0 0;   /* esquinas superiores del sheet */
     }
     .sb-header-icon {
-        width: 34px;
-        height: 34px;
+        width: 32px;
+        height: 32px;
         border-radius: 10px;
         font-size: .84rem;
     }
@@ -604,16 +604,17 @@ select.sb-input {
 
     /* Body con espacio para el footer sticky */
     .sb-body {
-        padding: 14px 14px 90px;    /* 90px = altura del sticky footer */
+        padding: 10px 12px 74px;    /* 74px = sticky footer compacto */
         -webkit-overflow-scrolling: touch;
     }
 
     /* Secciones más compactas */
-    .sb-section { padding: 14px 12px; margin-bottom: 8px; }
+    .sb-section { padding: 10px 10px; margin-bottom: 6px; }
+    .sb-section-label { margin: 0 0 8px; font-size: .68rem; }
 
     /* Filas en 2 columnas MANTIENEN en móvil cuando tienen sentido */
     /* Fila 1 (comuna + sistema): colapsa a 1 col en pantallas muy pequeñas */
-    .sb-row--2 { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sb-row--2 { grid-template-columns: 1fr 1fr; gap: 8px; }
 
     /* ← Para pantallas muy pequeñas (≤ 380px) sí colapsa */
     @media (max-width: 380px) {
@@ -629,13 +630,15 @@ select.sb-input {
     select.sb-input { font-size: 16px; }
 
     /* Labels más pequeaños para compensar inputs grandes */
-    .sb-label { font-size: .74rem; }
+    .sb-label { font-size: .7rem; }
+    .sb-field-group { gap: 3px; margin-bottom: 10px; }
 
     /* Autocomplete: menos alto para no tapar el form */
     .sb-autocomplete-list { max-height: 140px; }
 
     /* Archivo: tap target cómodo */
-    .sb-file-label { padding: 12px 14px; font-size: .86rem; }
+    .sb-file-label { padding: 10px 12px; font-size: .82rem; }
+    .sb-textarea { min-height: 54px; padding: 8px 11px; }
 
     /* CTA: en móvil se mueve al sticky footer */
     #sb-submit-btn,
@@ -647,26 +650,26 @@ select.sb-input {
     .sb-sticky-footer {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 4px;
         position: absolute;
         bottom: 0; left: 0; right: 0;
         background: rgba(255,255,255,.88);
         backdrop-filter: saturate(180%) blur(20px);
         -webkit-backdrop-filter: saturate(180%) blur(20px);
         border-top: 1px solid rgba(37,99,235,.1);
-        padding: 12px 14px;
-        padding-bottom: max(12px, env(safe-area-inset-bottom));
+        padding: 10px 12px;
+        padding-bottom: max(10px, env(safe-area-inset-bottom));
         z-index: 6;
     }
 
     .sb-sticky-submit {
         width: 100%;
-        padding: 15px 20px;
-        border-radius: 14px;
+        padding: 13px 18px;
+        border-radius: 13px;
         background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
         color: #fff;
         border: none;
-        font-size: 1rem;
+        font-size: .98rem;
         font-weight: 800;
         font-family: var(--font-heading, 'Outfit', sans-serif);
         letter-spacing: -.01em;
@@ -684,7 +687,7 @@ select.sb-input {
 
     .sb-sticky-legal {
         text-align: center;
-        font-size: .7rem;
+        font-size: .66rem;
         color: var(--sb-txt-2);
         display: flex;
         align-items: center;
