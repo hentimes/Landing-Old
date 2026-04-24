@@ -606,7 +606,9 @@ select.sb-input {
     .sb-body {
         padding: 10px 12px 74px;    /* 74px = sticky footer compacto */
         -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;      /* Firefox: ocultar scrollbar */
     }
+    .sb-body::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
     /* Secciones más compactas */
     .sb-section { padding: 10px 10px; margin-bottom: 6px; }
@@ -700,7 +702,9 @@ select.sb-input {
         max-width: 100%;
         max-height: 70dvh;
         border-radius: 16px;
+        scrollbar-width: none;      /* Firefox: ocultar scrollbar */
     }
+    .sb-inner-modal-box::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
     /* Boton de cierre más grande (tap target) */
     .sb-close-btn {
