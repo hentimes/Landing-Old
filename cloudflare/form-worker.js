@@ -52,16 +52,26 @@ async function handleLeadCreate(request, env) {
   let pdfObjectKey = '';
   let pdfOriginalName = '';
   if (uploadedFile && uploadedFile.size > 0) {
-    pdfOriginalName = uploadedFile.name || `${leadId}.pdf`;
-    pdfObjectKey = `leads/${leadId}/${pdfOriginalName}`;
+    pdfOriginalName = buildUploadFilename({
+      originalName: uploadedFile.name,
+      leadId,
+      leadName: normalized.nombre,
+      createdAt: now,
+    });
+    pdfObjectKey = `leads/${pdfOriginalName}`;
     const bytes = new Uint8Array(await uploadedFile.arrayBuffer());
     await env.FORM_UPLOADS.put(pdfObjectKey, bytes, {
       httpMetadata: { contentType: uploadedFile.type || 'application/pdf' },
     });
   } else if (payload.base64pdf) {
     const pdf = decodeBase64(payload.base64pdf);
-    pdfOriginalName = payload.filename || `${leadId}.pdf`;
-    pdfObjectKey = `leads/${leadId}/${pdfOriginalName}`;
+    pdfOriginalName = buildUploadFilename({
+      originalName: payload.filename,
+      leadId,
+      leadName: normalized.nombre,
+      createdAt: now,
+    });
+    pdfObjectKey = `leads/${pdfOriginalName}`;
     await env.FORM_UPLOADS.put(pdfObjectKey, pdf, {
       httpMetadata: { contentType: 'application/pdf' },
     });
@@ -237,6 +247,31 @@ async function formDataToFields(formData) {
 function decodeBase64(base64) {
   const bytes = Uint8Array.from(atob(base64), (char) => char.charCodeAt(0));
   return bytes;
+}
+
+function buildUploadFilename({ originalName, leadId, leadName, createdAt }) {
+  const datePart = (createdAt || new Date().toISOString()).slice(0, 10);
+  const namePart = slugifyFilePart(leadName || 'sin-nombre');
+  const leadPart = String(leadId || '').slice(0, 8) || 'lead';
+  const extension = getSafeExtension(originalName);
+  return `${datePart}_${namePart}_${leadPart}.${extension}`;
+}
+
+function slugifyFilePart(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60) || 'archivo';
+}
+
+function getSafeExtension(filename) {
+  const raw = String(filename || '').trim();
+  const parts = raw.split('.');
+  const ext = parts.length > 1 ? parts.pop().toLowerCase() : 'pdf';
+  return /^[a-z0-9]{2,5}$/.test(ext) ? ext : 'pdf';
 }
 
 function json(body, status, env, request) {
