@@ -293,6 +293,15 @@ function corsHeaders(env, request) {
 
   const requestOrigin = (request?.headers?.get?.('Origin') || '').replace(/\/$/, '');
 
+  // Allow any local dev port without needing to keep the allowlist in sync.
+  if (/^http:\/\/(127\.0\.0\.1|localhost):\d+$/.test(requestOrigin)) {
+    return {
+      'Access-Control-Allow-Origin': requestOrigin,
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    };
+  }
+
   let origin = '*';
   if (allowed.includes('*')) {
     origin = '*';
