@@ -97,6 +97,24 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
 - [ ] Agregar GA4 Measurement ID cuando este disponible.
 - [ ] Crear articulos relacionados en noticias que apunten al ebook.
 
+## 6.1 Formulario sidebar nuevo
+
+- [ ] Crear una carpeta dedicada para el formulario nuevo y separar su logica del formulario legacy.
+- [ ] Definir al formulario sidebar como unica version activa para el sitio, manteniendo el legacy solo como referencia temporal.
+- [ ] Reducir el formulario a los campos realmente usados hoy: comuna, region, sistema, isapre, cargas, renta, nombre, telefono, email, archivo y comentario.
+- [ ] Mantener solo la logica vigente del sidebar: autocomplete comuna-region, toggle Fonasa/Isapre, modal de cargas y validacion de telefono.
+- [ ] Eliminar dependencias y modulos del formulario antiguo que ya no participen en el flujo actual.
+- [ ] Revisar si `formulario/js`, `formulario/templates` y `formulario/styles` pueden archivarse o moverse a una carpeta legacy.
+- [ ] Normalizar nombres de campos entre frontend y Apps Script para evitar mapeos duplicados.
+- [ ] Agregar `Comentario` al contrato del formulario, Apps Script y Google Sheets.
+- [ ] Preparar desde ya el contrato de `Agendamiento` o `Cita` aunque el flujo aun no exista en frontend.
+- [ ] Definir si la cita se guardara como estado, fecha/hora, link de agenda o combinacion de esos campos.
+- [ ] Diseñar el flujo futuro de agendamiento conectado a Google Calendar sin mezclarlo aun con el submit principal.
+- [ ] Mantener Apps Script como backend transitorio del sidebar hasta cerrar la migracion a Cloudflare.
+- [ ] Definir un adaptador de backend para que el frontend nuevo no dependa de Apps Script ni de Cloudflare directamente.
+- [ ] Probar el sidebar completo en mobile real, incluyendo CTA del header, menu hamburguesa, scroll, abandono y envio.
+- [ ] Probar el sidebar en desktop real despues de la simplificacion para evitar regresiones.
+
 ## 7. UX, accesibilidad y QA
 
 - [x] Navegacion movil tiene `aria-controls` y `aria-expanded`.
