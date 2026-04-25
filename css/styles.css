@@ -18,5 +18,5 @@
 @import url('_modal.css');           /* 10. Estilos para la ventana modal */
 @import url('_responsive.css');      /* 10. Media queries para diseño adaptable */
 @import url('_asistente-faq.css');   /* 11. Estilos para el asistente FAQ (Overrides) */
-@import url('../formulario/styles/styles.css'); /* 12. Estilos del formulario */
+/* (legacy) formulario/ removido: estilos ahora viven en form/ */
 @import url('../form/styles/sidebar.css'); /* 13. Sidebar form */

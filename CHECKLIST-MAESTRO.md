@@ -20,7 +20,7 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
 
 - [x] CSS ya esta separado por archivos parciales (`_base`, `_layout`, `_components`, `_header-footer`, paginas y modulos).
 - [x] JS ya esta separado por modulos funcionales en `js/modules`.
-- [x] Formulario ya tiene modulos propios en `formulario/js`.
+- [x] Formulario ya tiene modulos propios en `form/`.
 - [ ] Modularizar HTML compartido: header, footer, menu mobile, modales y secciones.
 - [ ] Definir un mecanismo de build o includes para evitar duplicar header/footer en cada HTML.
 - [ ] Separar CSS y JS por seccion de forma consistente, sin romper cache ni orden de carga.
@@ -104,7 +104,7 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
 - [ ] Reducir el formulario a los campos realmente usados hoy: comuna, region, sistema, isapre, cargas, renta, nombre, telefono, email, archivo y comentario.
 - [ ] Mantener solo la logica vigente del sidebar: autocomplete comuna-region, toggle Fonasa/Isapre, modal de cargas y validacion de telefono.
 - [ ] Eliminar dependencias y modulos del formulario antiguo que ya no participen en el flujo actual.
-- [ ] Revisar si `formulario/js`, `formulario/templates` y `formulario/styles` pueden archivarse o moverse a una carpeta legacy.
+- [x] Eliminar carpeta legacy `formulario/` (ya no se usa).
 - [ ] Normalizar nombres de campos entre frontend y Apps Script para evitar mapeos duplicados.
 - [x] Agregar `Comentario` al contrato del formulario, Apps Script y Google Sheets.
 - [x] Preparar desde ya el contrato de `Agendamiento` o `Cita` aunque el flujo aun no exista en frontend.
