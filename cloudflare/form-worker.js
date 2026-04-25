@@ -253,10 +253,10 @@ function corsHeaders(env, request) {
   const allowedRaw = env.FORM_ALLOWED_ORIGIN || '*';
   const allowed = String(allowedRaw)
     .split(',')
-    .map((value) => value.trim())
+    .map((value) => value.trim().replace(/\/$/, ''))
     .filter(Boolean);
 
-  const requestOrigin = request?.headers?.get?.('Origin') || '';
+  const requestOrigin = (request?.headers?.get?.('Origin') || '').replace(/\/$/, '');
 
   let origin = '*';
   if (allowed.includes('*')) {
