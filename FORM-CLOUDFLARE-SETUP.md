@@ -43,12 +43,22 @@ Ya pude verificar esto:
 - `account_id`: `a69ce5c1cf6b705438ee7028f37cb30b`
 - zona encontrada: `planespro.cl`
 - `zone_id`: `6bf0d82dd59c05b841eee2fd4531785c`
-- estado de la zona: `pending`
+- estado de la zona: `active`
 
 Implicación directa:
 
 - sí puedo dejar listo el Worker para `workers.dev`
 - no conviene cerrar `form.planespro.cl` hasta que `planespro.cl` apunte a los nameservers de Cloudflare y la zona quede `active`
+
+Actualización:
+
+- ya está cerrado `form.planespro.cl` con DNS + route del Worker
+- Worker desplegado: `planespro-form`
+- Ruta activa: `form.planespro.cl/*`
+- Bucket R2 creado: `planespro-form-uploads`
+- D1 usado temporalmente: `ppnews_db` (`96ac7139-09d1-4254-bbc7-b1d349bd90fd`)
+
+Nota: la creación de una nueva base D1 llamada `planespro-form` devolvió error 7500 (internal). Cuando Cloudflare permita crearla, se migra el binding sin tocar el frontend.
 
 ## 2.2. Permisos que le faltan al token actual
 

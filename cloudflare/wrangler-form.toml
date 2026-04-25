@@ -7,8 +7,8 @@ workers_dev = true
 
 [[d1_databases]]
 binding = "FORM_DB"
-database_name = "planespro-form"
-database_id = "REEMPLAZAR_DATABASE_ID"
+database_name = "ppnews_db"
+database_id = "96ac7139-09d1-4254-bbc7-b1d349bd90fd"
 
 [[r2_buckets]]
 binding = "FORM_UPLOADS"

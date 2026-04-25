@@ -24,9 +24,17 @@ export default {
 
 async function handleLeadCreate(request, env) {
   const contentType = request.headers.get('content-type') || '';
-  const payload = contentType.includes('application/json')
-    ? await request.json()
-    : await formDataToObject(await request.formData());
+  let payload = {};
+  let uploadedFile = null;
+
+  if (contentType.includes('application/json')) {
+    payload = await request.json();
+  } else {
+    const formData = await request.formData();
+    const parsed = await formDataToFields(formData);
+    payload = parsed.fields;
+    uploadedFile = parsed.file;
+  }
 
   const leadId = crypto.randomUUID();
   const now = new Date().toISOString();
@@ -34,7 +42,14 @@ async function handleLeadCreate(request, env) {
 
   let pdfObjectKey = '';
   let pdfOriginalName = '';
-  if (payload.base64pdf) {
+  if (uploadedFile && uploadedFile.size > 0) {
+    pdfOriginalName = uploadedFile.name || `${leadId}.pdf`;
+    pdfObjectKey = `leads/${leadId}/${pdfOriginalName}`;
+    const bytes = new Uint8Array(await uploadedFile.arrayBuffer());
+    await env.FORM_UPLOADS.put(pdfObjectKey, bytes, {
+      httpMetadata: { contentType: uploadedFile.type || 'application/pdf' },
+    });
+  } else if (payload.base64pdf) {
     const pdf = decodeBase64(payload.base64pdf);
     pdfOriginalName = payload.filename || `${leadId}.pdf`;
     pdfObjectKey = `leads/${leadId}/${pdfOriginalName}`;
@@ -188,12 +203,26 @@ function normalizeLead(payload, leadId, now, fallbackStatus) {
   };
 }
 
-async function formDataToObject(formData) {
-  const data = {};
+async function formDataToFields(formData) {
+  const fields = {};
+  let file = null;
+
   for (const [key, value] of formData.entries()) {
-    data[key] = value;
+    if (key === 'archivo' && value && typeof value === 'object' && 'arrayBuffer' in value) {
+      file = value;
+      continue;
+    }
+    if (typeof value === 'string') {
+      fields[key] = value;
+    } else if (value == null) {
+      fields[key] = '';
+    } else {
+      // For safety, coerce unexpected types to string.
+      fields[key] = String(value);
+    }
   }
-  return data;
+
+  return { fields, file };
 }
 
 function decodeBase64(base64) {
