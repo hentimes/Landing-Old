@@ -12,7 +12,7 @@ import { initAnalytics }    from './modules/analytics.js';
 import { initAccordion }    from './modules/accordion.js';
 
 // ── Sidebar Form (reemplaza formulario modal) ──────────────────
-import { initSidebar } from '../formulario/sidebar/sidebar.js';
+import { initSidebar } from '../form/sidebar.js';
 
 // ── Módulos por página ─────────────────────────────────────────
 import { initFlipCards }          from './modules/flip-cards.js';

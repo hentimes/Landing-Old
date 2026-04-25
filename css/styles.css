@@ -19,4 +19,4 @@
 @import url('_responsive.css');      /* 10. Media queries para diseño adaptable */
 @import url('_asistente-faq.css');   /* 11. Estilos para el asistente FAQ (Overrides) */
 @import url('../formulario/styles/styles.css'); /* 12. Estilos del formulario */
-@import url('../formulario/sidebar/sidebar.css'); /* 13. Sidebar form */
+@import url('../form/styles/sidebar.css'); /* 13. Sidebar form */
