@@ -8,8 +8,8 @@ Configuración y datos estáticos del sidebar form
 export const SIDEBAR_STORAGE_KEY = 'sidebarFormProgress';
 export const BACKEND_TARGET = 'cloudflare';
 
-// Endpoint del Cloudflare Worker (placeholder hasta despliegue)
-export const WORKER_URL = 'https://form.planespro.cl';
+// Endpoint directo del Worker desplegado en workers.dev
+export const WORKER_URL = 'https://ppforms.hentimes.workers.dev';
 
 // Endpoint actual (temporal) â€” Google Apps Script
 // Se usa mientras se monta el backend en Cloudflare.
