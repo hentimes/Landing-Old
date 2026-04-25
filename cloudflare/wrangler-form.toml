@@ -1,0 +1,18 @@
+name = "planespro-form"
+main = "cloudflare/form-worker.js"
+compatibility_date = "2026-04-25"
+account_id = "a69ce5c1cf6b705438ee7028f37cb30b"
+
+workers_dev = true
+
+[[d1_databases]]
+binding = "FORM_DB"
+database_name = "planespro-form"
+database_id = "REEMPLAZAR_DATABASE_ID"
+
+[[r2_buckets]]
+binding = "FORM_UPLOADS"
+bucket_name = "planespro-form-uploads"
+
+[vars]
+FORM_ALLOWED_ORIGIN = "https://planespro.cl"

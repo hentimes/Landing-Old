@@ -36,11 +36,54 @@ Cuando lo tengas creado, necesito estos datos exactos:
   - ejemplo: `https://planespro.cl`
   - si usarás también GitHub Pages o staging, necesito esa lista
 
+## 2.1. Estado actual detectado
+
+Ya pude verificar esto:
+
+- `account_id`: `a69ce5c1cf6b705438ee7028f37cb30b`
+- zona encontrada: `planespro.cl`
+- `zone_id`: `6bf0d82dd59c05b841eee2fd4531785c`
+- estado de la zona: `pending`
+
+Implicación directa:
+
+- sí puedo dejar listo el Worker para `workers.dev`
+- no conviene cerrar `form.planespro.cl` hasta que `planespro.cl` apunte a los nameservers de Cloudflare y la zona quede `active`
+
+## 2.2. Permisos que le faltan al token actual
+
+El token actual es válido, pero no alcanza para provisionar todo.
+
+Permisos observados:
+
+- `#worker:edit`
+- `#worker:read`
+- `#zone:read`
+
+Con eso puedo leer la zona y trabajar parcialmente con Workers, pero no puedo crear ni administrar estos recursos:
+
+- D1
+- R2
+- DNS records / routes para `form.planespro.cl`
+
+Para que yo haga todo por CLI, el token debe incluir además:
+
+- `D1: Edit`
+- `R2: Edit`
+- `Zone DNS: Edit`
+- `Workers Routes: Edit`
+
+Opcional pero útil:
+
+- `Account Settings: Read`
+- `User Details: Read`
+
 ## 3. Configuración esperada
 
 El ejemplo de Wrangler ya está listo en:
 
 - `cloudflare/wrangler-form.example.toml`
+- `cloudflare/wrangler-form.toml`
 
 Debe quedar con estos bindings:
 
