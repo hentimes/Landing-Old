@@ -3,22 +3,31 @@ export default {
     const url = new URL(request.url);
 
     if (request.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders(env) });
+      return new Response(null, { headers: corsHeaders(env, request) });
     }
 
-    if (request.method === 'POST' && url.pathname === '/api/form/leads') {
-      return handleLeadCreate(request, env);
+    try {
+      if (request.method === 'POST' && url.pathname === '/api/form/leads') {
+        return await handleLeadCreate(request, env);
+      }
+
+      if (request.method === 'POST' && url.pathname === '/api/form/leads/abandoned') {
+        return await handleLeadAbandoned(request, env);
+      }
+
+      if (request.method === 'POST' && url.pathname === '/api/form/appointments') {
+        return await handleAppointmentUpdate(request, env);
+      }
+    } catch (error) {
+      return json(
+        { error: error?.message || 'Internal error' },
+        500,
+        env,
+        request
+      );
     }
 
-    if (request.method === 'POST' && url.pathname === '/api/form/leads/abandoned') {
-      return handleLeadAbandoned(request, env);
-    }
-
-    if (request.method === 'POST' && url.pathname === '/api/form/appointments') {
-      return handleAppointmentUpdate(request, env);
-    }
-
-    return json({ error: 'Not found' }, 404, env);
+    return json({ error: 'Not found' }, 404, env, request);
   },
 };
 
@@ -97,7 +106,7 @@ async function handleLeadCreate(request, env) {
     JSON.stringify(normalized.raw_payload)
   ).run();
 
-  return json({ ok: true, leadId }, 200, env);
+  return json({ ok: true, leadId }, 200, env, request);
 }
 
 async function handleLeadAbandoned(request, env) {
@@ -143,13 +152,13 @@ async function handleLeadAbandoned(request, env) {
     JSON.stringify(normalized.raw_payload)
   ).run();
 
-  return json({ ok: true, leadId }, 200, env);
+  return json({ ok: true, leadId }, 200, env, request);
 }
 
 async function handleAppointmentUpdate(request, env) {
   const payload = await request.json().catch(() => ({}));
   if (!payload.leadId) {
-    return json({ error: 'leadId is required' }, 400, env);
+    return json({ error: 'leadId is required' }, 400, env, request);
   }
 
   await env.FORM_DB.prepare(`
@@ -170,7 +179,7 @@ async function handleAppointmentUpdate(request, env) {
     payload.leadId
   ).run();
 
-  return json({ ok: true }, 200, env);
+  return json({ ok: true }, 200, env, request);
 }
 
 function normalizeLead(payload, leadId, now, fallbackStatus) {
@@ -230,19 +239,37 @@ function decodeBase64(base64) {
   return bytes;
 }
 
-function json(body, status, env) {
+function json(body, status, env, request) {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       'Content-Type': 'application/json',
-      ...corsHeaders(env),
+      ...corsHeaders(env, request),
     },
   });
 }
 
-function corsHeaders(env) {
+function corsHeaders(env, request) {
+  const allowedRaw = env.FORM_ALLOWED_ORIGIN || '*';
+  const allowed = String(allowedRaw)
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  const requestOrigin = request?.headers?.get?.('Origin') || '';
+
+  let origin = '*';
+  if (allowed.includes('*')) {
+    origin = '*';
+  } else if (requestOrigin && allowed.includes(requestOrigin)) {
+    origin = requestOrigin;
+  } else if (allowed.length > 0) {
+    // Return an origin that will intentionally fail CORS when not in allowlist.
+    origin = 'null';
+  }
+
   return {
-    'Access-Control-Allow-Origin': env.FORM_ALLOWED_ORIGIN || '*',
+    'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   };
