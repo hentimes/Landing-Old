@@ -9,7 +9,7 @@ export const SIDEBAR_STORAGE_KEY = 'sidebarFormProgress';
 export const BACKEND_TARGET = 'apps-script';
 
 // Endpoint del Cloudflare Worker (placeholder hasta despliegue)
-export const WORKER_URL = 'https://form.planespro.cl/submit';
+export const WORKER_URL = 'https://form.planespro.cl';
 
 // Endpoint actual (temporal) â€” Google Apps Script
 // Se usa mientras se monta el backend en Cloudflare.

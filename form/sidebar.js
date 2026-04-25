@@ -285,6 +285,11 @@ function injectHTML() {
           </div>
 
           <!-- Error envío -->
+          <input type="hidden" id="sb-cita-estado" name="cita_estado" value="" />
+          <input type="hidden" id="sb-cita-fecha-hora" name="cita_fecha_hora" value="" />
+          <input type="hidden" id="sb-cita-calendar-event-id" name="cita_calendar_event_id" value="" />
+          <input type="hidden" id="sb-cita-calendar-url" name="cita_calendar_url" value="" />
+
           <p id="sb-submit-error" class="sb-submit-error" style="display:none"></p>
 
           <!-- CTA -->

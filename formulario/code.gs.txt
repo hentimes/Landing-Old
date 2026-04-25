@@ -7,12 +7,12 @@ const SHEETS_CONFIG = {
   DEFAULT_SHEET: 'PlanesPro'
 };
 
-// --- ESTRUCTURA DE COLUMNAS ACTUALIZADA ---
 const COLUMN_HEADERS = [
-  'FechaEnvio','Estado','CTA','Campaña','Nombre','Rut','Email','Teléfono','Edad','Factor',
-  'Est. Civil','Comuna','Región','Sist. Salud','Isapre','Anualidad','Estatura','Peso',
-  'Cargas','Edad Cargas','Interés','Costo Plan','Evaluar AFP','AFP','Archivo PDF',
-  'Contacto WA','Estado WA'
+  'FechaEnvio', 'Estado', 'CTA', 'Campana', 'Nombre', 'Rut', 'Email', 'Telefono', 'Edad',
+  'Factor', 'Est. Civil', 'Comuna', 'Region', 'Sist. Salud', 'Isapre', 'Anualidad',
+  'Estatura', 'Peso', 'Cargas', 'Edad Cargas', 'Interes', 'Comentario', 'Costo Plan',
+  'Evaluar AFP', 'AFP', 'Archivo PDF', 'Cita Estado', 'Cita Fecha Hora',
+  'Cita Calendar Event ID', 'Cita Calendar URL', 'Contacto WA', 'Estado WA'
 ];
 
 function onOpen() {
@@ -27,59 +27,68 @@ function doPost(e) {
   lock.waitLock(30000);
 
   try {
-    const data = {};
-    for (const k in e.parameter) data[k] = e.parameter[k];
-    Logger.log("📥 Parámetros recibidos: " + JSON.stringify(data));
+    let data = {};
+    try {
+      const isJson = e.postData && e.postData.type && String(e.postData.type).indexOf('application/json') !== -1;
+      const body = isJson ? JSON.parse(e.postData.contents || '{}') : {};
+      data = Object.assign({}, e.parameter || {}, body || {});
+    } catch (parseErr) {
+      data = Object.assign({}, e.parameter || {});
+      Logger.log('No se pudo parsear JSON del body: ' + parseErr);
+    }
 
     const fuente = (data.fuente_cta || '').toLowerCase();
-    const target = fuente === SHEETS_CONFIG.MIEMBRO_1.fuente
-      ? SHEETS_CONFIG.MIEMBRO_1.nombreHoja
-      : fuente === SHEETS_CONFIG.MIEMBRO_2.fuente
-      ? SHEETS_CONFIG.MIEMBRO_2.nombreHoja
-      : SHEETS_CONFIG.DEFAULT_SHEET;
+    const target = (data.sheetName && String(data.sheetName).trim() !== '')
+      ? String(data.sheetName).trim()
+      : (fuente === SHEETS_CONFIG.MIEMBRO_1.fuente
+        ? SHEETS_CONFIG.MIEMBRO_1.nombreHoja
+        : fuente === SHEETS_CONFIG.MIEMBRO_2.fuente
+          ? SHEETS_CONFIG.MIEMBRO_2.nombreHoja
+          : SHEETS_CONFIG.DEFAULT_SHEET);
 
-    const sheet = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(target);
-    if (!sheet) throw `Hoja "${target}" no encontrada.`;
-    if (sheet.getLastRow() === 0) sheet.appendRow(COLUMN_HEADERS);
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    let sheet = ss.getSheetByName(target);
+    if (!sheet) {
+      sheet = ss.insertSheet(target);
+    }
+
+    ensureHeaders_(sheet);
 
     let pdfUrl = '';
     try {
-      if (e.parameter.base64pdf) {
-        const base64 = e.parameter.base64pdf;
-        
-        // --- NOMBRE DE PDF MEJORADO CON FECHA PARA ORDENAR ---
+      const base64 = data.base64pdf || (e.parameter && e.parameter.base64pdf);
+      if (base64) {
         const fechaActual = new Date();
-        const fechaFormateada = Utilities.formatDate(fechaActual, "America/Santiago", "yyyy-MM-dd_HHmm");
+        const fechaFormateada = Utilities.formatDate(fechaActual, 'America/Santiago', 'yyyy-MM-dd_HHmm');
         const nombreCliente = (data.nombre || 'SinNombre').replace(/\s+/g, '_');
         const rutCliente = data.rut || 'SinRUT';
         const nombreArchivo = `${fechaFormateada}_${nombreCliente}_${rutCliente}.pdf`;
-        
+
         const decoded = Utilities.base64Decode(base64);
         const blob = Utilities.newBlob(decoded, MimeType.PDF, nombreArchivo);
         const file = DriveApp.getFolderById(DRIVE_FOLDER_ID).createFile(blob);
         const fileId = file.getId();
         pdfUrl = `=HYPERLINK("https://drive.google.com/file/d/${fileId}/view", "${nombreArchivo}")`;
-        Logger.log("✅ PDF subido con éxito: " + fileId);
       }
     } catch (err) {
-      Logger.log("❌ Error al procesar archivo base64: " + err);
+      Logger.log('Error al procesar archivo base64: ' + err);
     }
 
-    const row = COLUMN_HEADERS.map(h => {
-      switch (h) {
+    const row = COLUMN_HEADERS.map((header) => {
+      switch (header) {
         case 'FechaEnvio': return new Date();
         case 'Estado': return data.status || 'Completado';
         case 'CTA': return data.fuente_cta || '';
-        case 'Campaña': return data.campana || '';
+        case 'Campana': return data.campana || '';
         case 'Nombre': return data.nombre || '';
         case 'Rut': return data.rut || '';
         case 'Email': return data.email || '';
-        case 'Teléfono': return data.telefono || '';
+        case 'Telefono': return data.telefono || '';
         case 'Edad': return data.rango_edad || '';
         case 'Factor': return data.factor || '';
         case 'Est. Civil': return data.estado_civil || '';
         case 'Comuna': return data.comuna || '';
-        case 'Región': return data.region || '';
+        case 'Region': return data.region || '';
         case 'Sist. Salud': return data.sistema_actual || '';
         case 'Isapre': return data.isapre_especifica || '';
         case 'Anualidad': return data.anualidad_isapre || '';
@@ -87,11 +96,16 @@ function doPost(e) {
         case 'Peso': return data.peso || '';
         case 'Cargas': return data.num_cargas || '';
         case 'Edad Cargas': return data.edad_cargas || '';
-        case 'Interés': return data.interes || '';
+        case 'Interes': return data.interes || '';
+        case 'Comentario': return data.comentarios || '';
         case 'Costo Plan': return data.rango_costo || '';
         case 'Evaluar AFP': return data.evaluar_afp || '';
         case 'AFP': return data.afp_actual || '';
         case 'Archivo PDF': return pdfUrl || '';
+        case 'Cita Estado': return data.cita_estado || '';
+        case 'Cita Fecha Hora': return data.cita_fecha_hora || '';
+        case 'Cita Calendar Event ID': return data.cita_calendar_event_id || '';
+        case 'Cita Calendar URL': return data.cita_calendar_url || '';
         case 'Contacto WA': return '';
         case 'Estado WA': return '';
         default: return '';
@@ -107,37 +121,69 @@ function doPost(e) {
     const region = data.region || '';
     const sistema = data.sistema_actual || '';
     const isapre = sistema === 'Isapre' ? ` (${data.isapre_especifica || ''})` : '';
-    const cargas = data.num_cargas > 0 ? `• Cargas: ${data.num_cargas}\n` : '';
+    const cargas = Number(data.num_cargas || 0) > 0 ? `• Cargas: ${data.num_cargas}\n` : '';
     const interes = data.interes || '';
+    const comentario = data.comentarios ? `• Comentario: ${data.comentarios}\n` : '';
     const costo = data.rango_costo || '';
     const afp = data.evaluar_afp === 'Si' ? `• Me interesa AFP\n• AFP Actual: ${data.afp_actual || ''}\n` : '';
-    const msg = `Hola, ${nombre}, te saludamos de PlanesPro:\n\n` +
-      `• Rut: ${data.rut || ''}\n` +
-      `• Teléfono: ${telefono}\n` +
-      `• Comuna: ${comuna}\n` +
-      `• Región: ${region}\n` +
-      `• Sistema de Salud: ${sistema}${isapre}\n` +
-      cargas +
-      `• Interés: ${interes}\n` +
-      `• Costo plan actual: ${costo}\n` +
-      afp +
-      `\nGracias por tu confianza.\nPronto te entregamos tu análisis.`;
-    const url = `https://wa.me/56${telefono.replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
+    const msg = `Hola, ${nombre}, te saludamos de PlanesPro:\n\n`
+      + `• Rut: ${data.rut || ''}\n`
+      + `• Telefono: ${telefono}\n`
+      + `• Comuna: ${comuna}\n`
+      + `• Region: ${region}\n`
+      + `• Sistema de Salud: ${sistema}${isapre}\n`
+      + cargas
+      + `• Interes: ${interes}\n`
+      + comentario
+      + `• Costo plan actual: ${costo}\n`
+      + afp
+      + `\nGracias por tu confianza.\nPronto te entregamos tu analisis.`;
+    const url = `https://wa.me/56${String(telefono).replace(/\D/g, '')}?text=${encodeURIComponent(msg)}`;
 
-    sheet.getRange(lastRow, COLUMN_HEADERS.indexOf('Contacto WA') + 1).setFormula(`=HYPERLINK("${url}"; "Enviar WhatsApp")`);
-    
+    sheet.getRange(lastRow, COLUMN_HEADERS.indexOf('Contacto WA') + 1)
+      .setFormula(`=HYPERLINK("${url}"; "Enviar WhatsApp")`);
+
+    try { notifyTeam_(data, target, lastRow); } catch (err) { Logger.log('notifyTeam_ error: ' + err); }
+
     if (data.status !== 'Abandonado' && data.email) {
       sendConfirmationEmail(data);
     }
 
-    return ContentService.createTextOutput(JSON.stringify({ result: 'success', message: 'Formulario enviado con éxito.' }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return ContentService.createTextOutput(JSON.stringify({
+      result: 'success',
+      sheet: target,
+      message: 'Formulario enviado con exito.'
+    })).setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
-    Logger.log("❌ Error en doPost: " + err);
-    return ContentService.createTextOutput(JSON.stringify({ result: 'error', message: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+    Logger.log('Error en doPost: ' + err);
+    return ContentService.createTextOutput(JSON.stringify({
+      result: 'error',
+      message: err.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
   } finally {
     lock.releaseLock();
+  }
+}
+
+function ensureHeaders_(sheet) {
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, COLUMN_HEADERS.length).setValues([COLUMN_HEADERS]);
+    return;
+  }
+
+  const currentHeaders = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), 1)).getValues()[0];
+  const normalizedCurrent = currentHeaders.map(String);
+  let changed = false;
+
+  COLUMN_HEADERS.forEach((header) => {
+    if (normalizedCurrent.indexOf(header) === -1) {
+      normalizedCurrent.push(header);
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    sheet.getRange(1, 1, 1, normalizedCurrent.length).setValues([normalizedCurrent]);
   }
 }
 
@@ -146,7 +192,7 @@ function prepararContactoWhatsApp() {
   const sh = SpreadsheetApp.getActiveSheet();
   const sel = sh.getActiveRange();
   if (sel.getNumRows() > 1 || sel.getRow() < 2) {
-    ui.alert('Selecciona UNA fila válida.');
+    ui.alert('Selecciona UNA fila valida.');
     return;
   }
 
@@ -159,60 +205,113 @@ function prepararContactoWhatsApp() {
     return;
   }
 
-  const cargasTxt = d['Cargas'] > 0 ? `• Cargas: ${d['Cargas']}\n` : '';
+  const cargasTxt = Number(d['Cargas'] || 0) > 0 ? `• Cargas: ${d['Cargas']}\n` : '';
   const isapreTxt = d['Sist. Salud'] === 'Isapre' && d['Isapre'] ? ` (${d['Isapre']})` : '';
+  const comentarioTxt = d['Comentario'] ? `• Comentario: ${d['Comentario']}\n` : '';
   const afpTxt = d['Evaluar AFP'] === 'Si' ? `• Me interesa AFP\n• AFP Actual: ${d['AFP']}\n` : '';
 
-  const msg = `Hola, ${d['Nombre']}, te saludamos de PlanesPro:\n\n` +
-    `• Rut: ${d['Rut']}\n` +
-    `• Teléfono: ${d['Teléfono']}\n` +
-    `• Comuna: ${d['Comuna']}\n` +
-    `• Región: ${d['Región']}\n` +
-    `• Sistema de Salud: ${d['Sist. Salud']}${isapreTxt}\n` +
-    cargasTxt +
-    `• Interés: ${d['Interés']}\n` +
-    `• Costo plan actual: ${d['Costo Plan']}\n` +
-    afpTxt +
-    `\nGracias por tu confianza.\nPronto te entregamos tu análisis.`;
+  const msg = `Hola, ${d['Nombre']}, te saludamos de PlanesPro:\n\n`
+    + `• Rut: ${d['Rut']}\n`
+    + `• Telefono: ${d['Telefono']}\n`
+    + `• Comuna: ${d['Comuna']}\n`
+    + `• Region: ${d['Region']}\n`
+    + `• Sistema de Salud: ${d['Sist. Salud']}${isapreTxt}\n`
+    + cargasTxt
+    + `• Interes: ${d['Interes']}\n`
+    + comentarioTxt
+    + `• Costo plan actual: ${d['Costo Plan']}\n`
+    + afpTxt
+    + `\nGracias por tu confianza.\nPronto te entregamos tu analisis.`;
 
-  const tel = `56${String(d['Teléfono']).replace(/\D/g, '')}`;
+  const tel = `56${String(d['Telefono']).replace(/\D/g, '')}`;
   const url = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
   sh.getRange(sel.getRow(), headers.indexOf('Contacto WA') + 1).setFormula(`=HYPERLINK("${url}"; "Enviar WhatsApp")`);
   sh.getRange(sel.getRow(), headers.indexOf('Estado WA') + 1).setValue('Contactado');
-  ui.alert('✅ Botón de WhatsApp creado y marcado como "Contactado".');
+  ui.alert('Boton de WhatsApp creado y marcado como Contactado.');
 }
 
 function sendConfirmationEmail(d) {
   if (!d.email) return;
-  const cargas = d.num_cargas > 0 ? `<p><strong>Cargas:</strong> ${d.num_cargas}</p>` : '';
+
+  const comentario = d.comentarios
+    ? `<p><strong>Comentario:</strong> ${d.comentarios}</p>`
+    : '';
+  const cargas = Number(d.num_cargas || 0) > 0 ? `<p><strong>Cargas:</strong> ${d.num_cargas}</p>` : '';
   const isapreTxt = d.sistema_actual === 'Isapre' && d.isapre_especifica ? ` (${d.isapre_especifica})` : '';
   const afpSection = d.evaluar_afp === 'Si'
-    ? `<p><strong>Me interesa AFP</strong><br>AFP Actual: ${d.afp_actual}</p>` : '';
+    ? `<p><strong>Me interesa AFP</strong><br>AFP Actual: ${d.afp_actual || ''}</p>`
+    : '';
 
   const html = `
   <div style="font-family:Arial;max-width:600px;margin:auto">
     <h2 style="background:#19B471;color:white;padding:10px">PlanesPro</h2>
     <div style="padding:20px;background:#f9f9f9">
-      <p>Hola <strong>${d.nombre}</strong>,</p>
-      <p>Recibimos tu solicitud. Aquí tus datos:</p>
-      <p><strong>RUT:</strong> ${d.rut}</p>
-      <p><strong>Teléfono:</strong> ${d.telefono}</p>
-      <p><strong>Comuna:</strong> ${d.comuna}</p>
-      <p><strong>Región:</strong> ${d.region}</p>
-      <p><strong>Sistema de Salud:</strong> ${d.sistema_actual}${isapreTxt}</p>
+      <p>Hola <strong>${d.nombre || ''}</strong>,</p>
+      <p>Recibimos tu solicitud. Aqui tus datos:</p>
+      <p><strong>RUT:</strong> ${d.rut || ''}</p>
+      <p><strong>Telefono:</strong> ${d.telefono || ''}</p>
+      <p><strong>Comuna:</strong> ${d.comuna || ''}</p>
+      <p><strong>Region:</strong> ${d.region || ''}</p>
+      <p><strong>Sistema de Salud:</strong> ${d.sistema_actual || ''}${isapreTxt}</p>
       ${cargas}
-      <p><strong>Interés:</strong> ${d.interes}</p>
-      <p><strong>Costo plan actual:</strong> ${d.rango_costo}</p>
+      ${comentario}
+      <p><strong>Interes:</strong> ${d.interes || ''}</p>
+      <p><strong>Costo plan actual:</strong> ${d.rango_costo || ''}</p>
       ${afpSection}
-      <p>En breve recibirás tu evaluación.</p>
+      <p>En breve recibiras tu evaluacion.</p>
       <p>Saludos,<br>Equipo PlanesPro</p>
     </div>
     <div style="text-align:center;font-size:12px;color:#555;padding:5px">© ${new Date().getFullYear()} PlanesPro</div>
   </div>`;
+
   MailApp.sendEmail({
     to: d.email,
-    subject: "Tu análisis de Plan de Salud está en proceso",
+    subject: 'Tu analisis de Plan de Salud esta en proceso',
     htmlBody: html,
-    name: "PlanesPro"
+    name: 'PlanesPro'
   });
+}
+
+function notifyTeam_(d, targetSheetName, lastRow) {
+  try {
+    const admin = 'planesproisapre@gmail.com';
+    const asunto = 'Nuevo lead - ' + (targetSheetName || 'PlanesPro');
+    const campos = [
+      ['Nombre', d.nombre],
+      ['Email', d.email],
+      ['WhatsApp', d.telefono],
+      ['Rango edad', d.rango_edad],
+      ['Sistema actual', d.sistema_actual || ''],
+      ['Isapre especifica', d.isapre_especifica || ''],
+      ['N de cargas', d.num_cargas],
+      ['Costo plan', d.rango_costo],
+      ['Comentario', d.comentarios],
+      ['Cita estado', d.cita_estado],
+      ['Cita fecha hora', d.cita_fecha_hora],
+      ['Fuente CTA', d.fuente_cta],
+      ['Campana', d.campana]
+    ];
+
+    const filas = campos.map((kv) => {
+      return `<tr><td style="padding:6px 10px;border-bottom:1px solid #eee"><b>${kv[0]}</b></td><td style="padding:6px 10px;border-bottom:1px solid #eee">${kv[1] || ''}</td></tr>`;
+    }).join('');
+
+    const html = ''
+      + '<div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;font-size:14px;color:#0b1220">'
+      + '<h2 style="margin:0 0 10px">Nuevo lead</h2>'
+      + `<p>Se registro un nuevo lead en la hoja <b>${targetSheetName || ''}</b> (fila #${lastRow || ''}).</p>`
+      + `<table style="border-collapse:collapse;border:1px solid #eee">${filas}</table>`
+      + '<p style="font-size:12px;color:#64748b;margin-top:10px">Este mensaje fue generado automaticamente por PlanesPro (Apps Script).</p>'
+      + '</div>';
+
+    MailApp.sendEmail({
+      to: admin,
+      subject: asunto,
+      htmlBody: html,
+      name: 'PlanesPro',
+      replyTo: d.email || ''
+    });
+  } catch (err) {
+    Logger.log('notifyTeam_ failed: ' + err);
+  }
 }

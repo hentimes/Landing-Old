@@ -7,8 +7,10 @@ Stub para la futura implementacion sobre Cloudflare Worker + D1 + R2.
 
 import { WORKER_URL } from '../config.js';
 
+const buildUrl = (path) => `${WORKER_URL.replace(/\/$/, '')}${path}`;
+
 export async function sendLeadToCloudflare(_form, formData) {
-    const response = await fetch(WORKER_URL, {
+    const response = await fetch(buildUrl('/api/form/leads'), {
         method: 'POST',
         body: formData,
     });
@@ -21,5 +23,5 @@ export async function sendLeadToCloudflare(_form, formData) {
 export function sendAbandonedToCloudflare(data) {
     const payload = JSON.stringify(data);
     const blob = new Blob([payload], { type: 'application/json' });
-    navigator.sendBeacon(`${WORKER_URL}/abandoned`, blob);
+    navigator.sendBeacon(buildUrl('/api/form/leads/abandoned'), blob);
 }
