@@ -1,4 +1,4 @@
-name = "planespro-form"
+name = "ppforms"
 main = "cloudflare/form-worker.js"
 compatibility_date = "2026-04-25"
 account_id = "a69ce5c1cf6b705438ee7028f37cb30b"
@@ -12,7 +12,7 @@ database_id = "3bca5190-8e8f-4d53-bbf4-c7b15ade1cf6"
 
 [[r2_buckets]]
 binding = "FORM_UPLOADS"
-bucket_name = "planespro-form-uploads"
+bucket_name = "ppforms-uploads"
 
 [vars]
 FORM_ALLOWED_ORIGIN = "https://planespro.cl"
