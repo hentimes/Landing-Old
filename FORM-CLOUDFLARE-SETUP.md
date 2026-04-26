@@ -14,15 +14,16 @@ Este documento deja el setup exacto que falta para mover el formulario nuevo de 
 ### D1
 - Nombre sugerido: `planespro-form`
 - Binding esperado por el código: `FORM_DB`
-- Migración lista para ejecutar:
+- Migraciones listas para ejecutar:
   - `cloudflare/migrations/002_create_form_leads.sql`
+  - `cloudflare/migrations/003_create_form_admin_tables.sql`
 
 ### R2
 - Bucket sugerido: `planespro-form-uploads`
 - Binding esperado por el código: `FORM_UPLOADS`
 - Uso actual:
   - guardar PDFs opcionales del formulario
-  - ruta de objeto: `leads/<leadId>/<filename>`
+  - ruta de objeto: `leads/<fecha>_<nombre>_<leadId-corto>.<ext>`
 
 ## 2. Datos que necesito que me traigas
 
@@ -103,6 +104,8 @@ Debe quedar con estos bindings:
 Y esta variable:
 
 - `FORM_ALLOWED_ORIGIN`
+- secreto recomendado para backoffice:
+  - `ADMIN_API_KEY`
 
 ## 4. Endpoints ya preparados
 
@@ -111,6 +114,13 @@ El frontend nuevo ya está desacoplado por adaptador y espera estos endpoints:
 - `POST /api/form/leads`
 - `POST /api/form/leads/abandoned`
 - `POST /api/form/appointments`
+- `GET /api/admin/session`
+- `GET /api/admin/leads`
+- `GET /api/admin/leads/:id`
+- `GET /api/admin/leads/:id/file`
+- `POST /api/admin/leads/:id/notes`
+- `POST /api/admin/leads/:id/status`
+- `POST /api/admin/leads/:id/archive`
 
 ## 5. Qué hace cada endpoint
 

@@ -1,6 +1,11 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const leadDetailMatch = url.pathname.match(/^\/api\/admin\/leads\/([^/]+)$/);
+    const leadFileMatch = url.pathname.match(/^\/api\/admin\/leads\/([^/]+)\/file$/);
+    const leadNotesMatch = url.pathname.match(/^\/api\/admin\/leads\/([^/]+)\/notes$/);
+    const leadStatusMatch = url.pathname.match(/^\/api\/admin\/leads\/([^/]+)\/status$/);
+    const leadArchiveMatch = url.pathname.match(/^\/api\/admin\/leads\/([^/]+)\/archive$/);
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders(env, request) });
@@ -17,6 +22,34 @@ export default {
 
       if (request.method === 'POST' && url.pathname === '/api/form/appointments') {
         return await handleAppointmentUpdate(request, env);
+      }
+
+      if (request.method === 'GET' && url.pathname === '/api/admin/session') {
+        return await handleAdminSession(request, env);
+      }
+
+      if (request.method === 'GET' && url.pathname === '/api/admin/leads') {
+        return await handleAdminLeadList(request, env);
+      }
+
+      if (request.method === 'GET' && leadDetailMatch) {
+        return await handleAdminLeadDetail(request, env, leadDetailMatch[1]);
+      }
+
+      if (request.method === 'GET' && leadFileMatch) {
+        return await handleAdminLeadFile(request, env, leadFileMatch[1]);
+      }
+
+      if (request.method === 'POST' && leadNotesMatch) {
+        return await handleAdminLeadNote(request, env, leadNotesMatch[1]);
+      }
+
+      if (request.method === 'POST' && leadStatusMatch) {
+        return await handleAdminLeadStatus(request, env, leadStatusMatch[1]);
+      }
+
+      if (request.method === 'POST' && leadArchiveMatch) {
+        return await handleAdminLeadArchive(request, env, leadArchiveMatch[1]);
       }
     } catch (error) {
       return json(
@@ -192,6 +225,286 @@ async function handleAppointmentUpdate(request, env) {
   return json({ ok: true }, 200, env, request);
 }
 
+async function handleAdminSession(request, env) {
+  const admin = requireAdmin(request, env);
+  if (admin.response) {
+    return admin.response;
+  }
+
+  return json(
+    {
+      ok: true,
+      actorEmail: admin.actorEmail,
+      authMode: admin.authMode,
+    },
+    200,
+    env,
+    request
+  );
+}
+
+async function handleAdminLeadList(request, env) {
+  const admin = requireAdmin(request, env);
+  if (admin.response) {
+    return admin.response;
+  }
+
+  const url = new URL(request.url);
+  const query = (url.searchParams.get('q') || '').trim().toLowerCase();
+  const status = (url.searchParams.get('status') || '').trim();
+  const sistema = (url.searchParams.get('sistema') || '').trim();
+  const isapre = (url.searchParams.get('isapre') || '').trim();
+  const from = (url.searchParams.get('from') || '').trim();
+  const to = (url.searchParams.get('to') || '').trim();
+  const limit = clampInteger(url.searchParams.get('limit'), 20, 1, 100);
+  const offset = clampInteger(url.searchParams.get('offset'), 0, 0, 5000);
+
+  const searchLike = `%${query}%`;
+  const filters = [
+    query,
+    searchLike,
+    searchLike,
+    searchLike,
+    searchLike,
+    status,
+    status,
+    sistema,
+    sistema,
+    isapre,
+    isapre,
+    from,
+    from,
+    to,
+    to,
+  ];
+
+  const whereClause = `
+    WHERE
+      (? = '' OR lower(nombre) LIKE ? OR lower(email) LIKE ? OR lower(telefono) LIKE ? OR lower(comuna) LIKE ?)
+      AND (? = '' OR status = ?)
+      AND (? = '' OR sistema_actual = ?)
+      AND (? = '' OR isapre_especifica = ?)
+      AND (? = '' OR date(created_at) >= date(?))
+      AND (? = '' OR date(created_at) <= date(?))
+  `;
+
+  const countSql = `SELECT COUNT(*) AS total FROM form_leads ${whereClause}`;
+  const listSql = `
+    SELECT
+      id,
+      created_at,
+      updated_at,
+      status,
+      nombre,
+      email,
+      telefono,
+      comuna,
+      region,
+      sistema_actual,
+      isapre_especifica,
+      comentarios,
+      pdf_object_key,
+      pdf_original_name
+    FROM form_leads
+    ${whereClause}
+    ORDER BY datetime(created_at) DESC
+    LIMIT ? OFFSET ?
+  `;
+
+  const [{ total } = { total: 0 }] = (await env.FORM_DB.prepare(countSql).bind(...filters).all()).results || [];
+  const listResults = await env.FORM_DB.prepare(listSql).bind(...filters, limit, offset).all();
+
+  return json(
+    {
+      ok: true,
+      items: (listResults.results || []).map((item) => ({
+        ...item,
+        has_file: Boolean(item.pdf_object_key),
+      })),
+      total: Number(total || 0),
+      limit,
+      offset,
+    },
+    200,
+    env,
+    request
+  );
+}
+
+async function handleAdminLeadDetail(request, env, leadId) {
+  const admin = requireAdmin(request, env);
+  if (admin.response) {
+    return admin.response;
+  }
+
+  const leadResult = await env.FORM_DB.prepare(`
+    SELECT *
+    FROM form_leads
+    WHERE id = ?
+    LIMIT 1
+  `).bind(leadId).all();
+
+  const lead = leadResult.results?.[0];
+  if (!lead) {
+    return json({ error: 'Lead not found' }, 404, env, request);
+  }
+
+  const notesResult = await env.FORM_DB.prepare(`
+    SELECT id, lead_id, note_text, author_email, created_at
+    FROM lead_notes
+    WHERE lead_id = ?
+    ORDER BY datetime(created_at) DESC
+  `).bind(leadId).all();
+
+  const eventsResult = await env.FORM_DB.prepare(`
+    SELECT id, lead_id, event_type, actor_email, payload_json, created_at
+    FROM lead_events
+    WHERE lead_id = ?
+    ORDER BY datetime(created_at) DESC
+    LIMIT 30
+  `).bind(leadId).all();
+
+  return json(
+    {
+      ok: true,
+      lead: {
+        ...lead,
+        has_file: Boolean(lead.pdf_object_key),
+      },
+      notes: notesResult.results || [],
+      events: (eventsResult.results || []).map((event) => ({
+        ...event,
+        payload: safeJsonParse(event.payload_json),
+      })),
+    },
+    200,
+    env,
+    request
+  );
+}
+
+async function handleAdminLeadFile(request, env, leadId) {
+  const admin = requireAdmin(request, env);
+  if (admin.response) {
+    return admin.response;
+  }
+
+  const leadResult = await env.FORM_DB.prepare(`
+    SELECT pdf_object_key, pdf_original_name
+    FROM form_leads
+    WHERE id = ?
+    LIMIT 1
+  `).bind(leadId).all();
+
+  const lead = leadResult.results?.[0];
+  if (!lead?.pdf_object_key) {
+    return json({ error: 'File not found' }, 404, env, request);
+  }
+
+  const object = await env.FORM_UPLOADS.get(lead.pdf_object_key);
+  if (!object) {
+    return json({ error: 'Stored file not found' }, 404, env, request);
+  }
+
+  const headers = new Headers(corsHeaders(env, request));
+  headers.set('Content-Type', object.httpMetadata?.contentType || 'application/octet-stream');
+  headers.set('Content-Disposition', `inline; filename="${lead.pdf_original_name || 'adjunto'}"`);
+
+  return new Response(object.body, { status: 200, headers });
+}
+
+async function handleAdminLeadNote(request, env, leadId) {
+  const admin = requireAdmin(request, env);
+  if (admin.response) {
+    return admin.response;
+  }
+
+  const body = await request.json().catch(() => ({}));
+  const note = String(body.note || '').trim();
+  if (!note) {
+    return json({ error: 'Note is required' }, 400, env, request);
+  }
+
+  const now = new Date().toISOString();
+  await env.FORM_DB.prepare(`
+    INSERT INTO lead_notes (id, lead_id, note_text, author_email, created_at)
+    VALUES (?, ?, ?, ?, ?)
+  `).bind(
+    crypto.randomUUID(),
+    leadId,
+    note,
+    admin.actorEmail,
+    now
+  ).run();
+
+  await insertLeadEvent(env, {
+    leadId,
+    eventType: 'note_added',
+    actorEmail: admin.actorEmail,
+    payload: { note },
+    createdAt: now,
+  });
+
+  return json({ ok: true }, 200, env, request);
+}
+
+async function handleAdminLeadStatus(request, env, leadId) {
+  const admin = requireAdmin(request, env);
+  if (admin.response) {
+    return admin.response;
+  }
+
+  const body = await request.json().catch(() => ({}));
+  const status = String(body.status || '').trim();
+  if (!status) {
+    return json({ error: 'Status is required' }, 400, env, request);
+  }
+
+  const now = new Date().toISOString();
+  await env.FORM_DB.prepare(`
+    UPDATE form_leads
+    SET status = ?, updated_at = ?
+    WHERE id = ?
+  `).bind(status, now, leadId).run();
+
+  await insertLeadEvent(env, {
+    leadId,
+    eventType: 'status_changed',
+    actorEmail: admin.actorEmail,
+    payload: { status },
+    createdAt: now,
+  });
+
+  return json({ ok: true }, 200, env, request);
+}
+
+async function handleAdminLeadArchive(request, env, leadId) {
+  const admin = requireAdmin(request, env);
+  if (admin.response) {
+    return admin.response;
+  }
+
+  const body = await request.json().catch(() => ({}));
+  const reason = String(body.reason || '').trim();
+  const now = new Date().toISOString();
+
+  await env.FORM_DB.prepare(`
+    UPDATE form_leads
+    SET status = ?, updated_at = ?
+    WHERE id = ?
+  `).bind('Archivado', now, leadId).run();
+
+  await insertLeadEvent(env, {
+    leadId,
+    eventType: 'archived',
+    actorEmail: admin.actorEmail,
+    payload: { reason },
+    createdAt: now,
+  });
+
+  return json({ ok: true }, 200, env, request);
+}
+
 function normalizeLead(payload, leadId, now, fallbackStatus) {
   return {
     id: leadId,
@@ -249,6 +562,65 @@ function decodeBase64(base64) {
   return bytes;
 }
 
+function requireAdmin(request, env) {
+  const url = new URL(request.url);
+  const accessEmail =
+    request.headers.get('Cf-Access-Authenticated-User-Email') ||
+    request.headers.get('cf-access-authenticated-user-email') ||
+    '';
+
+  if (accessEmail) {
+    return { actorEmail: accessEmail, authMode: 'cloudflare-access' };
+  }
+
+  const adminKey = request.headers.get('X-Admin-Key') || url.searchParams.get('adminKey') || '';
+  if (env.ADMIN_API_KEY && adminKey && adminKey === env.ADMIN_API_KEY) {
+    return { actorEmail: 'local-admin', authMode: 'admin-key' };
+  }
+
+  return {
+    response: json(
+      {
+        error: 'Unauthorized',
+        message: 'Cloudflare Access o X-Admin-Key requerido.',
+      },
+      401,
+      env,
+      request
+    ),
+  };
+}
+
+async function insertLeadEvent(env, { leadId, eventType, actorEmail, payload, createdAt }) {
+  await env.FORM_DB.prepare(`
+    INSERT INTO lead_events (id, lead_id, event_type, actor_email, payload_json, created_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).bind(
+    crypto.randomUUID(),
+    leadId,
+    eventType,
+    actorEmail,
+    JSON.stringify(payload || {}),
+    createdAt || new Date().toISOString()
+  ).run();
+}
+
+function clampInteger(value, fallback, min, max) {
+  const parsed = Number.parseInt(value, 10);
+  if (Number.isNaN(parsed)) {
+    return fallback;
+  }
+  return Math.min(max, Math.max(min, parsed));
+}
+
+function safeJsonParse(value) {
+  try {
+    return value ? JSON.parse(value) : null;
+  } catch {
+    return null;
+  }
+}
+
 function buildUploadFilename({ originalName, leadId, leadName, createdAt }) {
   const datePart = (createdAt || new Date().toISOString()).slice(0, 10);
   const namePart = slugifyFilePart(leadName || 'sin-nombre');
@@ -298,7 +670,7 @@ function corsHeaders(env, request) {
     return {
       'Access-Control-Allow-Origin': requestOrigin,
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Key',
     };
   }
 
@@ -315,6 +687,6 @@ function corsHeaders(env, request) {
   return {
     'Access-Control-Allow-Origin': origin,
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Admin-Key',
   };
 }

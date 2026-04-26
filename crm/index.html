@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#0a74da" />
+  <title>CRM Leads | PlanesPro</title>
+  <link rel="icon" type="image/webp" sizes="32x32" href="../assets/favicons/favicon-32.webp" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicons/favicon-180.webp" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="crm-body">
+  <div class="crm-shell">
+    <header class="crm-topbar">
+      <div class="crm-brand">
+        <img src="../assets/logos_pp/logo-planespro.obs.webp" alt="PlanesPro.cl" class="crm-brand__logo" />
+        <div>
+          <p class="crm-eyebrow">Backoffice privado</p>
+          <h1>Leads y seguimiento</h1>
+        </div>
+      </div>
+      <div class="crm-session">
+        <div>
+          <p class="crm-session__label">Sesión</p>
+          <strong id="session-status">Verificando acceso...</strong>
+        </div>
+        <div class="crm-keybox">
+          <label for="admin-key">Clave admin</label>
+          <div class="crm-keybox__row">
+            <input id="admin-key" type="password" placeholder="Solo desarrollo local" autocomplete="off" />
+            <button type="button" id="save-admin-key" class="button button--secondary">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="crm-filters">
+      <div class="crm-filters__grid">
+        <label>
+          <span>Buscar</span>
+          <input id="filter-q" type="search" placeholder="Nombre, correo, teléfono o comuna" />
+        </label>
+        <label>
+          <span>Estado</span>
+          <select id="filter-status">
+            <option value="">Todos</option>
+          </select>
+        </label>
+        <label>
+          <span>Sistema</span>
+          <select id="filter-sistema">
+            <option value="">Todos</option>
+            <option value="Fonasa">Fonasa</option>
+            <option value="Isapre">Isapre</option>
+          </select>
+        </label>
+        <label>
+          <span>Isapre</span>
+          <input id="filter-isapre" type="text" placeholder="Colmena, Cruz Blanca..." />
+        </label>
+        <label>
+          <span>Desde</span>
+          <input id="filter-from" type="date" />
+        </label>
+        <label>
+          <span>Hasta</span>
+          <input id="filter-to" type="date" />
+        </label>
+      </div>
+      <div class="crm-filters__actions">
+        <button type="button" id="apply-filters" class="button button--primary">Aplicar filtros</button>
+        <button type="button" id="clear-filters" class="button button--ghost">Limpiar</button>
+      </div>
+    </section>
+
+    <main class="crm-layout">
+      <section class="crm-panel crm-list">
+        <div class="crm-panel__header">
+          <div>
+            <p class="crm-eyebrow">Bandeja</p>
+            <h2>Leads captados</h2>
+          </div>
+          <strong id="lead-count">0 resultados</strong>
+        </div>
+        <div id="lead-list" class="crm-list__items"></div>
+      </section>
+
+      <aside class="crm-panel crm-detail">
+        <div id="lead-detail-empty" class="crm-empty">
+          <h3>Selecciona un lead</h3>
+          <p>Aquí verás datos, adjunto, comentarios, notas internas y acciones del caso.</p>
+        </div>
+        <div id="lead-detail" class="crm-detail__content" hidden></div>
+      </aside>
+    </main>
+  </div>
+
+  <template id="lead-row-template">
+    <button type="button" class="crm-lead-row">
+      <div class="crm-lead-row__top">
+        <strong data-field="nombre"></strong>
+        <span class="crm-badge" data-field="status"></span>
+      </div>
+      <div class="crm-lead-row__meta">
+        <span data-field="sistema"></span>
+        <span data-field="isapre"></span>
+        <span data-field="created"></span>
+      </div>
+      <p data-field="contacto"></p>
+    </button>
+  </template>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

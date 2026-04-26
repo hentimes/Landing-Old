@@ -14,4 +14,4 @@ binding = "FORM_UPLOADS"
 bucket_name = "planespro-form-uploads"
 
 [vars]
-FORM_ALLOWED_ORIGIN = "https://planespro.cl"
+FORM_ALLOWED_ORIGIN = "https://planespro.cl,https://asesores.planespro.cl"
