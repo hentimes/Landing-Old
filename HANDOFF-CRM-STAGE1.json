@@ -1,0 +1,471 @@
+{
+  "document_type": "ai_handoff",
+  "project": {
+    "name": "PlanesPro Landing / CRM Stage 1",
+    "repository_root": "C:\\Users\\henti\\OneDrive\\Documentos\\ISAPRE\\PlanesPro\\Landing Old",
+    "active_branch": "form",
+    "current_date": "2026-04-25",
+    "timezone": "America/Santiago"
+  },
+  "objective": {
+    "summary": "Construir y publicar la primera etapa del CRM privado de leads de PlanesPro, reutilizando la captación ya existente del formulario público y agregando una interfaz privada para operar leads.",
+    "stage_definition": {
+      "name": "Etapa 1 - Backoffice privado operativo",
+      "includes": [
+        "Subdominio privado para asesores",
+        "Listado de leads",
+        "Filtros básicos",
+        "Detalle del lead",
+        "Visualización inline del adjunto",
+        "Notas internas",
+        "Cambio de estado",
+        "Archivado lógico"
+      ],
+      "explicitly_not_in_scope_yet": [
+        "Multiusuario real con permisos por asesor",
+        "Asignación automática de leads por advisor_id",
+        "Cloudflare Access completamente montado",
+        "Chat interno",
+        "Grupos",
+        "Marketplace de leads",
+        "Compra/venta de leads",
+        "Dashboard avanzado de métricas",
+        "Borrado físico desde UI"
+      ]
+    }
+  },
+  "high_level_architecture": {
+    "public_form_flow": {
+      "frontend_entrypoint": "https://planespro.cl (landing pública)",
+      "form_backend_public_url": "https://form.planespro.cl",
+      "worker_name": "ppforms",
+      "database": "ppforms_db",
+      "database_id": "3bca5190-8e8f-4d53-bbf4-c7b15ade1cf6",
+      "r2_bucket": "ppforms-uploads",
+      "purpose": "Captación pública de leads y almacenamiento de adjuntos"
+    },
+    "crm_private_flow": {
+      "crm_subdomain": "https://asesores.planespro.cl",
+      "worker_name": "ppcrm",
+      "purpose": "Servir UI privada del CRM y proxear endpoints admin al backend real",
+      "upstream_admin_backend": "https://ppforms.hentimes.workers.dev",
+      "reason_for_workers_dev_upstream": "Cuando el worker ppcrm intentó proxear a https://form.planespro.cl/api/admin/* apareció error 525 SSL handshake failed entre Cloudflare y el host form.planespro.cl. Para destrabar la etapa 1, el proxy del CRM quedó apuntando al endpoint técnico workers.dev del worker ppforms."
+    },
+    "separation_of_responsibilities": {
+      "ppforms": [
+        "Recibe leads públicos",
+        "Guarda metadata en D1",
+        "Guarda archivos en R2",
+        "Expone endpoints admin reales sobre la misma base de datos"
+      ],
+      "ppcrm": [
+        "Sirve archivos estáticos de la UI CRM",
+        "Hace proxy de /api/admin/* hacia ppforms",
+        "Aplica un gate temporal por Cloudflare Access o clave manual"
+      ]
+    }
+  },
+  "implemented_work": {
+    "commits_created": [
+      {
+        "sha": "98741e3",
+        "message": "feat: add crm stage 1 backoffice base"
+      },
+      {
+        "sha": "d3a8dc1",
+        "message": "feat: publish crm worker on asesores subdomain"
+      }
+    ],
+    "pushed_to_remote": true,
+    "worker_deployments_performed": [
+      {
+        "worker": "ppforms",
+        "action": "redeployed",
+        "reason": "Agregar endpoints admin, CORS para X-Admin-Key y soporte de notas/eventos"
+      },
+      {
+        "worker": "ppcrm",
+        "action": "created_and_deployed",
+        "reason": "Servir la UI del CRM en asesores.planespro.cl"
+      }
+    ],
+    "database_migrations_applied": [
+      {
+        "file": "cloudflare/migrations/003_create_form_admin_tables.sql",
+        "applied_to": "ppforms_db",
+        "tables_created": [
+          "lead_notes",
+          "lead_events"
+        ]
+      }
+    ],
+    "cloudflare_dns_and_routes_created": [
+      {
+        "type": "DNS",
+        "record": "asesores.planespro.cl",
+        "content": "hentimes.workers.dev",
+        "proxied": true
+      },
+      {
+        "type": "Workers Route",
+        "pattern": "asesores.planespro.cl/*",
+        "script": "ppcrm"
+      }
+    ]
+  },
+  "files_created_or_modified": {
+    "created": [
+      {
+        "path": "ROADMAP-CRM.md",
+        "purpose": "Roadmap/checklist del CRM en markdown"
+      },
+      {
+        "path": "cloudflare/migrations/003_create_form_admin_tables.sql",
+        "purpose": "Crear tablas D1 para notas internas e historial/eventos"
+      },
+      {
+        "path": "crm/index.html",
+        "purpose": "Shell HTML del CRM etapa 1"
+      },
+      {
+        "path": "crm/config.js",
+        "purpose": "Configuración del frontend CRM, incluyendo resolución del API base URL"
+      },
+      {
+        "path": "crm/api.js",
+        "purpose": "Cliente fetch del CRM hacia la API admin"
+      },
+      {
+        "path": "crm/app.js",
+        "purpose": "Lógica principal de la UI CRM"
+      },
+      {
+        "path": "crm/styles.css",
+        "purpose": "Estilos del CRM etapa 1"
+      },
+      {
+        "path": "cloudflare/build-crm-worker.mjs",
+        "purpose": "Generador del worker estático/proxy para el CRM"
+      },
+      {
+        "path": "cloudflare/crm-worker.js",
+        "purpose": "Build generado del worker ppcrm"
+      },
+      {
+        "path": "cloudflare/wrangler-crm.example.toml",
+        "purpose": "Ejemplo de configuración para el worker del CRM"
+      },
+      {
+        "path": "HANDOFF-CRM-STAGE1.json",
+        "purpose": "Este handoff estructurado para otra IA"
+      }
+    ],
+    "modified": [
+      {
+        "path": "cloudflare/form-worker.js",
+        "purpose": "Extensión del backend con endpoints admin y soporte de notas/eventos"
+      },
+      {
+        "path": "cloudflare/wrangler-form.toml",
+        "purpose": "Ampliar orígenes permitidos para incluir asesores.planespro.cl"
+      },
+      {
+        "path": "cloudflare/wrangler-form.example.toml",
+        "purpose": "Reflejar orígenes del formulario + CRM"
+      },
+      {
+        "path": "FORM-CLOUDFLARE-SETUP.md",
+        "purpose": "Documentar el nuevo estado del backend, CRM y bloqueo de Access"
+      }
+    ]
+  },
+  "backend_admin_api": {
+    "implemented_in": "cloudflare/form-worker.js",
+    "authentication_model_current": {
+      "primary_target": "Cloudflare Access header",
+      "fallback_currently_enabled": "X-Admin-Key comparado contra env.ADMIN_API_KEY",
+      "why_fallback_exists": "El token actual de Cloudflare no permitió automatizar Access/Zero Trust, así que se dejó una vía temporal para seguir probando el CRM"
+    },
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/api/admin/session",
+        "purpose": "Verifica si el usuario está autenticado para usar el CRM"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/leads",
+        "purpose": "Lista paginada y filtrable de leads"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/leads/:id",
+        "purpose": "Detalle del lead incluyendo notas e historial"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/leads/:id/file",
+        "purpose": "Devuelve el adjunto inline desde R2"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/leads/:id/notes",
+        "purpose": "Agregar nota interna"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/leads/:id/status",
+        "purpose": "Actualizar estado del lead"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/leads/:id/archive",
+        "purpose": "Archivar lógicamente el lead"
+      }
+    ],
+    "filtering_logic": {
+      "implemented_fields": [
+        "q (nombre, email, telefono, comuna via LIKE)",
+        "status",
+        "sistema",
+        "isapre",
+        "from",
+        "to",
+        "limit",
+        "offset"
+      ],
+      "ordering": "created_at DESC"
+    },
+    "event_tracking": {
+      "stored_in": "lead_events",
+      "implemented_event_types": [
+        "note_added",
+        "status_changed",
+        "archived"
+      ]
+    },
+    "notes_tracking": {
+      "stored_in": "lead_notes",
+      "fields": [
+        "id",
+        "lead_id",
+        "note_text",
+        "author_email",
+        "created_at"
+      ]
+    }
+  },
+  "frontend_crm_ui": {
+    "entry_file": "crm/index.html",
+    "runtime_files": [
+      "crm/config.js",
+      "crm/api.js",
+      "crm/app.js",
+      "crm/styles.css"
+    ],
+    "features_implemented": [
+      "Verificación de sesión al cargar",
+      "Campo de clave admin temporal",
+      "Listado de leads",
+      "Filtro por texto",
+      "Filtro por estado",
+      "Filtro por sistema",
+      "Filtro por isapre",
+      "Filtro por rango de fechas",
+      "Panel de detalle",
+      "Visualización inline del archivo adjunto en iframe",
+      "Alta de notas",
+      "Cambio de estado",
+      "Archivado"
+    ],
+    "base_url_resolution": {
+      "logic": "Si el host es localhost o 127.0.0.1 usa https://form.planespro.cl como API base; en cualquier otro caso usa window.location.origin",
+      "implemented_in": "crm/config.js"
+    },
+    "important_runtime_behavior": [
+      "Cuando se abre desde asesores.planespro.cl, la UI pega al mismo origen y el worker ppcrm proxea a ppforms",
+      "Cuando se abre localmente, la UI pega directo a form.planespro.cl y usa la clave admin manual"
+    ]
+  },
+  "file_upload_and_attachment_behavior": {
+    "public_form_worker": "ppforms",
+    "r2_bucket": "ppforms-uploads",
+    "current_key_format": "leads/YYYY-MM-DD_nombre-normalizado_leadIdCorto.ext",
+    "implemented_in": "cloudflare/form-worker.js",
+    "important_detail": "Ya no se crea una carpeta por leadId; el archivo queda plano bajo leads/"
+  },
+  "security_state": {
+    "what_is_secure_now": [
+      "La API admin del CRM no responde sin Cloudflare Access o clave manual",
+      "La visualización de archivos pasa por el backend y no expone el bucket R2 públicamente"
+    ],
+    "temporary_security_compromise": {
+      "name": "manual_admin_key_fallback",
+      "exists_in": [
+        "ppforms via ADMIN_API_KEY",
+        "ppcrm via ADMIN_PROXY_KEY"
+      ],
+      "reason": "Permitir pruebas mientras no se termina Cloudflare Access",
+      "known_current_value": "ppcrm_dev_20260425_9f6c2c8e1a4b",
+      "important_warning": "Esta clave debe rotarse o eliminarse cuando Cloudflare Access quede operativo. No debería quedar como método permanente en producción."
+    },
+    "cloudflare_access_status": {
+      "desired_state": "asesores.planespro.cl protegido por Cloudflare Access usando login Google/email",
+      "actual_state": "No automatizado todavía",
+      "blocker": {
+        "type": "permissions",
+        "details": "Al consultar el endpoint de Access/Zero Trust con el token actual se obtuvo 403 Authentication error",
+        "request_that_failed": "GET https://api.cloudflare.com/client/v4/accounts/{account_id}/access/apps",
+        "meaning": "El token actual no tiene permisos suficientes para administrar Access Apps/Policies"
+      }
+    }
+  },
+  "cloudflare_resources_and_known_identifiers": {
+    "account_id": "a69ce5c1cf6b705438ee7028f37cb30b",
+    "zone_id": "6bf0d82dd59c05b841eee2fd4531785c",
+    "workers": [
+      {
+        "name": "ppforms",
+        "public_domain": "https://form.planespro.cl",
+        "workers_dev": "https://ppforms.hentimes.workers.dev"
+      },
+      {
+        "name": "ppcrm",
+        "public_domain": "https://asesores.planespro.cl"
+      }
+    ],
+    "routes": [
+      {
+        "pattern": "form.planespro.cl/*",
+        "script": "ppforms"
+      },
+      {
+        "pattern": "asesores.planespro.cl/*",
+        "script": "ppcrm"
+      }
+    ],
+    "dns_records": [
+      {
+        "hostname": "asesores.planespro.cl",
+        "type": "CNAME",
+        "content": "hentimes.workers.dev",
+        "proxied": true
+      }
+    ],
+    "d1": {
+      "database_name": "ppforms_db",
+      "database_id": "3bca5190-8e8f-4d53-bbf4-c7b15ade1cf6"
+    },
+    "r2": {
+      "bucket_name": "ppforms-uploads"
+    }
+  },
+  "validation_performed": {
+    "local_syntax_checks": [
+      "node --check cloudflare/form-worker.js",
+      "node --check crm/app.js",
+      "node --check crm/config.js",
+      "node --check cloudflare/crm-worker.js"
+    ],
+    "cloudflare_runtime_checks": [
+      "Migración 003 aplicada contra D1 por API",
+      "Worker ppforms redeploy exitoso",
+      "Worker ppcrm deploy exitoso",
+      "GET https://asesores.planespro.cl/ responde HTML del CRM",
+      "GET https://asesores.planespro.cl/app.js responde JS del CRM",
+      "GET https://asesores.planespro.cl/api/admin/session sin clave responde 401",
+      "GET https://asesores.planespro.cl/api/admin/session con clave manual responde 200",
+      "GET https://asesores.planespro.cl/api/admin/leads?limit=2 con clave manual responde 200",
+      "GET https://form.planespro.cl/api/admin/leads/:id/file con clave manual devuelve PDF inline"
+    ],
+    "cleanup_performed": [
+      "Se insertaron notas/eventos de prueba sobre un lead real para validar la etapa 1",
+      "Después se revirtió ese estado y se eliminaron los registros de prueba para no contaminar la base"
+    ]
+  },
+  "exact_pending_work_to_finish_stage_1": {
+    "summary": "La etapa 1 está funcional, pero no está terminada al estándar deseado porque falta cerrar autenticación seria con Cloudflare Access.",
+    "pending_items": [
+      {
+        "id": "stage1-auth-1",
+        "title": "Crear Cloudflare Access app para asesores.planespro.cl",
+        "required": true,
+        "details": [
+          "Crear aplicación self-hosted para asesores.planespro.cl/*",
+          "Configurar política allow para los correos autorizados",
+          "Idealmente login con Google/email"
+        ]
+      },
+      {
+        "id": "stage1-auth-2",
+        "title": "Validar paso del header de identidad al worker ppcrm",
+        "required": true,
+        "details": [
+          "El worker ppcrm espera Cf-Access-Authenticated-User-Email",
+          "Debe confirmarse que ese header llegue efectivamente desde Access",
+          "Si llega, ppcrm ya acepta esa vía y no necesita clave manual"
+        ]
+      },
+      {
+        "id": "stage1-auth-3",
+        "title": "Eliminar o rotar el bypass temporal por clave manual",
+        "required": true,
+        "details": [
+          "ADMIN_PROXY_KEY en ppcrm y ADMIN_API_KEY en ppforms son transitorios",
+          "Una vez funcionando Access, hay que decidir si se eliminan o se dejan solo para desarrollo",
+          "Si se dejan, deben rotarse y documentarse mejor"
+        ]
+      },
+      {
+        "id": "stage1-ops-1",
+        "title": "Documentar operación diaria del CRM",
+        "required": false,
+        "details": [
+          "Cómo ingresar",
+          "Qué estados usar",
+          "Cómo agregar notas",
+          "Qué significa archivar"
+        ]
+      }
+    ]
+  },
+  "recommended_next_steps_for_another_ai": {
+    "priority_order": [
+      "Conseguir un token Cloudflare con permisos para Access/Zero Trust",
+      "Montar Access sobre asesores.planespro.cl",
+      "Validar login real sin clave manual",
+      "Eliminar/rotar bypass manual",
+      "Opcional: agregar documentación de operación"
+    ],
+    "what_token_permissions_are_likely_missing": [
+      "Cloudflare Zero Trust / Access Apps edit/read",
+      "Policies edit/read"
+    ],
+    "exact_follow_up_checks": [
+      "Abrir https://asesores.planespro.cl y verificar redirección/login de Access",
+      "Después del login, llamar /api/admin/session y confirmar actorEmail != local-admin",
+      "Probar listado, detalle, archivo, notas, estado y archivado ya sin clave manual"
+    ]
+  },
+  "important_code_references": {
+    "backend_admin_router": "cloudflare/form-worker.js",
+    "admin_auth_guard": "cloudflare/form-worker.js -> requireAdmin()",
+    "crm_frontend_shell": "crm/index.html",
+    "crm_frontend_logic": "crm/app.js",
+    "crm_frontend_api_client": "crm/api.js",
+    "crm_runtime_config": "crm/config.js",
+    "crm_worker_generator": "cloudflare/build-crm-worker.mjs",
+    "generated_crm_worker": "cloudflare/crm-worker.js",
+    "migration_for_notes_and_events": "cloudflare/migrations/003_create_form_admin_tables.sql",
+    "cloudflare_setup_doc": "FORM-CLOUDFLARE-SETUP.md"
+  },
+  "current_operational_note": {
+    "how_to_use_right_now": [
+      "Abrir https://asesores.planespro.cl",
+      "Ingresar la clave temporal en el campo 'Clave admin'",
+      "Usar el CRM normalmente"
+    ],
+    "temporary_admin_key": "ppcrm_dev_20260425_9f6c2c8e1a4b",
+    "warning": "Esta clave existe solo para pruebas de la etapa 1. No debe considerarse solución final."
+  }
+}
