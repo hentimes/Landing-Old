@@ -1,0 +1,12 @@
+name = "ppcrm"
+main = "cloudflare/crm-worker.js"
+compatibility_date = "2026-04-25"
+account_id = "a69ce5c1cf6b705438ee7028f37cb30b"
+
+workers_dev = true
+
+[vars]
+FORM_ADMIN_BASE_URL = "https://ppforms.hentimes.workers.dev"
+
+# Secretos requeridos
+# - ADMIN_PROXY_KEY

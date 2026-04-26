@@ -122,6 +122,34 @@ El frontend nuevo ya está desacoplado por adaptador y espera estos endpoints:
 - `POST /api/admin/leads/:id/status`
 - `POST /api/admin/leads/:id/archive`
 
+## 4.1. Backoffice CRM etapa 1
+
+Ya quedó preparada una segunda capa para el backoffice:
+
+- frontend base en `crm/`
+- worker de frontend/proxy generado en `cloudflare/crm-worker.js`
+- script generador: `cloudflare/build-crm-worker.mjs`
+- subdominio objetivo: `https://asesores.planespro.cl`
+
+Arquitectura actual:
+
+- `asesores.planespro.cl` sirve la UI del CRM desde `ppcrm`
+- `ppcrm` proxea `/api/admin/*` hacia `ppforms`
+- `ppforms` sigue siendo el backend real contra D1 + R2
+
+Estado:
+
+- `ppcrm` ya puede operar el CRM
+- `asesores.planespro.cl` ya responde con la UI del CRM
+- la API admin bajo `asesores.planespro.cl/api/admin/*` exige temporalmente una clave manual
+- la protección final con Cloudflare Access sigue pendiente porque el token actual devuelve `403 Authentication error` al llamar `accounts/{account_id}/access/apps`
+
+Clave temporal de desarrollo:
+
+- secret del worker `ppcrm`: `ADMIN_PROXY_KEY`
+- el frontend la pide como `Clave admin`
+- su único objetivo es permitir pruebas hasta que exista Access
+
 ## 5. Qué hace cada endpoint
 
 ### `POST /api/form/leads`
