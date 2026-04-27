@@ -40,6 +40,8 @@
 - [ ] Agregar notas internas
 - [ ] Agregar cambio de estado
 - [ ] Agregar archivado
+- [ ] Agregar bloque de cita en la ficha del lead
+- [ ] Agregar resumen de agenda con proximas citas
 - [ ] No permitir borrado fisico desde UI
 
 ### Estados del lead
@@ -67,6 +69,18 @@
 - [ ] Guardar quien hizo cada accion
 - [ ] Guardar timestamp de cambios de estado
 - [ ] Guardar motivo de archivado o descarte
+
+### Agenda y citas
+- [ ] Mostrar `cita_estado` en la ficha del lead
+- [ ] Mostrar `cita_fecha_hora` en la ficha del lead
+- [ ] Mostrar `cita_calendar_url` si existe
+- [ ] Crear lista de proximas citas
+- [ ] Crear indicadores de citas de hoy, pendientes y proximas
+- [ ] Definir estados de cita
+- [ ] Integrar agendamiento real con Google Calendar
+- [ ] Guardar `cita_calendar_event_id`
+- [ ] Permitir reprogramacion de cita
+- [ ] Permitir marcar cita como realizada o cancelada
 
 ## Fase 2 - Atribucion por asesor
 - [ ] Crear tabla `advisors`
@@ -97,6 +111,7 @@
 - [ ] Agregar etiquetas internas
 - [ ] Agregar comentarios privados por asesor
 - [ ] Permitir adjuntos adicionales si hace falta
+- [ ] Agregar vista operativa de agenda semanal
 
 ### Metricas
 - [ ] Medir leads recibidos por asesor

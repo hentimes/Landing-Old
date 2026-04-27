@@ -303,6 +303,9 @@ async function handleAdminLeadList(request, env) {
       sistema_actual,
       isapre_especifica,
       comentarios,
+      cita_estado,
+      cita_fecha_hora,
+      cita_calendar_url,
       pdf_object_key,
       pdf_original_name
     FROM form_leads

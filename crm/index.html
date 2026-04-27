@@ -77,6 +77,29 @@
       </div>
     </section>
 
+    <section class="crm-agenda-overview">
+      <article class="crm-kpi-card">
+        <p class="crm-eyebrow">Agenda</p>
+        <strong id="agenda-count-total">0</strong>
+        <span>Citas registradas</span>
+      </article>
+      <article class="crm-kpi-card">
+        <p class="crm-eyebrow">Hoy</p>
+        <strong id="agenda-count-today">0</strong>
+        <span>Compromisos del día</span>
+      </article>
+      <article class="crm-kpi-card">
+        <p class="crm-eyebrow">Pendientes</p>
+        <strong id="agenda-count-pending">0</strong>
+        <span>Sin confirmar o por coordinar</span>
+      </article>
+      <article class="crm-kpi-card">
+        <p class="crm-eyebrow">Próximas</p>
+        <strong id="agenda-count-upcoming">0</strong>
+        <span>Dentro de 7 días</span>
+      </article>
+    </section>
+
     <main class="crm-layout">
       <section class="crm-panel crm-list">
         <div class="crm-panel__header">
@@ -86,6 +109,13 @@
           </div>
           <strong id="lead-count">0 resultados</strong>
         </div>
+        <section class="crm-agenda-list">
+          <div class="crm-card__header">
+            <h3>Próximas citas</h3>
+            <span id="agenda-list-caption" class="crm-muted">Sin citas por ahora</span>
+          </div>
+          <div id="agenda-list" class="crm-agenda-list__items"></div>
+        </section>
         <div id="lead-list" class="crm-list__items"></div>
       </section>
 
@@ -111,6 +141,19 @@
         <span data-field="created"></span>
       </div>
       <p data-field="contacto"></p>
+    </button>
+  </template>
+
+  <template id="agenda-row-template">
+    <button type="button" class="crm-agenda-row">
+      <div class="crm-agenda-row__top">
+        <strong data-field="nombre"></strong>
+        <span class="crm-badge" data-field="estado-cita"></span>
+      </div>
+      <div class="crm-agenda-row__meta">
+        <span data-field="fecha"></span>
+        <span data-field="sistema"></span>
+      </div>
     </button>
   </template>
 

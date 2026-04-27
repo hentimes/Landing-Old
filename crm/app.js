@@ -32,9 +32,16 @@ const elements = {
   clearFilters: document.getElementById('clear-filters'),
   leadList: document.getElementById('lead-list'),
   leadCount: document.getElementById('lead-count'),
+  agendaCountTotal: document.getElementById('agenda-count-total'),
+  agendaCountToday: document.getElementById('agenda-count-today'),
+  agendaCountPending: document.getElementById('agenda-count-pending'),
+  agendaCountUpcoming: document.getElementById('agenda-count-upcoming'),
+  agendaListCaption: document.getElementById('agenda-list-caption'),
+  agendaList: document.getElementById('agenda-list'),
   leadDetail: document.getElementById('lead-detail'),
   leadDetailEmpty: document.getElementById('lead-detail-empty'),
   leadRowTemplate: document.getElementById('lead-row-template'),
+  agendaRowTemplate: document.getElementById('agenda-row-template'),
 };
 
 init();
@@ -118,6 +125,7 @@ async function loadLeads() {
     const payload = await listLeads(filters);
     state.items = payload.items || [];
     elements.leadCount.textContent = `${payload.total || 0} resultados`;
+    renderAgenda(state.items);
     renderList(state.items);
 
     if (state.selectedLeadId) {
@@ -131,9 +139,49 @@ async function loadLeads() {
     }
   } catch (error) {
     elements.leadCount.textContent = error.message;
+    renderAgenda([]);
     renderList([]);
     renderDetail(null);
   }
+}
+
+function renderAgenda(items) {
+  const appointments = buildAppointments(items);
+  const today = startOfDay(new Date());
+  const nextWeek = new Date(today);
+  nextWeek.setDate(nextWeek.getDate() + 7);
+
+  const total = appointments.length;
+  const todayCount = appointments.filter((item) => isSameDay(item.date, today)).length;
+  const pendingCount = appointments.filter((item) => !item.status || ['Pendiente', 'Por coordinar'].includes(item.status)).length;
+  const upcomingCount = appointments.filter((item) => item.date >= today && item.date < nextWeek).length;
+
+  elements.agendaCountTotal.textContent = String(total);
+  elements.agendaCountToday.textContent = String(todayCount);
+  elements.agendaCountPending.textContent = String(pendingCount);
+  elements.agendaCountUpcoming.textContent = String(upcomingCount);
+
+  elements.agendaList.innerHTML = '';
+  if (!appointments.length) {
+    elements.agendaListCaption.textContent = 'Sin citas por ahora';
+    elements.agendaList.innerHTML = '<p class="crm-muted">Cuando empieces a agendar reuniones, aparecerán aquí.</p>';
+    return;
+  }
+
+  elements.agendaListCaption.textContent = `${Math.min(appointments.length, 5)} próximas visibles`;
+  const fragment = document.createDocumentFragment();
+
+  appointments.slice(0, 5).forEach((appointment) => {
+    const node = elements.agendaRowTemplate.content.firstElementChild.cloneNode(true);
+    node.querySelector('[data-field="nombre"]').textContent = appointment.nombre || 'Sin nombre';
+    node.querySelector('[data-field="estado-cita"]').textContent = appointment.status || 'Pendiente';
+    node.querySelector('[data-field="fecha"]').textContent = formatDateTime(appointment.rawDate);
+    node.querySelector('[data-field="sistema"]').textContent = appointment.sistema_actual || 'Sin sistema';
+    node.addEventListener('click', () => loadLeadDetail(appointment.id));
+    fragment.appendChild(node);
+  });
+
+  elements.agendaList.appendChild(fragment);
 }
 
 function renderList(items) {
@@ -238,6 +286,7 @@ function renderDetail(payload, errorMessage = '') {
     <div class="crm-detail__grid">
       ${renderInfoCard(lead)}
       ${renderCommentCard(lead)}
+      ${renderAppointmentCard(lead)}
       ${renderActionsCard(lead)}
       ${filePreview}
       <div class="crm-card">
@@ -381,6 +430,35 @@ function renderActionsCard(lead) {
   `;
 }
 
+function renderAppointmentCard(lead) {
+  const appointmentDate = lead.cita_fecha_hora ? formatDateTime(lead.cita_fecha_hora) : 'Sin fecha agendada';
+  const appointmentStatus = lead.cita_estado || 'Pendiente';
+  const appointmentLink = lead.cita_calendar_url
+    ? `<a href="${escapeHtml(lead.cita_calendar_url)}" target="_blank" rel="noopener noreferrer">Abrir en Google Calendar</a>`
+    : '<span class="crm-muted">Sin enlace de calendario todavía.</span>';
+
+  return `
+    <div class="crm-card">
+      <div class="crm-card__header">
+        <h3>Agenda / cita</h3>
+      </div>
+      <div class="crm-kv-grid">
+        <div class="crm-kv">
+          <span>Estado cita</span>
+          <strong>${escapeHtml(appointmentStatus)}</strong>
+        </div>
+        <div class="crm-kv">
+          <span>Fecha y hora</span>
+          <strong>${escapeHtml(appointmentDate)}</strong>
+        </div>
+      </div>
+      <div class="crm-inline-link">
+        ${appointmentLink}
+      </div>
+    </div>
+  `;
+}
+
 function hydrateStatusOptions() {
   LEAD_STATUSES.forEach((status) => {
     const option = document.createElement('option');
@@ -395,6 +473,30 @@ function formatDate(value) {
   return new Intl.DateTimeFormat('es-CL', {
     dateStyle: 'medium',
   }).format(new Date(value));
+}
+
+function buildAppointments(items) {
+  return (items || [])
+    .filter((item) => item.cita_fecha_hora)
+    .map((item) => ({
+      ...item,
+      rawDate: item.cita_fecha_hora,
+      date: new Date(item.cita_fecha_hora),
+    }))
+    .filter((item) => !Number.isNaN(item.date.getTime()))
+    .sort((a, b) => a.date - b.date);
+}
+
+function startOfDay(date) {
+  const normalized = new Date(date);
+  normalized.setHours(0, 0, 0, 0);
+  return normalized;
+}
+
+function isSameDay(left, right) {
+  return left.getFullYear() === right.getFullYear()
+    && left.getMonth() === right.getMonth()
+    && left.getDate() === right.getDate();
 }
 
 function formatDateTime(value) {
