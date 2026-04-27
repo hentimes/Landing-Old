@@ -79,6 +79,14 @@ export async function updateLeadStatus(leadId, status) {
   });
 }
 
+export async function updateLeadRut(leadId, rut) {
+  return fetchJson(`/api/admin/leads/${leadId}/rut`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rut }),
+  });
+}
+
 export async function archiveLead(leadId, reason) {
   return fetchJson(`/api/admin/leads/${leadId}/archive`, {
     method: 'POST',

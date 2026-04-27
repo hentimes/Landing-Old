@@ -11,210 +11,402 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body class="crm-body">
-  <div class="crm-shell">
-    <header class="crm-topbar">
-      <div class="crm-brand-wrap">
-        <div class="crm-brand">
-          <img src="../assets/logos_pp/logo-planespro.obs.webp" alt="PlanesPro.cl" class="crm-brand__logo" />
-          <div>
-            <p class="crm-eyebrow">Backoffice privado</p>
-            <h1>Leads y seguimiento</h1>
-          </div>
-        </div>
-        <div class="crm-hero-copy">
-          <p class="crm-hero-copy__title">Panel operativo</p>
-          <p class="crm-hero-copy__text">Controla ingresos, seguimiento comercial, citas y documentos desde una sola bandeja.</p>
+  <div class="crm-appshell">
+    <aside class="crm-sidebar">
+      <div class="crm-sidebar__brand">
+        <img src="../assets/logos_pp/logo-planespro.obs.webp" alt="PlanesPro.cl" class="crm-sidebar__logo" />
+        <div>
+          <strong>PlanesPro</strong>
+          <span>Panel del asesor</span>
         </div>
       </div>
-      <div class="crm-session">
+
+      <div class="crm-sidebar__profile">
+        <div class="crm-avatar crm-avatar--sidebar" id="sidebar-avatar"><i class="fas fa-user" aria-hidden="true"></i></div>
         <div>
-          <p class="crm-session__label">Sesión</p>
-          <strong id="session-status">Verificando acceso...</strong>
+          <strong id="sidebar-user-name">Asesor</strong>
+          <span id="session-status">Verificando acceso...</span>
         </div>
+      </div>
+
+      <nav class="crm-sidebar__nav">
+        <button type="button" class="crm-nav-item is-active" data-view="dashboard">
+          <span class="crm-nav-item__icon"><i class="fas fa-chart-pie" aria-hidden="true"></i></span>
+          <span>Dashboard</span>
+        </button>
+        <button type="button" class="crm-nav-item" data-view="leads">
+          <span class="crm-nav-item__icon"><i class="fas fa-address-book" aria-hidden="true"></i></span>
+          <span>Leads</span>
+        </button>
+        <button type="button" class="crm-nav-item" data-view="agenda">
+          <span class="crm-nav-item__icon"><i class="fas fa-calendar-alt" aria-hidden="true"></i></span>
+          <span>Agenda</span>
+        </button>
+      </nav>
+
+      <div class="crm-sidebar__meta">
+        <p class="crm-sidebar__label">Acceso</p>
         <div class="crm-keybox" id="admin-keybox">
-          <label for="admin-key">Clave admin</label>
+          <label for="admin-key">Clave admin local</label>
           <div class="crm-keybox__row">
             <input id="admin-key" type="password" placeholder="Solo desarrollo local" autocomplete="off" />
             <button type="button" id="save-admin-key" class="button button--secondary">Guardar</button>
           </div>
         </div>
+        <p class="crm-sidebar__hint">Producción usa Cloudflare Access. Local sigue disponible para iterar.</p>
       </div>
-    </header>
+    </aside>
 
-    <section class="crm-leads-overview">
-      <article class="crm-kpi-card crm-kpi-card--lead">
-        <div class="crm-kpi-card__icon">01</div>
-        <div>
-          <p class="crm-eyebrow">Leads totales</p>
-          <strong id="lead-count-total">0</strong>
-          <span>Registros cargados en la bandeja actual</span>
+    <main class="crm-main">
+      <header class="crm-topbar">
+        <div class="crm-topbar__intro">
+          <h1 id="view-title">Dashboard de leads</h1>
         </div>
-      </article>
-      <article class="crm-kpi-card crm-kpi-card--lead">
-        <div class="crm-kpi-card__icon">02</div>
-        <div>
-          <p class="crm-eyebrow">Por contactar</p>
-          <strong id="lead-count-pending">0</strong>
-          <span>Nuevos y pendientes de primera gestión</span>
-        </div>
-      </article>
-      <article class="crm-kpi-card crm-kpi-card--lead">
-        <div class="crm-kpi-card__icon">03</div>
-        <div>
-          <p class="crm-eyebrow">Con adjunto</p>
-          <strong id="lead-count-files">0</strong>
-          <span>Casos con plan o documento disponible</span>
-        </div>
-      </article>
-      <article class="crm-kpi-card crm-kpi-card--lead">
-        <div class="crm-kpi-card__icon">04</div>
-        <div>
-          <p class="crm-eyebrow">Activos</p>
-          <strong id="lead-count-active">0</strong>
-          <span>Leads no archivados ni descartados</span>
-        </div>
-      </article>
-    </section>
 
-    <section class="crm-filters">
-      <div class="crm-filters__header">
-        <div>
-          <p class="crm-eyebrow">Segmentación</p>
-          <h2>Filtrar bandeja</h2>
-        </div>
-        <p class="crm-muted">Busca por nombre, contacto, sistema o rango de fechas.</p>
-      </div>
-      <div class="crm-filters__grid">
-        <label>
-          <span>Buscar</span>
-          <input id="filter-q" type="search" placeholder="Nombre, correo, teléfono o comuna" />
-        </label>
-        <label>
-          <span>Estado</span>
-          <select id="filter-status">
-            <option value="">Todos</option>
-          </select>
-        </label>
-        <label>
-          <span>Sistema</span>
-          <select id="filter-sistema">
-            <option value="">Todos</option>
-            <option value="Fonasa">Fonasa</option>
-            <option value="Isapre">Isapre</option>
-          </select>
-        </label>
-        <label>
-          <span>Isapre</span>
-          <input id="filter-isapre" type="text" placeholder="Colmena, Cruz Blanca..." />
-        </label>
-        <label>
-          <span>Desde</span>
-          <input id="filter-from" type="date" />
-        </label>
-        <label>
-          <span>Hasta</span>
-          <input id="filter-to" type="date" />
-        </label>
-      </div>
-      <div class="crm-filters__actions">
-        <button type="button" id="apply-filters" class="button button--primary">Aplicar filtros</button>
-        <button type="button" id="clear-filters" class="button button--ghost">Limpiar</button>
-      </div>
-    </section>
-
-    <section class="crm-agenda-overview">
-      <article class="crm-kpi-card">
-        <p class="crm-eyebrow">Agenda</p>
-        <strong id="agenda-count-total">0</strong>
-        <span>Citas registradas</span>
-      </article>
-      <article class="crm-kpi-card">
-        <p class="crm-eyebrow">Hoy</p>
-        <strong id="agenda-count-today">0</strong>
-        <span>Compromisos del día</span>
-      </article>
-      <article class="crm-kpi-card">
-        <p class="crm-eyebrow">Pendientes</p>
-        <strong id="agenda-count-pending">0</strong>
-        <span>Sin confirmar o por coordinar</span>
-      </article>
-      <article class="crm-kpi-card">
-        <p class="crm-eyebrow">Próximas</p>
-        <strong id="agenda-count-upcoming">0</strong>
-        <span>Dentro de 7 días</span>
-      </article>
-    </section>
-
-    <main class="crm-layout">
-      <section class="crm-panel crm-list">
-        <div class="crm-panel__header">
-          <div>
-            <p class="crm-eyebrow">Bandeja</p>
-            <h2>Leads captados</h2>
+        <div class="crm-topbar__controls">
+          <div class="crm-topbar__summary">
+            <p class="crm-eyebrow">Panel operativo</p>
+            <strong>Leads y seguimiento</strong>
+            <span>Métricas, pipeline comercial y agenda.</span>
           </div>
-          <strong id="lead-count">0 resultados</strong>
-        </div>
-        <div class="crm-panel__subheader">
-          <span class="crm-muted">Prioriza casos nuevos, con adjunto y citas cercanas.</span>
-        </div>
-        <section class="crm-agenda-list">
-          <div class="crm-card__header">
-            <h3>Próximas citas</h3>
-            <span id="agenda-list-caption" class="crm-muted">Sin citas por ahora</span>
+
+          <div class="crm-toolbar-icons">
+            <button type="button" class="crm-icon-button" id="notification-button" title="Notificaciones">
+              <i class="fas fa-bell" aria-hidden="true"></i>
+              <strong id="notification-count">0</strong>
+            </button>
+            <button type="button" class="crm-icon-button" id="updates-button" title="Updates">
+              <i class="fas fa-bolt" aria-hidden="true"></i>
+              <strong id="updates-count">0</strong>
+            </button>
+            <button type="button" class="crm-icon-button" id="messages-button" title="Mensajes / citas">
+              <i class="fas fa-envelope" aria-hidden="true"></i>
+              <strong id="messages-count">0</strong>
+            </button>
           </div>
-          <div id="agenda-list" class="crm-agenda-list__items"></div>
+
+          <div class="crm-profile-wrap" id="profile-wrap">
+            <button type="button" class="crm-profile-trigger" id="profile-trigger">
+              <img id="profile-photo" class="crm-profile-trigger__photo" alt="Foto del asesor" hidden />
+              <div class="crm-avatar crm-avatar--profile" id="profile-avatar"><i class="fas fa-user" aria-hidden="true"></i></div>
+              <div>
+                <strong id="profile-name">Asesor</strong>
+                <span>Perfil del asesor</span>
+              </div>
+              <i class="fas fa-chevron-down crm-profile-trigger__caret" aria-hidden="true"></i>
+            </button>
+            <div class="crm-profile-menu" id="profile-menu" hidden>
+              <button type="button" class="crm-profile-menu__item" id="profile-menu-profile">
+                <i class="fas fa-user" aria-hidden="true"></i>
+                <span>Profile</span>
+              </button>
+              <button type="button" class="crm-profile-menu__item" id="profile-menu-settings">
+                <i class="fas fa-gear" aria-hidden="true"></i>
+                <span>Settings</span>
+              </button>
+              <a class="crm-profile-menu__logout" href="/cdn-cgi/access/logout">
+                <i class="fas fa-right-from-bracket" aria-hidden="true"></i>
+                <span>Logout</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="crm-top-actions">
+        <div class="crm-chip-range" id="range-selector">
+          <button type="button" class="crm-range-chip is-active" data-range="today">Hoy</button>
+          <button type="button" class="crm-range-chip" data-range="7d">7d</button>
+          <button type="button" class="crm-range-chip" data-range="14d">2 semanas</button>
+          <button type="button" class="crm-range-chip" data-range="1m">1 mes</button>
+          <button type="button" class="crm-range-chip" data-range="3m">3 meses</button>
+          <button type="button" class="crm-range-chip" data-range="6m">6 meses</button>
+          <button type="button" class="crm-range-chip" data-range="1y">1 año</button>
+        </div>
+        <span class="crm-chip crm-chip--accent" id="topbar-active-view">Dashboard</span>
+      </div>
+
+      <section class="crm-view is-active" data-view-panel="dashboard">
+        <section class="crm-metric-grid">
+          <article class="crm-metric-card crm-metric-card--icon">
+            <div class="crm-metric-card__head">
+              <span class="crm-metric-card__icon"><i class="fas fa-users" aria-hidden="true"></i></span>
+              <span class="crm-metric-card__trend" id="trend-leads">0%</span>
+            </div>
+            <strong id="metric-leads">0</strong>
+            <span class="crm-metric-card__label">Leads</span>
+            <span class="crm-metric-card__meta">Captados en el periodo</span>
+          </article>
+          <article class="crm-metric-card crm-metric-card--icon">
+            <div class="crm-metric-card__head">
+              <span class="crm-metric-card__icon"><i class="fas fa-handshake" aria-hidden="true"></i></span>
+              <span class="crm-metric-card__trend" id="trend-proposals">0%</span>
+            </div>
+            <strong id="metric-proposals">0</strong>
+            <span class="crm-metric-card__label">Propuestas</span>
+            <span class="crm-metric-card__meta">Estado Propuesta enviada</span>
+          </article>
+          <article class="crm-metric-card crm-metric-card--icon">
+            <div class="crm-metric-card__head">
+              <span class="crm-metric-card__icon"><i class="fas fa-circle-check" aria-hidden="true"></i></span>
+              <span class="crm-metric-card__trend" id="trend-closed">0%</span>
+            </div>
+            <strong id="metric-closed">0</strong>
+            <span class="crm-metric-card__label">Cerrados</span>
+            <span class="crm-metric-card__meta">Estado Cerrado</span>
+          </article>
+          <article class="crm-metric-card crm-metric-card--icon">
+            <div class="crm-metric-card__head">
+              <span class="crm-metric-card__icon"><i class="fas fa-phone-volume" aria-hidden="true"></i></span>
+              <span class="crm-metric-card__trend" id="trend-pending">0%</span>
+            </div>
+            <strong id="metric-pending">0</strong>
+            <span class="crm-metric-card__label">Por contactar</span>
+            <span class="crm-metric-card__meta">Nuevos o primer contacto</span>
+          </article>
         </section>
-        <div id="lead-list" class="crm-list__items"></div>
+
+        <section class="crm-dashboard-grid">
+          <article class="crm-card crm-card--chart">
+            <div class="crm-card__header">
+              <div>
+                <p class="crm-eyebrow">Overview</p>
+                <h2>Ingresos y cierres</h2>
+              </div>
+              <span class="crm-card__hint" id="overview-caption">Serie del periodo seleccionado</span>
+            </div>
+            <div class="crm-line-chart" id="overview-line-chart"></div>
+            <div class="crm-line-chart__legend">
+              <span><i class="crm-legend-dot crm-legend-dot--primary"></i> Leads</span>
+              <span><i class="crm-legend-dot crm-legend-dot--dark"></i> Cerrados</span>
+            </div>
+          </article>
+
+          <article class="crm-card crm-card--compact">
+            <div class="crm-card__header">
+              <div>
+                <p class="crm-eyebrow">Distribución</p>
+                <h2>Fonasa / isapres</h2>
+              </div>
+            </div>
+            <div class="crm-donut-wrap">
+              <div class="crm-donut" id="isapre-donut"></div>
+              <div class="crm-donut-legend" id="isapre-legend"></div>
+            </div>
+          </article>
+
+          <article class="crm-card crm-card--wide">
+            <div class="crm-card__header">
+              <div>
+                <p class="crm-eyebrow">Pipeline</p>
+                <h2>Estados de tus leads</h2>
+              </div>
+              <span class="crm-card__hint">Vista compacta</span>
+            </div>
+            <div class="crm-status-list" id="status-breakdown"></div>
+          </article>
+
+          <article class="crm-card crm-card--wide">
+            <div class="crm-card__header">
+              <div>
+                <p class="crm-eyebrow">Próximas citas</p>
+                <h2>Agenda inmediata</h2>
+              </div>
+              <span id="agenda-list-caption" class="crm-card__hint">Sin citas por ahora</span>
+            </div>
+            <div id="agenda-list" class="crm-agenda-grid"></div>
+          </article>
+        </section>
       </section>
 
-      <aside class="crm-panel crm-detail">
-        <div id="lead-detail-empty" class="crm-empty">
-          <h3>Selecciona un lead</h3>
-          <p>Aquí verás datos, adjunto, comentarios, notas internas y acciones del caso.</p>
-        </div>
-        <div id="lead-detail" class="crm-detail__content" hidden></div>
-      </aside>
+      <section class="crm-view" data-view-panel="leads">
+        <section class="crm-filters">
+          <div class="crm-filters__header">
+            <div>
+              <p class="crm-eyebrow">Segmentación</p>
+              <h2>Bandeja de leads</h2>
+            </div>
+            <p class="crm-card__hint">Filtra por estado, sistema, isapre, texto o fechas.</p>
+          </div>
+          <div class="crm-filters__grid">
+            <label>
+              <span>Buscar</span>
+              <input id="filter-q" type="search" placeholder="Nombre, correo, teléfono, comuna o RUT" />
+            </label>
+            <label>
+              <span>Estado</span>
+              <select id="filter-status">
+                <option value="">Todos</option>
+              </select>
+            </label>
+            <label>
+              <span>Sistema</span>
+              <select id="filter-sistema">
+                <option value="">Todos</option>
+                <option value="Fonasa">Fonasa</option>
+                <option value="Isapre">Isapre</option>
+              </select>
+            </label>
+            <label>
+              <span>Isapre</span>
+              <input id="filter-isapre" type="text" placeholder="Colmena, Cruz Blanca..." />
+            </label>
+            <label>
+              <span>Desde</span>
+              <input id="filter-from" type="date" />
+            </label>
+            <label>
+              <span>Hasta</span>
+              <input id="filter-to" type="date" />
+            </label>
+          </div>
+          <div class="crm-filters__actions">
+            <button type="button" id="apply-filters" class="button button--primary">Aplicar filtros</button>
+            <button type="button" id="clear-filters" class="button button--ghost">Limpiar</button>
+          </div>
+        </section>
+
+        <section class="crm-leads-layout">
+          <article class="crm-card crm-card--list">
+            <div class="crm-card__header">
+              <div>
+                <p class="crm-eyebrow">Resultados</p>
+                <h2>Leads captados</h2>
+              </div>
+              <strong id="lead-count">0 resultados</strong>
+            </div>
+            <div class="crm-list-head">
+              <span>Lead</span>
+              <span>Sistema</span>
+              <span>Estado</span>
+              <span>Ingreso</span>
+              <span class="crm-list-head__attach"><i class="fas fa-paperclip" aria-hidden="true"></i></span>
+            </div>
+            <div id="lead-list" class="crm-list__items"></div>
+          </article>
+
+          <aside class="crm-card crm-card--detail">
+            <div id="lead-detail-empty" class="crm-empty">
+              <h3>Selecciona un lead</h3>
+              <p>Aquí verás datos, comentarios, RUT, notas internas y acciones del caso.</p>
+            </div>
+            <div id="lead-detail" class="crm-detail__content" hidden></div>
+          </aside>
+        </section>
+      </section>
+
+      <section class="crm-view" data-view-panel="agenda">
+        <section class="crm-metric-grid crm-metric-grid--agenda">
+          <article class="crm-metric-card">
+            <span class="crm-metric-card__label">Citas registradas</span>
+            <strong id="agenda-count-total">0</strong>
+            <span class="crm-metric-card__meta">Total visible</span>
+          </article>
+          <article class="crm-metric-card">
+            <span class="crm-metric-card__label">Hoy</span>
+            <strong id="agenda-count-today">0</strong>
+            <span class="crm-metric-card__meta">Compromisos del día</span>
+          </article>
+          <article class="crm-metric-card">
+            <span class="crm-metric-card__label">Pendientes</span>
+            <strong id="agenda-count-pending">0</strong>
+            <span class="crm-metric-card__meta">Por coordinar o confirmar</span>
+          </article>
+          <article class="crm-metric-card">
+            <span class="crm-metric-card__label">Próximas 7 días</span>
+            <strong id="agenda-count-upcoming">0</strong>
+            <span class="crm-metric-card__meta">Agenda inmediata</span>
+          </article>
+        </section>
+
+        <section class="crm-card">
+          <div class="crm-card__header">
+            <div>
+              <p class="crm-eyebrow">Vista compacta</p>
+              <h2>Próximas citas</h2>
+            </div>
+            <span class="crm-card__hint">En el futuro aquí entra Google Calendar</span>
+          </div>
+          <div id="agenda-section-list" class="crm-agenda-table"></div>
+        </section>
+      </section>
     </main>
   </div>
 
-  <template id="lead-row-template">
-    <button type="button" class="crm-lead-row">
-      <div class="crm-lead-row__avatar" data-field="avatar"></div>
-      <div class="crm-lead-row__body">
-        <div class="crm-lead-row__top">
-          <strong data-field="nombre"></strong>
-          <span class="crm-badge" data-field="status"></span>
-        </div>
-        <div class="crm-lead-row__meta">
-          <span data-field="sistema"></span>
-          <span data-field="isapre"></span>
-          <span data-field="created"></span>
-        </div>
-        <p data-field="contacto"></p>
-        <div class="crm-lead-row__footer">
-          <div class="crm-chip-row">
-            <span class="crm-chip" data-field="region"></span>
-            <span class="crm-chip crm-chip--accent" data-field="adjunto"></span>
-          </div>
-        </div>
-      </div>
-    </button>
-  </template>
+  <div class="crm-popover" id="notification-popover" hidden></div>
+  <div class="crm-popover" id="updates-popover" hidden></div>
+  <div class="crm-popover" id="messages-popover" hidden></div>
 
-  <template id="agenda-row-template">
-    <button type="button" class="crm-agenda-row">
-      <div class="crm-agenda-row__top">
+  <dialog class="crm-file-modal" id="file-modal">
+    <div class="crm-file-modal__card">
+      <div class="crm-card__header">
+        <div>
+          <p class="crm-eyebrow">Adjunto</p>
+          <h2 id="file-modal-title">Archivo del lead</h2>
+        </div>
+        <div class="crm-actions__buttons">
+          <a id="file-modal-open" class="button button--ghost" href="#" target="_blank" rel="noopener noreferrer">Abrir aparte</a>
+          <button type="button" id="file-modal-close" class="button button--secondary">Cerrar</button>
+        </div>
+      </div>
+      <iframe id="file-modal-frame" class="crm-file-frame crm-file-frame--modal" src="about:blank" title="Adjunto del lead"></iframe>
+    </div>
+  </dialog>
+
+  <dialog class="crm-profile-modal" id="profile-modal">
+    <form method="dialog" class="crm-profile-form" id="profile-form">
+      <div class="crm-card__header">
+        <div>
+          <p class="crm-eyebrow">Perfil</p>
+          <h2>Datos visibles del asesor</h2>
+        </div>
+        <button type="submit" class="button button--ghost">Cerrar</button>
+      </div>
+      <label>
+        <span>Nombre visible</span>
+        <input id="profile-name-input" type="text" placeholder="Nombre del asesor" />
+      </label>
+      <label>
+        <span>Foto</span>
+        <input id="profile-photo-input" type="file" accept="image/*" />
+      </label>
+      <div class="crm-profile-form__preview">
+        <img id="profile-preview-photo" alt="Vista previa" hidden />
+        <div class="crm-avatar crm-avatar--profile-preview" id="profile-preview-avatar"><i class="fas fa-user" aria-hidden="true"></i></div>
+      </div>
+      <div class="crm-actions__buttons">
+        <button type="button" id="profile-reset" class="button button--ghost">Restablecer</button>
+        <button type="button" id="profile-save" class="button button--primary">Guardar cambios</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="lead-row-template">
+    <article class="crm-lead-row" tabindex="0" role="button">
+      <div class="crm-lead-row__avatar" data-field="avatar"></div>
+      <div class="crm-lead-row__identity">
         <strong data-field="nombre"></strong>
-        <span class="crm-badge" data-field="estado-cita"></span>
+        <span data-field="contacto"></span>
       </div>
-      <div class="crm-agenda-row__meta">
-        <span data-field="fecha"></span>
-        <span data-field="sistema"></span>
+      <div class="crm-lead-row__system">
+        <strong data-field="sistema"></strong>
+        <span data-field="isapre"></span>
       </div>
-    </button>
+      <div class="crm-lead-row__status">
+        <span class="crm-badge" data-field="status"></span>
+      </div>
+      <div class="crm-lead-row__date">
+        <strong data-field="created"></strong>
+        <span data-field="region"></span>
+      </div>
+      <button type="button" class="crm-lead-row__attach" data-field="attach" title="Ver adjunto" aria-label="Ver adjunto">
+        <i class="fas fa-paperclip" aria-hidden="true"></i>
+      </button>
+    </article>
   </template>
 
   <script type="module" src="./app.js"></script>

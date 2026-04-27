@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS form_leads (
   nombre TEXT,
   email TEXT,
   telefono TEXT,
+  rut TEXT,
   rango_edad TEXT,
   comuna TEXT,
   region TEXT,

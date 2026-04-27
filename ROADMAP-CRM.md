@@ -3,8 +3,8 @@
 ## Fase 0 - Base tecnica
 - [ ] Consolidar el formulario actual como unica entrada activa
 - [ ] Confirmar `ppforms_db` como base exclusiva del formulario
-- [ ] Confirmar `ppforms-uploads` como bucket exclusivo de adjuntos
-- [ ] Confirmar `form.planespro.cl` como endpoint publico del backend
+- [x] Confirmar `ppforms-uploads` como bucket exclusivo de adjuntos
+- [x] Confirmar `form.planespro.cl` como endpoint publico del backend
 - [ ] Definir contrato estable del lead
 - [ ] Incluir `lead_id`
 - [ ] Incluir `created_at`
@@ -20,28 +20,35 @@
 - [ ] Documentar estructura tecnica minima
 
 ## Fase 1 - CRM privado
-- [ ] Crear `asesores.planespro.cl`
-- [ ] Proteger `asesores.planespro.cl` con Cloudflare Access
+- [x] Crear `asesores.planespro.cl`
+- [x] Proteger `asesores.planespro.cl` con Cloudflare Access
 - [ ] Definir usuarios autorizados en esta etapa
 - [ ] Confirmar login por Google/email via Access
 
 ### CRM base
-- [ ] Crear vista principal de leads
-- [ ] Crear busqueda por nombre
-- [ ] Crear busqueda por email
-- [ ] Crear busqueda por telefono
-- [ ] Crear filtro por fecha
-- [ ] Crear filtro por sistema
-- [ ] Crear filtro por isapre especifica
-- [ ] Crear filtro por estado
-- [ ] Crear orden por fecha de ingreso
-- [ ] Crear ficha de detalle del lead
-- [ ] Mostrar adjunto inline en navegador
-- [ ] Agregar notas internas
-- [ ] Agregar cambio de estado
-- [ ] Agregar archivado
-- [ ] Agregar bloque de cita en la ficha del lead
-- [ ] Agregar resumen de agenda con proximas citas
+- [x] Crear vista principal de leads
+- [x] Crear busqueda por nombre
+- [x] Crear busqueda por email
+- [x] Crear busqueda por telefono
+- [x] Crear busqueda por RUT
+- [x] Crear filtro por fecha
+- [x] Crear filtro por sistema
+- [x] Crear filtro por isapre especifica
+- [x] Crear filtro por estado
+- [x] Crear orden por fecha de ingreso
+- [x] Crear ficha de detalle del lead
+- [x] Mostrar adjunto en modal desde la bandeja
+- [x] Agregar notas internas
+- [x] Agregar cambio de estado
+- [x] Agregar archivado
+- [x] Agregar bloque de cita en la ficha del lead
+- [x] Agregar resumen de agenda con proximas citas
+- [x] Compactar la bandeja de leads
+- [x] Compactar la ficha del lead
+- [x] Agregar campo RUT editable con validacion y formateo
+- [x] Reemplazar iniciales por avatar de silueta con colores dinamicos
+- [x] Usar iconos Font Awesome consistentes en toda la UI
+- [x] Agregar menu hover de perfil y settings del asesor
 - [ ] No permitir borrado fisico desde UI
 
 ### Estados del lead
@@ -55,27 +62,27 @@
 - [ ] Definir `Descartado`
 
 ### Backend admin
-- [ ] Crear endpoint de listado paginado
-- [ ] Crear endpoint de detalle por `lead_id`
-- [ ] Crear endpoint para ver adjunto
-- [ ] Crear endpoint para cambiar estado
-- [ ] Crear endpoint para agregar nota
-- [ ] Crear endpoint para archivar
-- [ ] Agregar auditoria basica de acciones
+- [x] Crear endpoint de listado paginado
+- [x] Crear endpoint de detalle por `lead_id`
+- [x] Crear endpoint para ver adjunto
+- [x] Crear endpoint para cambiar estado
+- [x] Crear endpoint para agregar nota
+- [x] Crear endpoint para archivar
+- [x] Agregar auditoria basica de acciones
 
 ### Trazabilidad
-- [ ] Crear tabla `lead_notes`
-- [ ] Crear tabla `lead_events`
-- [ ] Guardar quien hizo cada accion
-- [ ] Guardar timestamp de cambios de estado
+- [x] Crear tabla `lead_notes`
+- [x] Crear tabla `lead_events`
+- [x] Guardar quien hizo cada accion
+- [x] Guardar timestamp de cambios de estado
 - [ ] Guardar motivo de archivado o descarte
 
 ### Agenda y citas
-- [ ] Mostrar `cita_estado` en la ficha del lead
-- [ ] Mostrar `cita_fecha_hora` en la ficha del lead
-- [ ] Mostrar `cita_calendar_url` si existe
-- [ ] Crear lista de proximas citas
-- [ ] Crear indicadores de citas de hoy, pendientes y proximas
+- [x] Mostrar `cita_estado` en la ficha del lead
+- [x] Mostrar `cita_fecha_hora` en la ficha del lead
+- [x] Mostrar `cita_calendar_url` si existe
+- [x] Crear lista de proximas citas
+- [x] Crear indicadores de citas de hoy, pendientes y proximas
 - [ ] Definir estados de cita
 - [ ] Integrar agendamiento real con Google Calendar
 - [ ] Guardar `cita_calendar_event_id`
@@ -175,9 +182,9 @@
 - [ ] Evaluar login con Google
 
 ## Infraestructura
-- [ ] Mantener `form_leads`
-- [ ] Crear `lead_notes`
-- [ ] Crear `lead_events`
+- [x] Mantener `form_leads`
+- [x] Crear `lead_notes`
+- [x] Crear `lead_events`
 - [ ] Crear `advisors`
 - [ ] Evaluar futuro `organizations`
 - [ ] Evaluar futuro `lead_transfers`
@@ -185,14 +192,14 @@
 - [ ] Evaluar futuro `groups`
 
 ### Archivos
-- [ ] Mantener adjuntos en R2
-- [ ] Servir adjuntos solo a traves del Worker
-- [ ] No exponer bucket publicamente
+- [x] Mantener adjuntos en R2
+- [x] Servir adjuntos solo a traves del Worker
+- [x] No exponer bucket publicamente
 - [ ] Definir politica de retencion
 
 ### Seguridad
-- [ ] Mantener `asesores.planespro.cl` detras de Cloudflare Access
-- [ ] Separar rutas admin del frontend publico
+- [x] Mantener `asesores.planespro.cl` detras de Cloudflare Access
+- [x] Separar rutas admin del frontend publico
 - [ ] Registrar eventos de lectura y edicion
 - [ ] Proteger datos personales en marketplace futuro
 
@@ -203,14 +210,14 @@
 - [ ] Medir uso del CRM
 
 ## Prioridad inmediata
-- [ ] Crear `asesores.planespro.cl`
-- [ ] Configurar Cloudflare Access
-- [ ] Construir API admin del Worker
-- [ ] Construir vista de leads
-- [ ] Construir filtros
-- [ ] Construir ficha con adjunto
-- [ ] Agregar notas
-- [ ] Agregar estados
+- [x] Crear `asesores.planespro.cl`
+- [x] Configurar Cloudflare Access
+- [x] Construir API admin del Worker
+- [x] Construir vista de leads
+- [x] Construir filtros
+- [x] Construir ficha con adjunto
+- [x] Agregar notas
+- [x] Agregar estados
 - [ ] Agregar archivado
 
 ## Decisiones pendientes

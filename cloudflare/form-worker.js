@@ -5,6 +5,7 @@ export default {
     const leadFileMatch = url.pathname.match(/^\/api\/admin\/leads\/([^/]+)\/file$/);
     const leadNotesMatch = url.pathname.match(/^\/api\/admin\/leads\/([^/]+)\/notes$/);
     const leadStatusMatch = url.pathname.match(/^\/api\/admin\/leads\/([^/]+)\/status$/);
+    const leadRutMatch = url.pathname.match(/^\/api\/admin\/leads\/([^/]+)\/rut$/);
     const leadArchiveMatch = url.pathname.match(/^\/api\/admin\/leads\/([^/]+)\/archive$/);
 
     if (request.method === 'OPTIONS') {
@@ -46,6 +47,10 @@ export default {
 
       if (request.method === 'POST' && leadStatusMatch) {
         return await handleAdminLeadStatus(request, env, leadStatusMatch[1]);
+      }
+
+      if (request.method === 'POST' && leadRutMatch) {
+        return await handleAdminLeadRut(request, env, leadRutMatch[1]);
       }
 
       if (request.method === 'POST' && leadArchiveMatch) {
@@ -113,12 +118,12 @@ async function handleLeadCreate(request, env) {
   await env.FORM_DB.prepare(`
     INSERT INTO form_leads (
       id, created_at, updated_at, status, cta, campana, sheet_name,
-      nombre, email, telefono, rango_edad, comuna, region,
+      nombre, email, telefono, rut, rango_edad, comuna, region,
       sistema_actual, isapre_especifica, num_cargas, edad_cargas,
       rango_renta, rango_costo, comentarios,
       cita_estado, cita_fecha_hora, cita_calendar_event_id, cita_calendar_url,
       pdf_object_key, pdf_original_name, raw_payload
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     normalized.id,
     normalized.created_at,
@@ -130,6 +135,7 @@ async function handleLeadCreate(request, env) {
     normalized.nombre,
     normalized.email,
     normalized.telefono,
+    normalized.rut,
     normalized.rango_edad,
     normalized.comuna,
     normalized.region,
@@ -161,12 +167,12 @@ async function handleLeadAbandoned(request, env) {
   await env.FORM_DB.prepare(`
     INSERT INTO form_leads (
       id, created_at, updated_at, status, cta, campana, sheet_name,
-      nombre, email, telefono, rango_edad, comuna, region,
+      nombre, email, telefono, rut, rango_edad, comuna, region,
       sistema_actual, isapre_especifica, num_cargas, edad_cargas,
       rango_renta, rango_costo, comentarios,
       cita_estado, cita_fecha_hora, cita_calendar_event_id, cita_calendar_url,
       raw_payload
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(
     normalized.id,
     normalized.created_at,
@@ -178,6 +184,7 @@ async function handleLeadAbandoned(request, env) {
     normalized.nombre,
     normalized.email,
     normalized.telefono,
+    normalized.rut,
     normalized.rango_edad,
     normalized.comuna,
     normalized.region,
@@ -256,12 +263,13 @@ async function handleAdminLeadList(request, env) {
   const isapre = (url.searchParams.get('isapre') || '').trim();
   const from = (url.searchParams.get('from') || '').trim();
   const to = (url.searchParams.get('to') || '').trim();
-  const limit = clampInteger(url.searchParams.get('limit'), 20, 1, 100);
+  const limit = clampInteger(url.searchParams.get('limit'), 20, 1, 300);
   const offset = clampInteger(url.searchParams.get('offset'), 0, 0, 5000);
 
   const searchLike = `%${query}%`;
   const filters = [
     query,
+    searchLike,
     searchLike,
     searchLike,
     searchLike,
@@ -280,7 +288,7 @@ async function handleAdminLeadList(request, env) {
 
   const whereClause = `
     WHERE
-      (? = '' OR lower(nombre) LIKE ? OR lower(email) LIKE ? OR lower(telefono) LIKE ? OR lower(comuna) LIKE ?)
+      (? = '' OR lower(nombre) LIKE ? OR lower(email) LIKE ? OR lower(telefono) LIKE ? OR lower(comuna) LIKE ? OR lower(rut) LIKE ?)
       AND (? = '' OR status = ?)
       AND (? = '' OR sistema_actual = ?)
       AND (? = '' OR isapre_especifica = ?)
@@ -298,6 +306,7 @@ async function handleAdminLeadList(request, env) {
       nombre,
       email,
       telefono,
+      rut,
       comuna,
       region,
       sistema_actual,
@@ -481,6 +490,36 @@ async function handleAdminLeadStatus(request, env, leadId) {
   return json({ ok: true }, 200, env, request);
 }
 
+async function handleAdminLeadRut(request, env, leadId) {
+  const admin = requireAdmin(request, env);
+  if (admin.response) {
+    return admin.response;
+  }
+
+  const body = await request.json().catch(() => ({}));
+  const rut = normalizeRut(String(body.rut || ''));
+  if (rut && !isValidRut(rut)) {
+    return json({ error: 'RUT inválido' }, 400, env, request);
+  }
+
+  const now = new Date().toISOString();
+  await env.FORM_DB.prepare(`
+    UPDATE form_leads
+    SET rut = ?, updated_at = ?
+    WHERE id = ?
+  `).bind(rut, now, leadId).run();
+
+  await insertLeadEvent(env, {
+    leadId,
+    eventType: 'rut_updated',
+    actorEmail: admin.actorEmail,
+    payload: { rut },
+    createdAt: now,
+  });
+
+  return json({ ok: true, rut }, 200, env, request);
+}
+
 async function handleAdminLeadArchive(request, env, leadId) {
   const admin = requireAdmin(request, env);
   if (admin.response) {
@@ -520,6 +559,7 @@ function normalizeLead(payload, leadId, now, fallbackStatus) {
     nombre: payload.nombre || '',
     email: payload.email || '',
     telefono: payload.telefono || '',
+    rut: normalizeRut(payload.rut || ''),
     rango_edad: payload.rango_edad || '',
     comuna: payload.comuna || '',
     region: payload.region || '',
@@ -647,6 +687,44 @@ function getSafeExtension(filename) {
   const parts = raw.split('.');
   const ext = parts.length > 1 ? parts.pop().toLowerCase() : 'pdf';
   return /^[a-z0-9]{2,5}$/.test(ext) ? ext : 'pdf';
+}
+
+function cleanRut(value) {
+  return String(value || '')
+    .replace(/[^0-9kK]/g, '')
+    .toUpperCase();
+}
+
+function normalizeRut(value) {
+  const cleaned = cleanRut(value);
+  if (cleaned.length < 2) {
+    return cleaned;
+  }
+  const body = cleaned.slice(0, -1);
+  const dv = cleaned.slice(-1);
+  const bodyWithDots = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return `${bodyWithDots}-${dv}`;
+}
+
+function calculateRutDv(body) {
+  let sum = 0;
+  let multiplier = 2;
+  for (let index = body.length - 1; index >= 0; index -= 1) {
+    sum += Number(body[index]) * multiplier;
+    multiplier = multiplier === 7 ? 2 : multiplier + 1;
+  }
+  const remainder = 11 - (sum % 11);
+  if (remainder === 11) return '0';
+  if (remainder === 10) return 'K';
+  return String(remainder);
+}
+
+function isValidRut(value) {
+  const cleaned = cleanRut(value);
+  if (!/^\d{7,8}[0-9K]$/.test(cleaned)) {
+    return false;
+  }
+  return calculateRutDv(cleaned.slice(0, -1)) === cleaned.slice(-1);
 }
 
 function json(body, status, env, request) {

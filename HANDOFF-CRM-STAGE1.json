@@ -1,293 +1,174 @@
 {
-  "document_type": "ai_handoff",
+  "document_type": "ai_handoff_master",
+  "document_version": "2026-04-27.crm-stage1.v3",
   "project": {
-    "name": "PlanesPro Landing / CRM Stage 1",
+    "name": "PlanesPro Landing / CRM",
     "repository_root": "C:\\Users\\henti\\OneDrive\\Documentos\\ISAPRE\\PlanesPro\\Landing Old",
     "active_branch": "form",
     "current_date": "2026-04-27",
     "timezone": "America/Santiago"
   },
-  "objective": {
-    "summary": "Construir y publicar la primera etapa del CRM privado de leads de PlanesPro, reutilizando la captación ya existente del formulario público y agregando una interfaz privada para operar leads.",
-    "stage_definition": {
-      "name": "Etapa 1 - Backoffice privado operativo",
-      "includes": [
+  "governance": {
+    "master_plan_authority": "ROADMAP-CRM.md es el plan maestro del CRM. Debe respetarse. No puede ser reemplazado por una IA sucesora sin instruccion explicita del usuario.",
+    "successor_ai_rules": [
+      "Una IA sucesora debe continuar el CRM siguiendo el plan maestro ya definido en ROADMAP-CRM.md.",
+      "Una IA sucesora no tiene permitido cambiar la estrategia general, el orden de prioridades ni la arquitectura base sin instruccion explicita del usuario.",
+      "Una IA sucesora debe documentar todo cambio que haga en este handoff, pero no debe borrar ni reescribir el contenido ya establecido en este documento; debe agregar o actualizar solamente los bloques de estado operativo y changelog futuro si el usuario lo pide.",
+      "Si una IA sucesora detecta una contradiccion entre el codigo y este handoff, debe priorizar el estado real del codigo desplegado, corregir el handoff y dejar evidencia clara del ajuste.",
+      "No introducir auth propia, chat, marketplace, multicliente o permisos complejos antes de completar la etapa 1 y la capa operativa definida en el roadmap.",
+      "Mantener separacion estricta entre el formulario publico y el CRM privado.",
+      "Mantener el CRM fuera de indexacion publica. Debe seguir siendo noindex/nofollow y estar protegido por Cloudflare Access en produccion."
+    ],
+    "documentation_protocol": {
+      "required_after_every_substantive_change": [
+        "Actualizar ROADMAP-CRM.md si cambia alcance o prioridades del CRM",
+        "Actualizar este handoff si cambia arquitectura, seguridad, rutas, tablas, workers o flujos operativos",
+        "Indicar que fue desplegado, que no fue desplegado y que queda pendiente"
+      ],
+      "forbidden_without_user_request": [
+        "Eliminar secciones de este handoff",
+        "Cambiar el plan maestro por otro roadmap",
+        "Mover el CRM a otra arquitectura de auth sin instruccion del usuario"
+      ]
+    }
+  },
+  "master_plan": {
+    "source_file": "ROADMAP-CRM.md",
+    "current_priority_order": [
+      "1. CRM privado de asesor estable y usable",
+      "2. Dashboard premium del asesor",
+      "3. Capa operativa: RUT, seguimiento, prioridad, acciones comerciales",
+      "4. Agenda/citas mas rica",
+      "5. Atribucion por asesor",
+      "6. Roles, colaboracion y derivacion",
+      "7. Comunidad y luego marketplace"
+    ],
+    "stage_1_definition": {
+      "name": "Backoffice privado operativo del asesor",
+      "must_include": [
         "Subdominio privado para asesores",
+        "Cloudflare Access en produccion",
         "Listado de leads",
-        "Filtros básicos",
+        "Filtros",
         "Detalle del lead",
-        "Visualización inline del adjunto",
         "Notas internas",
         "Cambio de estado",
-        "Archivado lógico"
+        "Archivado logico",
+        "Visualizacion de adjunto",
+        "Agenda minima",
+        "Dashboard visual del asesor"
       ],
-      "explicitly_not_in_scope_yet": [
-        "Multiusuario real con permisos por asesor",
-        "Asignación automática de leads por advisor_id",
-        "Chat interno",
-        "Grupos",
-        "Marketplace de leads",
+      "must_not_include_yet": [
+        "Roles complejos",
+        "Multiempresa",
+        "Chat",
+        "Marketplace",
         "Compra/venta de leads",
-        "Dashboard avanzado de métricas",
-        "Borrado físico desde UI"
+        "Asignacion automatica por advisor_id en produccion"
       ]
     }
   },
-  "high_level_architecture": {
-    "public_form_flow": {
-      "frontend_entrypoint": "https://planespro.cl (landing pública)",
-      "form_backend_public_url": "https://form.planespro.cl",
-      "worker_name": "ppforms",
-      "database": "ppforms_db",
-      "database_id": "3bca5190-8e8f-4d53-bbf4-c7b15ade1cf6",
-      "r2_bucket": "ppforms-uploads",
-      "purpose": "Captación pública de leads y almacenamiento de adjuntos"
+  "architecture": {
+    "public_form_side": {
+      "public_url": "https://form.planespro.cl",
+      "worker": "ppforms",
+      "purpose": "Captacion publica del formulario y API admin real",
+      "database": {
+        "name": "ppforms_db",
+        "id": "3bca5190-8e8f-4d53-bbf4-c7b15ade1cf6"
+      },
+      "object_storage": {
+        "type": "R2",
+        "bucket": "ppforms-uploads",
+        "key_pattern": "leads/YYYY-MM-DD_nombre-normalizado_leadIdCorto.ext"
+      }
     },
-    "crm_private_flow": {
-      "crm_subdomain": "https://asesores.planespro.cl",
-      "worker_name": "ppcrm",
-      "purpose": "Servir UI privada del CRM y proxear endpoints admin al backend real",
+    "private_crm_side": {
+      "public_url": "https://asesores.planespro.cl",
+      "worker": "ppcrm",
+      "purpose": "Servir la UI del CRM y proxear /api/admin/* al backend real",
       "upstream_admin_backend": "https://ppforms.hentimes.workers.dev",
-      "reason_for_workers_dev_upstream": "Cuando el worker ppcrm intentó proxear a https://form.planespro.cl/api/admin/* apareció error 525 SSL handshake failed entre Cloudflare y el host form.planespro.cl. Para destrabar la etapa 1, el proxy del CRM quedó apuntando al endpoint técnico workers.dev del worker ppforms.",
-      "current_publication_status": "published_and_protected_by_access",
-      "current_usage_mode": "production_via_cloudflare_access_and_local_via_manual_key"
+      "why_upstream_is_workers_dev": "ppcrm proxear contra form.planespro.cl produjo 525 SSL handshake entre Cloudflare y el host custom domain. Para destrabar la etapa 1 el proxy usa el endpoint tecnico workers.dev del worker ppforms.",
+      "production_access_model": "Cloudflare Access obligatorio",
+      "local_access_model": "UI local + clave manual contra form.planespro.cl"
     },
-    "separation_of_responsibilities": {
+    "separation_of_concerns": {
       "ppforms": [
-        "Recibe leads públicos",
+        "Recibe leads publicos",
         "Guarda metadata en D1",
-        "Guarda archivos en R2",
-        "Expone endpoints admin reales sobre la misma base de datos"
+        "Guarda adjuntos en R2",
+        "Expone endpoints admin reales"
       ],
       "ppcrm": [
-        "Sirve archivos est?ticos de la UI CRM",
-        "Hace proxy de /api/admin/* hacia ppforms",
-        "Exige Cloudflare Access en producci?n",
-        "Solo permite clave manual cuando la UI corre local y pega directo a ppforms"
+        "Sirve HTML/CSS/JS del CRM",
+        "Hace proxy de /api/admin/*",
+        "No habla directo con D1 ni R2",
+        "No acepta clave manual en produccion"
       ]
     }
   },
-  "implemented_work": {
-    "commits_created": [
-      {
-        "sha": "98741e3",
-        "message": "feat: add crm stage 1 backoffice base"
-      },
-      {
-        "sha": "d3a8dc1",
-        "message": "feat: publish crm worker on asesores subdomain"
-      },
-      {
-        "sha": "6193d03",
-        "message": "feat: require access on public crm"
-      },
-      {
-        "sha": "355e3a3",
-        "message": "feat: add crm agenda overview"
-      },
-      {
-        "sha": "226baf3",
-        "message": "docs: update crm handoff state"
-      }
-    ],
-    "pushed_to_remote": true,
-    "worker_deployments_performed": [
-      {
-        "worker": "ppforms",
-        "action": "redeployed",
-        "reason": "Agregar endpoints admin, CORS para X-Admin-Key y soporte de notas/eventos"
-      },
-      {
-        "worker": "ppcrm",
-        "action": "created_and_deployed",
-        "reason": "Servir la UI del CRM en asesores.planespro.cl"
-      },
-      {
-        "worker": "ppcrm",
-        "action": "redeployed",
-        "reason": "Quitar el fallback de clave manual en producción y exigir Cloudflare Access en el proxy público"
-      },
-      {
-        "worker": "ppforms",
-        "action": "redeployed",
-        "reason": "Agregar campos de cita al listado admin para alimentar la agenda mínima del CRM"
-      },
-      {
-        "worker": "ppcrm",
-        "action": "redeployed",
-        "reason": "Aplicar iteraci?n visual premium del CRM y cambiar el build del worker a formato service-worker para mantener despliegue estable por API"
-      }
-    ],
-    "database_migrations_applied": [
-      {
-        "file": "cloudflare/migrations/003_create_form_admin_tables.sql",
-        "applied_to": "ppforms_db",
-        "tables_created": [
-          "lead_notes",
-          "lead_events"
-        ]
-      }
-    ],
-    "cloudflare_dns_and_routes_created": [
-      {
-        "type": "DNS",
-        "record": "asesores.planespro.cl",
-        "content": "hentimes.workers.dev",
-        "proxied": true,
-        "current_status": "active"
-      },
-      {
-        "type": "Workers Route",
-        "pattern": "asesores.planespro.cl/*",
-        "script": "ppcrm",
-        "current_status": "active"
-      }
-    ]
-  },
-  "files_created_or_modified": {
-    "created": [
-      {
-        "path": "ROADMAP-CRM.md",
-        "purpose": "Roadmap/checklist del CRM en markdown"
-      },
-      {
-        "path": "cloudflare/migrations/003_create_form_admin_tables.sql",
-        "purpose": "Crear tablas D1 para notas internas e historial/eventos"
-      },
-      {
-        "path": "crm/index.html",
-        "purpose": "Shell HTML del CRM etapa 1"
-      },
-      {
-        "path": "crm/config.js",
-        "purpose": "Configuración del frontend CRM, incluyendo resolución del API base URL"
-      },
-      {
-        "path": "crm/api.js",
-        "purpose": "Cliente fetch del CRM hacia la API admin"
-      },
-      {
-        "path": "crm/app.js",
-        "purpose": "Lógica principal de la UI CRM"
-      },
-      {
-        "path": "crm/styles.css",
-        "purpose": "Estilos del CRM etapa 1"
-      },
-      {
-        "path": "cloudflare/build-crm-worker.mjs",
-        "purpose": "Generador del worker estático/proxy para el CRM"
-      },
-      {
-        "path": "cloudflare/crm-worker.js",
-        "purpose": "Build generado del worker ppcrm"
-      },
-      {
-        "path": "cloudflare/wrangler-crm.example.toml",
-        "purpose": "Ejemplo de configuración para el worker del CRM"
-      },
-      {
-        "path": "HANDOFF-CRM-STAGE1.json",
-        "purpose": "Este handoff estructurado para otra IA"
-      }
-    ],
-    "modified": [
-      {
-        "path": "cloudflare/form-worker.js",
-        "purpose": "Extensión del backend con endpoints admin y soporte de notas/eventos"
-      },
-      {
-        "path": "cloudflare/wrangler-form.toml",
-        "purpose": "Ampliar orígenes permitidos para incluir asesores.planespro.cl"
-      },
-      {
-        "path": "cloudflare/wrangler-form.example.toml",
-        "purpose": "Reflejar orígenes del formulario + CRM"
-      },
-      {
-        "path": "FORM-CLOUDFLARE-SETUP.md",
-        "purpose": "Documentar el nuevo estado del backend, CRM y bloqueo de Access"
-      },
-      {
-        "path": "ROADMAP-CRM.md",
-        "purpose": "Checklist maestro del CRM, actualizado con agenda/citas"
-      },
-      {
-        "path": "cloudflare/build-crm-worker.mjs",
-        "purpose": "Generar ppcrm como worker service-worker y empaquetar la UI premium del CRM sin BOM"
-      }
-    ]
-  },
-  "backend_admin_api": {
-    "implemented_in": "cloudflare/form-worker.js",
-    "authentication_model_current": {
-      "primary_target": "Cloudflare Access header en asesores.planespro.cl",
-      "fallback_currently_enabled": "X-Admin-Key solo para desarrollo local directo contra form.planespro.cl",
-      "why_fallback_exists": "Permitir trabajo local mientras el CRM p?blico queda protegido solo por Cloudflare Access"
+  "security_and_access": {
+    "production": {
+      "host": "https://asesores.planespro.cl",
+      "protection": "Cloudflare Access",
+      "login_mode_current": "codigo al correo / identity provider configurado en Access",
+      "manual_admin_key_visible": false,
+      "manual_admin_key_accepted_by_public_proxy": false
     },
-    "routes": [
-      {
-        "method": "GET",
-        "path": "/api/admin/session",
-        "purpose": "Verifica si el usuario está autenticado para usar el CRM"
-      },
-      {
-        "method": "GET",
-        "path": "/api/admin/leads",
-        "purpose": "Lista paginada y filtrable de leads"
-      },
-      {
-        "method": "GET",
-        "path": "/api/admin/leads/:id",
-        "purpose": "Detalle del lead incluyendo notas e historial"
-      },
-      {
-        "method": "GET",
-        "path": "/api/admin/leads/:id/file",
-        "purpose": "Devuelve el adjunto inline desde R2"
-      },
-      {
-        "method": "POST",
-        "path": "/api/admin/leads/:id/notes",
-        "purpose": "Agregar nota interna"
-      },
-      {
-        "method": "POST",
-        "path": "/api/admin/leads/:id/status",
-        "purpose": "Actualizar estado del lead"
-      },
-      {
-        "method": "POST",
-        "path": "/api/admin/leads/:id/archive",
-        "purpose": "Archivar lógicamente el lead"
-      }
-    ],
-    "filtering_logic": {
-      "implemented_fields": [
-        "q (nombre, email, telefono, comuna via LIKE)",
+    "local_development": {
+      "entrypoints": [
+        "http://127.0.0.1:<puerto>/crm/",
+        "http://localhost:<puerto>/crm/"
+      ],
+      "api_base": "https://form.planespro.cl",
+      "manual_admin_key_required": true,
+      "manual_admin_key": "ppcrm_dev_20260425_9f6c2c8e1a4b"
+    },
+    "seo_policy": {
+      "crm_html_meta": "noindex, nofollow",
+      "reason": "El CRM es privado y no debe indexarse"
+    }
+  },
+  "data_model": {
+    "table_form_leads": {
+      "source_schema_files": [
+        "cloudflare/migrations/002_create_form_leads.sql",
+        "cloudflare/migrations/004_add_form_leads_rut.sql"
+      ],
+      "fields_relevant_to_crm": [
+        "id",
+        "created_at",
+        "updated_at",
         "status",
-        "sistema",
-        "isapre",
-        "from",
-        "to",
+        "cta",
+        "campana",
+        "sheet_name",
+        "nombre",
+        "email",
+        "telefono",
+        "rut",
+        "rango_edad",
+        "comuna",
+        "region",
+        "sistema_actual",
+        "isapre_especifica",
+        "num_cargas",
+        "edad_cargas",
+        "rango_renta",
+        "rango_costo",
+        "comentarios",
         "cita_estado",
         "cita_fecha_hora",
+        "cita_calendar_event_id",
         "cita_calendar_url",
-        "limit",
-        "offset"
+        "pdf_object_key",
+        "pdf_original_name",
+        "raw_payload"
       ],
-      "ordering": "created_at DESC"
+      "note": "rut ya forma parte del modelo del CRM. Debe existir tanto en esquema base como en la migracion incremental para bases ya creadas."
     },
-    "event_tracking": {
-      "stored_in": "lead_events",
-      "implemented_event_types": [
-        "note_added",
-        "status_changed",
-        "archived"
-      ]
-    },
-    "notes_tracking": {
-      "stored_in": "lead_notes",
+    "table_lead_notes": {
+      "schema_file": "cloudflare/migrations/003_create_form_admin_tables.sql",
       "fields": [
         "id",
         "lead_id",
@@ -295,253 +176,271 @@
         "author_email",
         "created_at"
       ]
+    },
+    "table_lead_events": {
+      "schema_file": "cloudflare/migrations/003_create_form_admin_tables.sql",
+      "fields": [
+        "id",
+        "lead_id",
+        "event_type",
+        "actor_email",
+        "payload_json",
+        "created_at"
+      ],
+      "event_types_current": [
+        "note_added",
+        "status_changed",
+        "rut_updated",
+        "archived"
+      ]
     }
   },
-  "frontend_crm_ui": {
-    "entry_file": "crm/index.html",
+  "api_contract": {
+    "implemented_in": "cloudflare/form-worker.js",
+    "admin_routes": [
+      {
+        "method": "GET",
+        "path": "/api/admin/session",
+        "purpose": "Verificar acceso del CRM"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/leads",
+        "purpose": "Listado filtrable de leads",
+        "query_params": [
+          "q",
+          "status",
+          "sistema",
+          "isapre",
+          "from",
+          "to",
+          "limit",
+          "offset"
+        ],
+        "returns_fields": [
+          "id",
+          "created_at",
+          "updated_at",
+          "status",
+          "nombre",
+          "email",
+          "telefono",
+          "rut",
+          "comuna",
+          "region",
+          "sistema_actual",
+          "isapre_especifica",
+          "comentarios",
+          "cita_estado",
+          "cita_fecha_hora",
+          "cita_calendar_url",
+          "pdf_object_key",
+          "pdf_original_name",
+          "has_file"
+        ],
+        "limit_current_max": 300
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/leads/:id",
+        "purpose": "Detalle completo del lead, notas e historial"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/leads/:id/file",
+        "purpose": "Servir adjunto inline desde R2"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/leads/:id/notes",
+        "body": {
+          "note": "string"
+        },
+        "purpose": "Agregar nota interna"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/leads/:id/status",
+        "body": {
+          "status": "string"
+        },
+        "purpose": "Actualizar estado"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/leads/:id/rut",
+        "body": {
+          "rut": "string"
+        },
+        "purpose": "Guardar RUT validado y normalizado"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/leads/:id/archive",
+        "body": {
+          "reason": "string"
+        },
+        "purpose": "Archivar logicamente el lead"
+      }
+    ],
+    "rut_validation_rule": {
+      "client_side": "El frontend limpia caracteres, formatea con puntos y guion y solo persiste si pasa modulo 11",
+      "server_side": "El worker normaliza y vuelve a validar antes de escribir"
+    }
+  },
+  "frontend_state": {
     "runtime_files": [
+      "crm/index.html",
       "crm/config.js",
       "crm/api.js",
       "crm/app.js",
       "crm/styles.css"
     ],
-    "features_implemented": [
-      "Verificación de sesión al cargar",
-      "Campo de clave admin temporal",
-      "Listado de leads",
-      "Resumen de agenda",
-      "Lista de próximas citas",
-      "Filtro por texto",
-      "Filtro por estado",
-      "Filtro por sistema",
-      "Filtro por isapre",
-      "Filtro por rango de fechas",
-      "Panel de detalle",
-      "Visualización inline del archivo adjunto en iframe",
-      "Bloque de agenda/cita en la ficha del lead",
-      "Alta de notas",
-      "Cambio de estado",
-      "Archivado"
-    ],
-    "base_url_resolution": {
-      "logic": "Si el host es localhost o 127.0.0.1 usa https://form.planespro.cl como API base; en cualquier otro caso usa window.location.origin",
-      "implemented_in": "crm/config.js"
+    "design_direction": {
+      "reference": "https://demo.templatemonster.com/es/demo/79783.html",
+      "target": "Dashboard premium de asesor, mas compacto y mas denso que el corte previo. No es panel de administrador global. Es panel del asesor dueño de sus leads.",
+      "do_not_do": [
+        "No volver a emoticones para iconos",
+        "No volver a una ficha de lead con hero grande sin valor operativo",
+        "No mezclar modulos irrelevantes del template (widgets genericos, invoices, etc.)"
+      ],
+      "must_keep": [
+        "Font Awesome como sistema de iconos",
+        "Sidebar compacto con solo las secciones necesarias",
+        "Topbar con perfil, notificaciones, updates y mensajes",
+        "Selector temporal: Hoy, 7d, 2 semanas, 1 mes, 3 meses, 6 meses, 1 año"
+      ]
     },
-    "important_runtime_behavior": [
-      "Cuando se abre desde asesores.planespro.cl, la UI pega al mismo origen y el worker ppcrm proxea a ppforms",
-      "Cuando se abre localmente, la UI pega directo a form.planespro.cl y usa la clave admin manual",
-      "La caja de clave manual se oculta automáticamente fuera de localhost/127.0.0.1",
-      "En producción el proxy ppcrm ya no acepta clave manual; exige Cloudflare Access"
+    "features_currently_present": [
+      "Sidebar con Dashboard, Leads y Agenda",
+      "Topbar compacta con resumen operativo a la derecha",
+      "Subida local de foto y nombre del asesor",
+      "Menu hover/click de profile y settings",
+      "Metricas del asesor: leads, propuestas, cerrados, por contactar",
+      "Porcentaje de incremento/decremento por rango temporal",
+      "Grafico lineal de ingresos/cierres",
+      "Donut Fonasa + 7 isapres + Otros",
+      "Pipeline por estado",
+      "Agenda inmediata",
+      "Bandeja de leads compacta",
+      "Avatar de silueta con colores dinamicos",
+      "Clip de adjunto al extremo derecho de la fila",
+      "Modal de adjunto con iframe",
+      "Ficha de lead mas compacta",
+      "Campo RUT editable con validacion y formateo",
+      "Comentario del lead contenido en caja mas compacta",
+      "Actualizado no visible en la UI principal del lead, pero updated_at sigue persistido"
+    ],
+    "features_removed_or_compacted": [
+      "Hero grande del lead seleccionado",
+      "Badge textual Adjunto/Sin adjunto en la fila compacta",
+      "Vista inline grande del adjunto dentro del detalle",
+      "Bloque visible de Actualizado en la ficha del lead",
+      "Iniciales del lead como avatar principal en la bandeja"
+    ],
+    "known_ui_behavior": [
+      "El clip del lead abre modal de adjunto sin cambiar la selección",
+      "El click sobre la fila sigue cargando detalle",
+      "El RUT se puede ingresar con o sin puntos/guion; se normaliza a formato chileno estándar",
+      "Si el RUT no es válido, no se guarda"
     ]
   },
-  "agenda_minima_stage": {
-    "status": "implemented",
-    "purpose": "Preparar el CRM para gestionar citas futuras antes de integrar Google Calendar real",
-    "implemented_in": [
+  "code_conventions": {
+    "frontend": [
+      "Vanilla JS modular, sin framework",
+      "HTML semantico y CSS propio en crm/",
+      "Font Awesome 6.4.0 via CDN",
+      "No usar emoticones para iconos",
+      "Mantener nombres de clases con prefijo crm-",
+      "Mantener textos de UI en español"
+    ],
+    "backend": [
+      "Worker Cloudflare en cloudflare/form-worker.js",
+      "Toda mutacion admin debe registrar evento en lead_events",
+      "Toda mutacion relevante debe actualizar updated_at",
+      "No exponer R2 publico; servir adjuntos solo via worker"
+    ],
+    "deploy": [
+      "Regenerar cloudflare/crm-worker.js con node cloudflare/build-crm-worker.mjs cada vez que cambie crm/*",
+      "Revisar sintaxis con node --check en crm/app.js y cloudflare/build-crm-worker.mjs antes de desplegar",
+      "Desplegar ppforms si cambia API o esquema operativo",
+      "Desplegar ppcrm si cambia UI, proxy o empaquetado estatico"
+    ]
+  },
+  "files_of_record": {
+    "must_read_first_for_successor_ai": [
+      "ROADMAP-CRM.md",
+      "HANDOFF-CRM-STAGE1.json",
       "crm/index.html",
       "crm/app.js",
       "crm/styles.css",
+      "crm/api.js",
+      "crm/config.js",
       "cloudflare/form-worker.js",
-      "ROADMAP-CRM.md"
+      "cloudflare/build-crm-worker.mjs"
     ],
-    "features": [
-      "KPIs de agenda en la cabecera: total, hoy, pendientes, próximas",
-      "Lista de próximas citas en la columna izquierda",
-      "Tarjeta Agenda / cita en la ficha del lead",
-      "Visualización de cita_estado",
-      "Visualización de cita_fecha_hora",
-      "Visualización de cita_calendar_url si existe"
-    ],
-    "not_implemented_yet": [
-      "Creación real de eventos en Google Calendar",
-      "Reprogramación desde UI",
-      "Cambio manual de estado de cita desde UI",
-      "Calendario semanal/mensual",
-      "Disponibilidad por asesor"
+    "schema_files": [
+      "cloudflare/migrations/002_create_form_leads.sql",
+      "cloudflare/migrations/003_create_form_admin_tables.sql",
+      "cloudflare/migrations/004_add_form_leads_rut.sql"
     ]
   },
-  "file_upload_and_attachment_behavior": {
-    "public_form_worker": "ppforms",
+  "deployment_and_validation_status": {
+    "last_substantive_ui_scope": "Compactacion y estilizacion del panel del asesor, reemplazo a iconos Font Awesome, modal de adjunto, avatar de silueta, campo RUT validado y reubicacion del resumen operativo en topbar",
+    "deployed_for_this_scope": [
+      "Migracion de columna rut aplicada en ppforms_db",
+      "ppforms redeployado con endpoint POST /api/admin/leads/:id/rut, busqueda por rut y CORS local actualizado",
+      "cloudflare/crm-worker.js regenerado desde crm/*",
+      "ppcrm redeployado con la UI compacta del asesor"
+    ],
+    "validated_programmatically": [
+      "GET /api/admin/session con X-Admin-Key responde ok",
+      "GET /api/admin/leads devuelve rut en el listado",
+      "POST /api/admin/leads/:id/rut guarda y normaliza 12.345.678-5",
+      "GET /api/admin/leads/:id devuelve el rut persistido y evento rut_updated",
+      "ppcrm fue redeployado con build actual del CRM"
+    ],
+    "manual_checks_expected_after_deploy": [
+      "Entrar a asesores.planespro.cl via Cloudflare Access",
+      "Verificar que el dashboard carga metricas y graficos",
+      "Abrir un lead y confirmar que el hero grande ya no existe",
+      "Abrir adjunto desde el clip de la fila y desde el detalle",
+      "Guardar un RUT valido y verificar persistencia visual en la ficha",
+      "Intentar guardar un RUT invalido y verificar rechazo visual",
+      "Confirmar que Actualizado no se muestra en la ficha",
+      "Confirmar que profile hover muestra Profile y Settings"
+    ],
+    "known_gap_after_deploy": [
+      "La validacion visual completa de asesores.planespro.cl sigue siendo manual porque el acceso esta detras de Cloudflare Access"
+    ]
+  },
+  "known_open_work_after_this_scope": {
+    "next_priority": [
+      "Pulir visualmente el dashboard para acercarlo aun mas al template de referencia sin agregar modulos irrelevantes",
+      "Agregar capa operativa: prioridad, ultimo contacto, proxima accion, motivo de archivado",
+      "Profundizar agenda/citas antes de Google Calendar real"
+    ],
+    "not_ready_yet": [
+      "Google Calendar real",
+      "Asignacion automatica por asesor",
+      "Roles granulares",
+      "Chat interno",
+      "Marketplace"
+    ]
+  },
+  "sensitive_operational_values": {
+    "local_manual_admin_key": "ppcrm_dev_20260425_9f6c2c8e1a4b",
+    "d1_database_name": "ppforms_db",
+    "d1_database_id": "3bca5190-8e8f-4d53-bbf4-c7b15ade1cf6",
     "r2_bucket": "ppforms-uploads",
-    "current_key_format": "leads/YYYY-MM-DD_nombre-normalizado_leadIdCorto.ext",
-    "implemented_in": "cloudflare/form-worker.js",
-    "important_detail": "Ya no se crea una carpeta por leadId; el archivo queda plano bajo leads/"
+    "public_crm_host": "asesores.planespro.cl",
+    "public_form_host": "form.planespro.cl"
   },
-  "security_state": {
-    "what_is_secure_now": [
-      "La UI pública del CRM está detrás de Cloudflare Access",
-      "La API admin pública del CRM no responde sin Cloudflare Access",
-      "La visualización de archivos pasa por el backend y no expone el bucket R2 públicamente"
-    ],
-    "temporary_security_compromise": {
-      "name": "manual_admin_key_fallback",
-      "exists_in": [
-        "ppforms via ADMIN_API_KEY"
-      ],
-      "reason": "Permitir pruebas en entorno local sin depender del flujo de Cloudflare Access",
-      "known_current_value": "ppcrm_dev_20260425_9f6c2c8e1a4b",
-      "important_warning": "Esta clave ya no debe usarse como mecanismo público de producción. Solo debe vivir para desarrollo local, o eliminarse si luego se implementa una estrategia local diferente."
-    },
-    "cloudflare_access_status": {
-      "desired_state": "asesores.planespro.cl protegido por Cloudflare Access usando login Google/email",
-      "actual_state": "Operativo en producción sobre asesores.planespro.cl",
-      "blocker": {
-        "type": "permissions",
-        "details": "El token actual sigue sin permitir administrar Access/Zero Trust por API, aunque la aplicación ya fue configurada manualmente y funciona",
-        "request_that_failed": "GET https://api.cloudflare.com/client/v4/accounts/{account_id}/access/apps",
-        "meaning": "Otra IA no debe asumir que puede crear o editar Access por API con este token. Debe trabajar con el panel manual o pedir un token con permisos Zero Trust."
-      }
-    }
-  },
-  "cloudflare_resources_and_known_identifiers": {
-    "account_id": "a69ce5c1cf6b705438ee7028f37cb30b",
-    "zone_id": "6bf0d82dd59c05b841eee2fd4531785c",
-    "workers": [
-      {
-        "name": "ppforms",
-        "public_domain": "https://form.planespro.cl",
-        "workers_dev": "https://ppforms.hentimes.workers.dev"
-      },
-      {
-        "name": "ppcrm",
-        "public_domain": "https://asesores.planespro.cl",
-        "current_status": "active_and_protected_by_access"
-      }
-    ],
-    "routes": [
-      {
-        "pattern": "form.planespro.cl/*",
-        "script": "ppforms"
-      },
-      {
-        "pattern": "asesores.planespro.cl/*",
-        "script": "ppcrm",
-        "current_status": "active"
-      }
-    ],
-    "dns_records": [
-      {
-        "hostname": "asesores.planespro.cl",
-        "type": "CNAME",
-        "content": "hentimes.workers.dev",
-        "proxied": true,
-        "current_status": "active"
-      }
-    ],
-    "d1": {
-      "database_name": "ppforms_db",
-      "database_id": "3bca5190-8e8f-4d53-bbf4-c7b15ade1cf6"
-    },
-    "r2": {
-      "bucket_name": "ppforms-uploads"
-    }
-  },
-  "validation_performed": {
-    "local_syntax_checks": [
-      "node --check cloudflare/form-worker.js",
-      "node --check crm/app.js",
-      "node --check crm/config.js",
-      "node --check cloudflare/crm-worker.js"
-    ],
-    "cloudflare_runtime_checks": [
-      "Migración 003 aplicada contra D1 por API",
-      "Worker ppforms redeploy exitoso",
-      "Worker ppcrm deploy exitoso",
-      "GET https://asesores.planespro.cl/ responde 302 hacia Cloudflare Access",
-      "GET https://asesores.planespro.cl/api/admin/session responde 302 hacia Cloudflare Access cuando no hay sesión",
-      "GET https://form.planespro.cl/api/admin/leads/:id/file con clave manual devuelve PDF inline"
-    ],
-    "cleanup_performed": [
-      "Se insertaron notas/eventos de prueba sobre un lead real para validar la etapa 1",
-      "Después se revirtió ese estado y se eliminaron los registros de prueba para no contaminar la base"
-    ]
-  },
-  "exact_pending_work_to_finish_stage_1": {
-    "summary": "La etapa 1 est? operativa en producci?n y local. Lo pendiente ya no es el acceso, sino consolidar la experiencia operativa y preparar la agenda/capa comercial siguiente.",
-    "reality_check": "Cloudflare Access ya protege asesores.planespro.cl. La prioridad inmediata del plan maestro pas? a ser pulir la operaci?n comercial (estado/seguimiento) y expandir la agenda hacia una capa real conectable con Google Calendar.",
-    "pending_items": [
-      {
-        "id": "stage1-ops-1",
-        "title": "Completar capa operativa del CRM sobre la UI premium",
-        "status": "pending",
-        "details": [
-          "La iteraci?n visual premium ya qued? aplicada en crm/index.html, crm/app.js y crm/styles.css",
-          "La siguiente prioridad del plan maestro es agregar campos operativos: prioridad, ?ltimo contacto, pr?xima acci?n y motivo de archivado",
-          "Esto debe construirse sin romper el flujo actual de notas, estados, agenda m?nima y adjuntos"
-        ]
-      },
-      {
-        "id": "stage1-auth-3",
-        "title": "Mantener o eliminar conscientemente el bypass local por clave manual",
-        "required": true,
-        "details": [
-          "ppcrm ya no usa la clave en producción",
-          "ppforms sigue aceptando ADMIN_API_KEY para permitir desarrollo local",
-          "Hay que decidir si ese bypass local se mantiene, se rota periódicamente o se reemplaza por otra estrategia"
-        ]
-      },
-      {
-        "id": "stage1-ops-1",
-        "title": "Consolidar operación diaria del CRM",
-        "required": false,
-        "details": [
-          "Cómo ingresar",
-          "Qué estados usar",
-          "Cómo agregar notas",
-          "Qué significa archivar",
-          "Cómo usar la agenda mínima"
-        ]
-      },
-      {
-        "id": "stage1-agenda-1",
-        "title": "Definir estados y flujo exacto de citas",
-        "required": true,
-        "details": [
-          "Definir catálogo de estados de cita",
-          "Definir cuándo una cita pasa a confirmada, realizada, cancelada o no asistió",
-          "Definir cómo se cargará la primera fecha/hora desde formulario o desde CRM"
-        ]
-      }
-    ]
-  },
-  "recommended_next_steps_for_another_ai": {
-    "next_priority": "Agregar capa operativa del CRM sin tocar la arquitectura de producci?n/local ya consolidada",
-    "concrete_next_tasks": [
-      "Definir y persistir prioridad del lead",
-      "Definir y persistir ?ltimo contacto",
-      "Definir y persistir pr?xima acci?n",
-      "Definir y persistir motivo de archivado visible",
-      "Expandir la agenda m?nima hacia agenda operativa real antes de integrar Google Calendar"
-    ],
-    "cloudflare_permissions_note": "No se necesitan m?s permisos de Cloudflare para seguir construyendo UI/flujo del CRM. Solo har?an falta permisos Zero Trust por API si se quisiera automatizar Access desde CLI.",
-    "validation_focus": [
-      "Abrir https://asesores.planespro.cl y verificar login por Cloudflare Access",
-      "Verificar que la UI premium cargue en producci?n",
-      "Probar el CRM local con la clave manual",
-      "Confirmar que la agenda m?nima y el visor de adjuntos siguen operativos"
-    ]
-  },
-  "important_code_references": {
-    "backend_admin_router": "cloudflare/form-worker.js",
-    "admin_auth_guard": "cloudflare/form-worker.js -> requireAdmin()",
-    "crm_frontend_shell": "crm/index.html",
-    "crm_frontend_logic": "crm/app.js",
-    "crm_frontend_api_client": "crm/api.js",
-    "crm_runtime_config": "crm/config.js",
-    "crm_worker_generator": "cloudflare/build-crm-worker.mjs",
-    "generated_crm_worker": "cloudflare/crm-worker.js",
-    "migration_for_notes_and_events": "cloudflare/migrations/003_create_form_admin_tables.sql",
-    "cloudflare_setup_doc": "FORM-CLOUDFLARE-SETUP.md"
-  },
-  "current_operational_note": {
-    "how_to_use_right_now": [
-      "Producción: abrir https://asesores.planespro.cl y entrar por Cloudflare Access",
-      "Local: levantar un servidor local sobre el repo",
-      "Local: abrir http://127.0.0.1:<puerto>/crm/ o http://localhost:<puerto>/crm/",
-      "Local: ingresar la clave temporal en el campo 'Clave admin'",
-      "Local: usar el CRM normalmente contra https://form.planespro.cl"
-    ],
-    "temporary_admin_key": "ppcrm_dev_20260425_9f6c2c8e1a4b",
-    "warning": "Esta clave existe solo para pruebas de la etapa 1. No debe considerarse solución final."
-  }
+  "notes_for_successor_ai": [
+    "No confiar en un handoff previo si contradice el estado actual del codigo. Este archivo reemplaza el handoff anterior como referencia vigente.",
+    "No mover el CRM a form.planespro.cl/crm. Esa arquitectura ya fue evaluada y descartada. El CRM privado vive en asesores.planespro.cl.",
+    "Si se toca el flujo de adjuntos, mantener el almacenamiento en R2 y la exposicion controlada por el worker.",
+    "Si se toca el RUT, validar en cliente y servidor. No confiar solo en la mascara visual.",
+    "Si se cambia la UI del dashboard, conservar la orientacion a panel de asesor, no a panel de administrador global."
+  ]
 }
