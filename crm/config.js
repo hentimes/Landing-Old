@@ -1,4 +1,4 @@
-const isLocalDev = /^localhost$|^127\.0\.0\.1$/.test(window.location.hostname);
+export const isLocalDev = /^localhost$|^127\.0\.0\.1$/.test(window.location.hostname);
 
 export const API_BASE_URL = isLocalDev
   ? 'https://form.planespro.cl'

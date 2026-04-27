@@ -1,4 +1,4 @@
-import { LEAD_STATUSES, ADMIN_KEY_STORAGE } from './config.js';
+import { isLocalDev, LEAD_STATUSES, ADMIN_KEY_STORAGE } from './config.js';
 import {
   addLeadNote,
   archiveLead,
@@ -19,6 +19,7 @@ const state = {
 
 const elements = {
   sessionStatus: document.getElementById('session-status'),
+  adminKeyBox: document.getElementById('admin-keybox'),
   adminKey: document.getElementById('admin-key'),
   saveAdminKey: document.getElementById('save-admin-key'),
   filterQ: document.getElementById('filter-q'),
@@ -40,16 +41,18 @@ init();
 
 function init() {
   hydrateStatusOptions();
-  elements.adminKey.value = readAdminKey();
+  configureAccessMode();
   bindEvents();
   bootstrap();
 }
 
 function bindEvents() {
-  elements.saveAdminKey.addEventListener('click', async () => {
-    saveAdminKey(elements.adminKey.value.trim());
-    await bootstrap();
-  });
+  if (isLocalDev) {
+    elements.saveAdminKey.addEventListener('click', async () => {
+      saveAdminKey(elements.adminKey.value.trim());
+      await bootstrap();
+    });
+  }
 
   elements.applyFilters.addEventListener('click', loadLeads);
   elements.clearFilters.addEventListener('click', async () => {
@@ -69,11 +72,23 @@ function bindEvents() {
     }
   });
 
-  window.addEventListener('storage', (event) => {
-    if (event.key === ADMIN_KEY_STORAGE) {
-      elements.adminKey.value = readAdminKey();
-    }
-  });
+  if (isLocalDev) {
+    window.addEventListener('storage', (event) => {
+      if (event.key === ADMIN_KEY_STORAGE) {
+        elements.adminKey.value = readAdminKey();
+      }
+    });
+  }
+}
+
+function configureAccessMode() {
+  if (isLocalDev) {
+    elements.adminKey.value = readAdminKey();
+    elements.adminKeyBox.hidden = false;
+    return;
+  }
+
+  elements.adminKeyBox.hidden = true;
 }
 
 async function bootstrap() {

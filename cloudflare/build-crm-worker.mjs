@@ -69,12 +69,11 @@ async function proxyAdminRequest(request, env, pathname, search) {
     request.headers.get('Cf-Access-Authenticated-User-Email') ||
     request.headers.get('cf-access-authenticated-user-email') ||
     '';
-  const requestAdminKey = request.headers.get('X-Admin-Key') || '';
 
-  if (!accessEmail && (!env.ADMIN_PROXY_KEY || requestAdminKey !== env.ADMIN_PROXY_KEY)) {
+  if (!accessEmail) {
     return new Response(JSON.stringify({
       error: 'Unauthorized',
-      message: 'Cloudflare Access o clave admin requerida.',
+      message: 'Cloudflare Access requerido.',
     }), {
       status: 401,
       headers: {

@@ -1,4 +1,4 @@
-import { API_BASE_URL, ADMIN_KEY_STORAGE } from './config.js';
+import { API_BASE_URL, ADMIN_KEY_STORAGE, isLocalDev } from './config.js';
 
 function getAdminKey() {
   return window.localStorage.getItem(ADMIN_KEY_STORAGE) || '';
@@ -7,7 +7,7 @@ function getAdminKey() {
 function getHeaders(extra = {}) {
   const headers = { ...extra };
   const adminKey = getAdminKey();
-  if (adminKey) {
+  if (isLocalDev && adminKey) {
     headers['X-Admin-Key'] = adminKey;
   }
   return headers;
@@ -47,7 +47,7 @@ export function readAdminKey() {
 export function getFileUrl(leadId) {
   const url = new URL(`${API_BASE_URL}/api/admin/leads/${leadId}/file`);
   const adminKey = getAdminKey();
-  if (adminKey) {
+  if (isLocalDev && adminKey) {
     url.searchParams.set('adminKey', adminKey);
   }
   return url.toString();
