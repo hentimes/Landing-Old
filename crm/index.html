@@ -16,11 +16,17 @@
 <body class="crm-body">
   <div class="crm-shell">
     <header class="crm-topbar">
-      <div class="crm-brand">
-        <img src="../assets/logos_pp/logo-planespro.obs.webp" alt="PlanesPro.cl" class="crm-brand__logo" />
-        <div>
-          <p class="crm-eyebrow">Backoffice privado</p>
-          <h1>Leads y seguimiento</h1>
+      <div class="crm-brand-wrap">
+        <div class="crm-brand">
+          <img src="../assets/logos_pp/logo-planespro.obs.webp" alt="PlanesPro.cl" class="crm-brand__logo" />
+          <div>
+            <p class="crm-eyebrow">Backoffice privado</p>
+            <h1>Leads y seguimiento</h1>
+          </div>
+        </div>
+        <div class="crm-hero-copy">
+          <p class="crm-hero-copy__title">Panel operativo</p>
+          <p class="crm-hero-copy__text">Controla ingresos, seguimiento comercial, citas y documentos desde una sola bandeja.</p>
         </div>
       </div>
       <div class="crm-session">
@@ -38,7 +44,49 @@
       </div>
     </header>
 
+    <section class="crm-leads-overview">
+      <article class="crm-kpi-card crm-kpi-card--lead">
+        <div class="crm-kpi-card__icon">01</div>
+        <div>
+          <p class="crm-eyebrow">Leads totales</p>
+          <strong id="lead-count-total">0</strong>
+          <span>Registros cargados en la bandeja actual</span>
+        </div>
+      </article>
+      <article class="crm-kpi-card crm-kpi-card--lead">
+        <div class="crm-kpi-card__icon">02</div>
+        <div>
+          <p class="crm-eyebrow">Por contactar</p>
+          <strong id="lead-count-pending">0</strong>
+          <span>Nuevos y pendientes de primera gestión</span>
+        </div>
+      </article>
+      <article class="crm-kpi-card crm-kpi-card--lead">
+        <div class="crm-kpi-card__icon">03</div>
+        <div>
+          <p class="crm-eyebrow">Con adjunto</p>
+          <strong id="lead-count-files">0</strong>
+          <span>Casos con plan o documento disponible</span>
+        </div>
+      </article>
+      <article class="crm-kpi-card crm-kpi-card--lead">
+        <div class="crm-kpi-card__icon">04</div>
+        <div>
+          <p class="crm-eyebrow">Activos</p>
+          <strong id="lead-count-active">0</strong>
+          <span>Leads no archivados ni descartados</span>
+        </div>
+      </article>
+    </section>
+
     <section class="crm-filters">
+      <div class="crm-filters__header">
+        <div>
+          <p class="crm-eyebrow">Segmentación</p>
+          <h2>Filtrar bandeja</h2>
+        </div>
+        <p class="crm-muted">Busca por nombre, contacto, sistema o rango de fechas.</p>
+      </div>
       <div class="crm-filters__grid">
         <label>
           <span>Buscar</span>
@@ -109,6 +157,9 @@
           </div>
           <strong id="lead-count">0 resultados</strong>
         </div>
+        <div class="crm-panel__subheader">
+          <span class="crm-muted">Prioriza casos nuevos, con adjunto y citas cercanas.</span>
+        </div>
         <section class="crm-agenda-list">
           <div class="crm-card__header">
             <h3>Próximas citas</h3>
@@ -131,16 +182,25 @@
 
   <template id="lead-row-template">
     <button type="button" class="crm-lead-row">
-      <div class="crm-lead-row__top">
-        <strong data-field="nombre"></strong>
-        <span class="crm-badge" data-field="status"></span>
+      <div class="crm-lead-row__avatar" data-field="avatar"></div>
+      <div class="crm-lead-row__body">
+        <div class="crm-lead-row__top">
+          <strong data-field="nombre"></strong>
+          <span class="crm-badge" data-field="status"></span>
+        </div>
+        <div class="crm-lead-row__meta">
+          <span data-field="sistema"></span>
+          <span data-field="isapre"></span>
+          <span data-field="created"></span>
+        </div>
+        <p data-field="contacto"></p>
+        <div class="crm-lead-row__footer">
+          <div class="crm-chip-row">
+            <span class="crm-chip" data-field="region"></span>
+            <span class="crm-chip crm-chip--accent" data-field="adjunto"></span>
+          </div>
+        </div>
       </div>
-      <div class="crm-lead-row__meta">
-        <span data-field="sistema"></span>
-        <span data-field="isapre"></span>
-        <span data-field="created"></span>
-      </div>
-      <p data-field="contacto"></p>
     </button>
   </template>
 

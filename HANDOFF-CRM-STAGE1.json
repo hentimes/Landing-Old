@@ -4,7 +4,7 @@
     "name": "PlanesPro Landing / CRM Stage 1",
     "repository_root": "C:\\Users\\henti\\OneDrive\\Documentos\\ISAPRE\\PlanesPro\\Landing Old",
     "active_branch": "form",
-    "current_date": "2026-04-25",
+    "current_date": "2026-04-27",
     "timezone": "America/Santiago"
   },
   "objective": {
@@ -24,7 +24,6 @@
       "explicitly_not_in_scope_yet": [
         "Multiusuario real con permisos por asesor",
         "Asignación automática de leads por advisor_id",
-        "Cloudflare Access completamente montado",
         "Chat interno",
         "Grupos",
         "Marketplace de leads",
@@ -61,9 +60,10 @@
         "Expone endpoints admin reales sobre la misma base de datos"
       ],
       "ppcrm": [
-        "Sirve archivos estáticos de la UI CRM",
+        "Sirve archivos est?ticos de la UI CRM",
         "Hace proxy de /api/admin/* hacia ppforms",
-        "Aplica un gate temporal por Cloudflare Access o clave manual"
+        "Exige Cloudflare Access en producci?n",
+        "Solo permite clave manual cuando la UI corre local y pega directo a ppforms"
       ]
     }
   },
@@ -76,6 +76,18 @@
       {
         "sha": "d3a8dc1",
         "message": "feat: publish crm worker on asesores subdomain"
+      },
+      {
+        "sha": "6193d03",
+        "message": "feat: require access on public crm"
+      },
+      {
+        "sha": "355e3a3",
+        "message": "feat: add crm agenda overview"
+      },
+      {
+        "sha": "226baf3",
+        "message": "docs: update crm handoff state"
       }
     ],
     "pushed_to_remote": true,
@@ -99,6 +111,11 @@
         "worker": "ppforms",
         "action": "redeployed",
         "reason": "Agregar campos de cita al listado admin para alimentar la agenda mínima del CRM"
+      },
+      {
+        "worker": "ppcrm",
+        "action": "redeployed",
+        "reason": "Aplicar iteraci?n visual premium del CRM y cambiar el build del worker a formato service-worker para mantener despliegue estable por API"
       }
     ],
     "database_migrations_applied": [
@@ -194,15 +211,19 @@
       {
         "path": "ROADMAP-CRM.md",
         "purpose": "Checklist maestro del CRM, actualizado con agenda/citas"
+      },
+      {
+        "path": "cloudflare/build-crm-worker.mjs",
+        "purpose": "Generar ppcrm como worker service-worker y empaquetar la UI premium del CRM sin BOM"
       }
     ]
   },
   "backend_admin_api": {
     "implemented_in": "cloudflare/form-worker.js",
     "authentication_model_current": {
-      "primary_target": "Cloudflare Access header",
-      "fallback_currently_enabled": "X-Admin-Key comparado contra env.ADMIN_API_KEY",
-      "why_fallback_exists": "El token actual de Cloudflare no permitió automatizar Access/Zero Trust, así que se dejó una vía temporal para seguir probando el CRM"
+      "primary_target": "Cloudflare Access header en asesores.planespro.cl",
+      "fallback_currently_enabled": "X-Admin-Key solo para desarrollo local directo contra form.planespro.cl",
+      "why_fallback_exists": "Permitir trabajo local mientras el CRM p?blico queda protegido solo por Cloudflare Access"
     },
     "routes": [
       {
@@ -436,9 +457,19 @@
     ]
   },
   "exact_pending_work_to_finish_stage_1": {
-    "summary": "La etapa 1 está funcional, pero no está terminada al estándar deseado porque falta cerrar autenticación seria con Cloudflare Access.",
-    "reality_check": "La autenticación seria con Cloudflare Access ya quedó funcional para producción. Lo pendiente de la etapa 1 ya no es el acceso, sino la consolidación visual/operativa del CRM y la futura agenda real.",
+    "summary": "La etapa 1 est? operativa en producci?n y local. Lo pendiente ya no es el acceso, sino consolidar la experiencia operativa y preparar la agenda/capa comercial siguiente.",
+    "reality_check": "Cloudflare Access ya protege asesores.planespro.cl. La prioridad inmediata del plan maestro pas? a ser pulir la operaci?n comercial (estado/seguimiento) y expandir la agenda hacia una capa real conectable con Google Calendar.",
     "pending_items": [
+      {
+        "id": "stage1-ops-1",
+        "title": "Completar capa operativa del CRM sobre la UI premium",
+        "status": "pending",
+        "details": [
+          "La iteraci?n visual premium ya qued? aplicada en crm/index.html, crm/app.js y crm/styles.css",
+          "La siguiente prioridad del plan maestro es agregar campos operativos: prioridad, ?ltimo contacto, pr?xima acci?n y motivo de archivado",
+          "Esto debe construirse sin romper el flujo actual de notas, estados, agenda m?nima y adjuntos"
+        ]
+      },
       {
         "id": "stage1-auth-3",
         "title": "Mantener o eliminar conscientemente el bypass local por clave manual",
@@ -447,16 +478,6 @@
           "ppcrm ya no usa la clave en producción",
           "ppforms sigue aceptando ADMIN_API_KEY para permitir desarrollo local",
           "Hay que decidir si ese bypass local se mantiene, se rota periódicamente o se reemplaza por otra estrategia"
-        ]
-      },
-      {
-        "id": "stage1-ui-1",
-        "title": "Aplicar la iteración visual premium del CRM",
-        "required": true,
-        "details": [
-          "El usuario pidió explícitamente un look más premium inspirado en una referencia externa",
-          "La lógica ya está montada; la siguiente prioridad recomendada por el plan maestro es rediseñar la UI sin alterar arquitectura",
-          "Debe mejorar cabecera, KPIs, bandeja de leads, panel derecho y agenda"
         ]
       },
       {
@@ -484,23 +505,20 @@
     ]
   },
   "recommended_next_steps_for_another_ai": {
-    "priority_order": [
-      "Aplicar la iteración visual premium del CRM sin tocar arquitectura",
-      "Consolidar operación diaria y estados finales del lead",
-      "Expandir la agenda mínima hacia una agenda operativa real",
-      "Preparar integración con Google Calendar",
-      "Mantener actualizada la documentación/handoff después de cada bloque"
+    "next_priority": "Agregar capa operativa del CRM sin tocar la arquitectura de producci?n/local ya consolidada",
+    "concrete_next_tasks": [
+      "Definir y persistir prioridad del lead",
+      "Definir y persistir ?ltimo contacto",
+      "Definir y persistir pr?xima acci?n",
+      "Definir y persistir motivo de archivado visible",
+      "Expandir la agenda m?nima hacia agenda operativa real antes de integrar Google Calendar"
     ],
-    "what_token_permissions_are_likely_missing": [
-      "Cloudflare Zero Trust / Access Apps edit/read",
-      "Policies edit/read"
-    ],
-    "exact_follow_up_checks": [
-      "Abrir https://asesores.planespro.cl y verificar login real por Cloudflare Access",
-      "Después del login, comprobar que la caja de clave manual no aparece",
-      "Probar listado, detalle, archivo, notas, estado y archivado en producción",
+    "cloudflare_permissions_note": "No se necesitan m?s permisos de Cloudflare para seguir construyendo UI/flujo del CRM. Solo har?an falta permisos Zero Trust por API si se quisiera automatizar Access desde CLI.",
+    "validation_focus": [
+      "Abrir https://asesores.planespro.cl y verificar login por Cloudflare Access",
+      "Verificar que la UI premium cargue en producci?n",
       "Probar el CRM local con la clave manual",
-      "Confirmar que la agenda mínima no rompe cuando no existen citas"
+      "Confirmar que la agenda m?nima y el visor de adjuntos siguen operativos"
     ]
   },
   "important_code_references": {

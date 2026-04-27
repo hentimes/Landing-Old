@@ -8,11 +8,11 @@ const crmDir = path.join(rootDir, 'crm');
 const outputPath = path.join(__dirname, 'crm-worker.js');
 
 const files = {
-  '/index.html': fs.readFileSync(path.join(crmDir, 'index.html'), 'utf8'),
-  '/styles.css': fs.readFileSync(path.join(crmDir, 'styles.css'), 'utf8'),
-  '/config.js': fs.readFileSync(path.join(crmDir, 'config.js'), 'utf8'),
-  '/api.js': fs.readFileSync(path.join(crmDir, 'api.js'), 'utf8'),
-  '/app.js': fs.readFileSync(path.join(crmDir, 'app.js'), 'utf8'),
+  '/index.html': stripBom(fs.readFileSync(path.join(crmDir, 'index.html'), 'utf8')),
+  '/styles.css': stripBom(fs.readFileSync(path.join(crmDir, 'styles.css'), 'utf8')),
+  '/config.js': stripBom(fs.readFileSync(path.join(crmDir, 'config.js'), 'utf8')),
+  '/api.js': stripBom(fs.readFileSync(path.join(crmDir, 'api.js'), 'utf8')),
+  '/app.js': stripBom(fs.readFileSync(path.join(crmDir, 'app.js'), 'utf8')),
 };
 
 const mimeTypes = {
@@ -26,26 +26,28 @@ const mimeTypes = {
 const generated = `const STATIC_ASSETS = ${JSON.stringify(files, null, 2)};
 const MIME_TYPES = ${JSON.stringify(mimeTypes, null, 2)};
 
-export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-    const pathname = normalizePath(url.pathname);
+addEventListener('fetch', (event) => {
+  event.respondWith(handleRequest(event.request));
+});
 
-    if (pathname.startsWith('/api/admin/')) {
-      return proxyAdminRequest(request, env, pathname, url.search);
-    }
+async function handleRequest(request) {
+  const url = new URL(request.url);
+  const pathname = normalizePath(url.pathname);
 
-    if (pathname === '/' || pathname === '/index.html') {
-      return serveStatic('/index.html');
-    }
+  if (pathname.startsWith('/api/admin/')) {
+    return proxyAdminRequest(request, pathname, url.search);
+  }
 
-    if (STATIC_ASSETS[pathname]) {
-      return serveStatic(pathname);
-    }
+  if (pathname === '/' || pathname === '/index.html') {
+    return serveStatic('/index.html');
+  }
 
-    return new Response('Not found', { status: 404 });
-  },
-};
+  if (STATIC_ASSETS[pathname]) {
+    return serveStatic(pathname);
+  }
+
+  return new Response('Not found', { status: 404 });
+}
 
 function normalizePath(pathname) {
   if (!pathname || pathname === '/') return '/';
@@ -64,7 +66,7 @@ function serveStatic(pathname) {
   });
 }
 
-async function proxyAdminRequest(request, env, pathname, search) {
+async function proxyAdminRequest(request, pathname, search) {
   const accessEmail =
     request.headers.get('Cf-Access-Authenticated-User-Email') ||
     request.headers.get('cf-access-authenticated-user-email') ||
@@ -82,9 +84,12 @@ async function proxyAdminRequest(request, env, pathname, search) {
     });
   }
 
-  const upstreamUrl = \`\${env.FORM_ADMIN_BASE_URL || 'https://form.planespro.cl'}\${pathname}\${search || ''}\`;
+  const upstreamBase = typeof FORM_ADMIN_BASE_URL === 'string' && FORM_ADMIN_BASE_URL
+    ? FORM_ADMIN_BASE_URL
+    : 'https://form.planespro.cl';
+  const upstreamUrl = upstreamBase + pathname + (search || '');
   const headers = new Headers(request.headers);
-  headers.set('X-Admin-Key', env.ADMIN_PROXY_KEY || '');
+  headers.set('X-Admin-Key', typeof ADMIN_PROXY_KEY === 'string' ? ADMIN_PROXY_KEY : '');
   headers.delete('host');
 
   const init = {
@@ -108,3 +113,7 @@ async function proxyAdminRequest(request, env, pathname, search) {
 
 fs.writeFileSync(outputPath, generated, 'utf8');
 console.log(`Generated ${path.relative(rootDir, outputPath)}`);
+
+function stripBom(value) {
+  return value.replace(/^\uFEFF/, '');
+}

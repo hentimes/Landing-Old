@@ -32,6 +32,10 @@ const elements = {
   clearFilters: document.getElementById('clear-filters'),
   leadList: document.getElementById('lead-list'),
   leadCount: document.getElementById('lead-count'),
+  leadCountTotal: document.getElementById('lead-count-total'),
+  leadCountPending: document.getElementById('lead-count-pending'),
+  leadCountFiles: document.getElementById('lead-count-files'),
+  leadCountActive: document.getElementById('lead-count-active'),
   agendaCountTotal: document.getElementById('agenda-count-total'),
   agendaCountToday: document.getElementById('agenda-count-today'),
   agendaCountPending: document.getElementById('agenda-count-pending'),
@@ -105,6 +109,8 @@ async function bootstrap() {
     await loadLeads();
   } catch (error) {
     elements.sessionStatus.textContent = error.message;
+    renderLeadOverview([]);
+    renderAgenda([]);
     renderList([]);
     renderDetail(null);
   }
@@ -125,6 +131,7 @@ async function loadLeads() {
     const payload = await listLeads(filters);
     state.items = payload.items || [];
     elements.leadCount.textContent = `${payload.total || 0} resultados`;
+    renderLeadOverview(state.items);
     renderAgenda(state.items);
     renderList(state.items);
 
@@ -139,10 +146,23 @@ async function loadLeads() {
     }
   } catch (error) {
     elements.leadCount.textContent = error.message;
+    renderLeadOverview([]);
     renderAgenda([]);
     renderList([]);
     renderDetail(null);
   }
+}
+
+function renderLeadOverview(items) {
+  const total = items.length;
+  const pending = items.filter((item) => ['Nuevo', 'Por contactar'].includes(item.status)).length;
+  const withFiles = items.filter((item) => item.has_file).length;
+  const active = items.filter((item) => !['Archivado', 'Descartado'].includes(item.status)).length;
+
+  elements.leadCountTotal.textContent = String(total);
+  elements.leadCountPending.textContent = String(pending);
+  elements.leadCountFiles.textContent = String(withFiles);
+  elements.leadCountActive.textContent = String(active);
 }
 
 function renderAgenda(items) {
@@ -200,13 +220,16 @@ function renderList(items) {
       node.classList.add('is-active');
     }
 
+    node.querySelector('[data-field="avatar"]').textContent = getInitials(item.nombre);
     node.querySelector('[data-field="nombre"]').textContent = item.nombre || 'Sin nombre';
     node.querySelector('[data-field="status"]').textContent = item.status || 'Sin estado';
     node.querySelector('[data-field="sistema"]').textContent = item.sistema_actual || 'Sin sistema';
-    node.querySelector('[data-field="isapre"]').textContent = item.isapre_especifica || '—';
+    node.querySelector('[data-field="isapre"]').textContent = item.isapre_especifica || 'Sin isapre';
     node.querySelector('[data-field="created"]').textContent = formatDate(item.created_at);
     node.querySelector('[data-field="contacto"]').textContent =
       [item.email, item.telefono, item.comuna].filter(Boolean).join(' · ') || 'Sin contacto';
+    node.querySelector('[data-field="region"]').textContent = item.region || 'Región no informada';
+    node.querySelector('[data-field="adjunto"]').textContent = item.has_file ? 'Con adjunto' : 'Sin adjunto';
 
     node.addEventListener('click', () => loadLeadDetail(item.id));
     fragment.appendChild(node);
@@ -243,7 +266,7 @@ function renderDetail(payload, errorMessage = '') {
 
   const filePreview = lead.has_file
     ? `
-      <div class="crm-card">
+      <div class="crm-card crm-card--wide">
         <div class="crm-card__header">
           <h3>Adjunto</h3>
           <a href="${getFileUrl(lead.id)}" target="_blank" rel="noopener noreferrer">Abrir en otra pestaña</a>
@@ -274,22 +297,39 @@ function renderDetail(payload, errorMessage = '') {
       `).join('')
     : '<p class="crm-muted">Sin eventos registrados.</p>';
 
+  const heroMeta = [
+    lead.email,
+    lead.telefono,
+    lead.comuna && lead.region ? `${lead.comuna}, ${lead.region}` : lead.comuna || lead.region,
+  ].filter(Boolean);
+
   elements.leadDetail.innerHTML = `
-    <div class="crm-detail__header">
-      <div>
-        <p class="crm-eyebrow">Lead seleccionado</p>
-        <h2>${escapeHtml(lead.nombre || 'Sin nombre')}</h2>
+    <div class="crm-detail-hero">
+      <div class="crm-detail-hero__avatar">${escapeHtml(getInitials(lead.nombre))}</div>
+      <div class="crm-detail-hero__content">
+        <div class="crm-detail__header">
+          <div>
+            <p class="crm-eyebrow">Lead seleccionado</p>
+            <h2>${escapeHtml(lead.nombre || 'Sin nombre')}</h2>
+          </div>
+          <span class="crm-badge">${escapeHtml(lead.status || 'Sin estado')}</span>
+        </div>
+        <div class="crm-chip-row crm-chip-row--hero">
+          ${heroMeta.map((value) => `<span class="crm-chip">${escapeHtml(value)}</span>`).join('')}
+          <span class="crm-chip crm-chip--accent">${escapeHtml(lead.sistema_actual || 'Sin sistema')}</span>
+          ${lead.isapre_especifica ? `<span class="crm-chip">${escapeHtml(lead.isapre_especifica)}</span>` : ''}
+          ${lead.has_file ? '<span class="crm-chip crm-chip--success">Documento adjunto</span>' : ''}
+        </div>
       </div>
-      <span class="crm-badge">${escapeHtml(lead.status || 'Sin estado')}</span>
     </div>
 
-    <div class="crm-detail__grid">
+    <div class="crm-detail__grid crm-detail__grid--premium">
       ${renderInfoCard(lead)}
       ${renderCommentCard(lead)}
       ${renderAppointmentCard(lead)}
       ${renderActionsCard(lead)}
       ${filePreview}
-      <div class="crm-card">
+      <div class="crm-card crm-card--wide">
         <div class="crm-card__header">
           <h3>Notas internas</h3>
         </div>
@@ -299,7 +339,7 @@ function renderDetail(payload, errorMessage = '') {
         </form>
         <div class="crm-note-list">${notesHtml}</div>
       </div>
-      <div class="crm-card">
+      <div class="crm-card crm-card--wide">
         <div class="crm-card__header">
           <h3>Historial</h3>
         </div>
@@ -505,6 +545,18 @@ function formatDateTime(value) {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(value));
+}
+
+function getInitials(value) {
+  const normalized = String(value || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || '')
+    .join('');
+
+  return normalized || 'LP';
 }
 
 function escapeHtml(value) {
