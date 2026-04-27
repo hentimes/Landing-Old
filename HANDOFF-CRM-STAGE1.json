@@ -16,7 +16,7 @@
       "Una IA sucesora debe documentar todo cambio que haga en este handoff, pero no debe borrar ni reescribir el contenido ya establecido en este documento; debe agregar o actualizar solamente los bloques de estado operativo y changelog futuro si el usuario lo pide.",
       "Si una IA sucesora detecta una contradiccion entre el codigo y este handoff, debe priorizar el estado real del codigo desplegado, corregir el handoff y dejar evidencia clara del ajuste.",
       "No introducir auth propia, chat, marketplace, multicliente o permisos complejos antes de completar la etapa 1 y la capa operativa definida en el roadmap.",
-      "Mantener separacion estricta entre el formulario publico y el CRM privado.",
+      "Mantener separacion estricta entre el formulario p?blico y el CRM privado.",
       "Mantener el CRM fuera de indexacion publica. Debe seguir siendo noindex/nofollow y estar protegido por Cloudflare Access en produccion."
     ],
     "documentation_protocol": {
@@ -37,9 +37,9 @@
     "current_priority_order": [
       "1. CRM privado de asesor estable y usable",
       "2. Dashboard premium del asesor",
-      "3. Capa operativa: RUT, seguimiento, prioridad, acciones comerciales",
+      "3. Capa operativa: RUT, seguimiento, prioridad, acci?nes comerciales",
       "4. Agenda/citas mas rica",
-      "5. Atribucion por asesor",
+      "5. Atribuci?n por asesor",
       "6. Roles, colaboracion y derivacion",
       "7. Comunidad y luego marketplace"
     ],
@@ -72,7 +72,7 @@
     "public_form_side": {
       "public_url": "https://form.planespro.cl",
       "worker": "ppforms",
-      "purpose": "Captacion publica del formulario y API admin real",
+      "purpose": "Captaci?n publica del formulario y API admin real",
       "database": {
         "name": "ppforms_db",
         "id": "3bca5190-8e8f-4d53-bbf4-c7b15ade1cf6"
@@ -94,7 +94,7 @@
     },
     "separation_of_concerns": {
       "ppforms": [
-        "Recibe leads publicos",
+        "Recibe leads p?blicos",
         "Guarda metadata en D1",
         "Guarda adjuntos en R2",
         "Expone endpoints admin reales"
@@ -145,13 +145,13 @@
         "sheet_name",
         "nombre",
         "email",
-        "telefono",
+        "tel?fono",
         "rut",
         "rango_edad",
         "comuna",
         "region",
         "sistema_actual",
-        "isapre_especifica",
+        "isapre_espec?fica",
         "num_cargas",
         "edad_cargas",
         "rango_renta",
@@ -224,12 +224,12 @@
           "status",
           "nombre",
           "email",
-          "telefono",
+          "tel?fono",
           "rut",
           "comuna",
           "region",
           "sistema_actual",
-          "isapre_especifica",
+          "isapre_espec?fica",
           "comentarios",
           "cita_estado",
           "cita_fecha_hora",
@@ -312,10 +312,10 @@
       ]
     },
     "features_currently_present": [
-      "Sidebar con Dashboard, Leads y Agenda",
-      "Topbar compacta con resumen operativo a la derecha",
+      "Sidebar del asesor con Dashboard, Leads, Agenda, Settings y Profile",
+      "Topbar con iconos, perfil en la esquina superior derecha y resumen operativo alineado a la derecha",
       "Subida local de foto y nombre del asesor",
-      "Menu hover/click de profile y settings",
+      "Menu hover/click de profile y settings en el encabezado",
       "Metricas del asesor: leads, propuestas, cerrados, por contactar",
       "Porcentaje de incremento/decremento por rango temporal",
       "Grafico lineal de ingresos/cierres",
@@ -323,9 +323,10 @@
       "Pipeline por estado",
       "Agenda inmediata",
       "Bandeja de leads compacta",
-      "Avatar de silueta con colores dinamicos",
+      "Avatar de silueta con colores dinamicos en la bandeja",
+      "Vistas reales de Profile y Settings",
       "Clip de adjunto al extremo derecho de la fila",
-      "Modal de adjunto con iframe",
+      "Modal de adjunto con iframe disparado solo desde el clip de la fila",
       "Ficha de lead mas compacta",
       "Campo RUT editable con validacion y formateo",
       "Comentario del lead contenido en caja mas compacta",
@@ -335,6 +336,7 @@
       "Hero grande del lead seleccionado",
       "Badge textual Adjunto/Sin adjunto en la fila compacta",
       "Vista inline grande del adjunto dentro del detalle",
+      "Estado vacio descriptivo del lead seleccionado",
       "Bloque visible de Actualizado en la ficha del lead",
       "Iniciales del lead como avatar principal en la bandeja"
     ],
@@ -358,7 +360,7 @@
       "Worker Cloudflare en cloudflare/form-worker.js",
       "Toda mutacion admin debe registrar evento en lead_events",
       "Toda mutacion relevante debe actualizar updated_at",
-      "No exponer R2 publico; servir adjuntos solo via worker"
+      "No exponer R2 p?blico; servir adjuntos solo via worker"
     ],
     "deploy": [
       "Regenerar cloudflare/crm-worker.js con node cloudflare/build-crm-worker.mjs cada vez que cambie crm/*",
@@ -386,10 +388,10 @@
     ]
   },
   "deployment_and_validation_status": {
-    "last_substantive_ui_scope": "Compactacion y estilizacion del panel del asesor, reemplazo a iconos Font Awesome, modal de adjunto, avatar de silueta, campo RUT validado y reubicacion del resumen operativo en topbar",
+    "last_substantive_ui_scope": "Refactor de la UI del asesor hacia layout tipo template: sidebar abierto/cerrado, topbar con profile arriba a la derecha, vistas Profile/Settings reales, bandeja de leads m?s compacta, clip como ?nico acceso al adjunto, campo RUT persistente y tags compactos",
     "deployed_for_this_scope": [
       "Migracion de columna rut aplicada en ppforms_db",
-      "ppforms redeployado con endpoint POST /api/admin/leads/:id/rut, busqueda por rut y CORS local actualizado",
+      "ppforms redeployado con endpoint POST /api/admin/leads/:id/rut, b?squeda por rut y CORS local actualizado",
       "cloudflare/crm-worker.js regenerado desde crm/*",
       "ppcrm redeployado con la UI compacta del asesor"
     ],
@@ -402,13 +404,15 @@
     ],
     "manual_checks_expected_after_deploy": [
       "Entrar a asesores.planespro.cl via Cloudflare Access",
-      "Verificar que el dashboard carga metricas y graficos",
+      "Verificar que el dashboard carga m?tricas y graficos",
       "Abrir un lead y confirmar que el hero grande ya no existe",
-      "Abrir adjunto desde el clip de la fila y desde el detalle",
+      "Abrir adjunto solo desde el clip de la fila",
       "Guardar un RUT valido y verificar persistencia visual en la ficha",
       "Intentar guardar un RUT invalido y verificar rechazo visual",
       "Confirmar que Actualizado no se muestra en la ficha",
-      "Confirmar que profile hover muestra Profile y Settings"
+      "Confirmar que profile hover muestra Profile y Settings",
+      "Confirmar que las vistas Profile y Settings existen y son navegables",
+      "Confirmar que el estado vac?o del detalle no muestra texto operativo"
     ],
     "known_gap_after_deploy": [
       "La validacion visual completa de asesores.planespro.cl sigue siendo manual porque el acceso esta detras de Cloudflare Access"
@@ -417,7 +421,7 @@
   "known_open_work_after_this_scope": {
     "next_priority": [
       "Pulir visualmente el dashboard para acercarlo aun mas al template de referencia sin agregar modulos irrelevantes",
-      "Agregar capa operativa: prioridad, ultimo contacto, proxima accion, motivo de archivado",
+      "Agregar capa operativa: prioridad, ultimo contacto, proxima acci?n, motivo de archivado",
       "Profundizar agenda/citas antes de Google Calendar real"
     ],
     "not_ready_yet": [

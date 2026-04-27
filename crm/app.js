@@ -19,28 +19,45 @@ import {
   updateLeadStatus,
 } from './api.js';
 
+const SIDEBAR_STORAGE = 'crm-sidebar-collapsed';
+
+const VIEW_META = {
+  dashboard: { title: 'Dashboard', crumb: 'Dashboard', copy: 'Métricas, pipeline comercial y agenda del asesor.' },
+  leads: { title: 'Leads', crumb: 'Leads', copy: 'Bandeja compacta, seguimiento y acciones comerciales.' },
+  agenda: { title: 'Agenda', crumb: 'Agenda', copy: 'Próximas citas, pendientes y agenda inmediata.' },
+  profile: { title: 'Profile', crumb: 'Profile', copy: 'Datos visibles del asesor dentro del CRM.' },
+  settings: { title: 'Settings', crumb: 'Settings', copy: 'Configuración actual del acceso y del panel privado.' },
+};
+
 const state = {
   items: [],
   filteredItems: [],
   selectedLeadId: '',
-  selectedLead: null,
   currentView: 'dashboard',
   session: null,
   selectedRange: '7d',
   profile: loadProfile(),
   openPopover: '',
-  activeFileLeadId: '',
   profileMenuOpen: false,
+  sidebarCollapsed: loadSidebarState(),
 };
 
 const elements = {
+  sidebar: document.getElementById('crm-sidebar'),
+  sidebarToggle: document.getElementById('sidebar-toggle'),
   sessionStatus: document.getElementById('session-status'),
   sidebarUserName: document.getElementById('sidebar-user-name'),
-  sidebarAvatar: document.getElementById('sidebar-avatar'),
   profileName: document.getElementById('profile-name'),
   profileAvatar: document.getElementById('profile-avatar'),
   profilePhoto: document.getElementById('profile-photo'),
+  profilePagePhoto: document.getElementById('profile-page-photo'),
+  profilePageAvatar: document.getElementById('profile-page-avatar'),
+  profilePageName: document.getElementById('profile-page-name'),
+  profilePageNameValue: document.getElementById('profile-page-name-value'),
+  profilePageAccess: document.getElementById('profile-page-access'),
+  profilePageEmail: document.getElementById('profile-page-email'),
   viewTitle: document.getElementById('view-title'),
+  viewCopy: document.querySelector('.crm-page-toolbar__copy'),
   topbarActiveView: document.getElementById('topbar-active-view'),
   navItems: Array.from(document.querySelectorAll('.crm-nav-item')),
   viewPanels: Array.from(document.querySelectorAll('[data-view-panel]')),
@@ -102,9 +119,9 @@ const elements = {
   profilePreviewAvatar: document.getElementById('profile-preview-avatar'),
   profileReset: document.getElementById('profile-reset'),
   profileSave: document.getElementById('profile-save'),
+  openProfileEditor: document.getElementById('open-profile-editor'),
   fileModal: document.getElementById('file-modal'),
   fileModalTitle: document.getElementById('file-modal-title'),
-  fileModalOpen: document.getElementById('file-modal-open'),
   fileModalClose: document.getElementById('file-modal-close'),
   fileModalFrame: document.getElementById('file-modal-frame'),
 };
@@ -114,8 +131,11 @@ init();
 function init() {
   hydrateStatusOptions();
   configureAccessMode();
+  applySidebarState();
   bindEvents();
   applyProfileToUI();
+  hydrateProfileSections();
+  setView(state.currentView);
   bootstrap();
 }
 
@@ -127,9 +147,13 @@ function bindEvents() {
     });
   }
 
-  elements.navItems.forEach((button) => {
-    button.addEventListener('click', () => setView(button.dataset.view));
+  elements.sidebarToggle?.addEventListener('click', () => {
+    state.sidebarCollapsed = !state.sidebarCollapsed;
+    persistSidebarState();
+    applySidebarState();
   });
+
+  elements.navItems.forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)));
 
   elements.rangeChips.forEach((button) => {
     button.addEventListener('click', () => {
@@ -139,7 +163,7 @@ function bindEvents() {
     });
   });
 
-  elements.applyFilters?.addEventListener('click', () => renderLeadsView());
+  elements.applyFilters?.addEventListener('click', renderLeadsView);
   elements.clearFilters?.addEventListener('click', () => {
     elements.filterQ.value = '';
     elements.filterStatus.value = '';
@@ -160,7 +184,7 @@ function bindEvents() {
   });
 
   [elements.filterStatus, elements.filterSistema, elements.filterFrom, elements.filterTo].forEach((input) => {
-    input?.addEventListener('change', () => renderLeadsView());
+    input?.addEventListener('change', renderLeadsView);
   });
 
   elements.notificationButton?.addEventListener('click', () => togglePopover('notification'));
@@ -171,38 +195,36 @@ function bindEvents() {
     event.preventDefault();
     toggleProfileMenu();
   });
-  elements.profileMenuProfile?.addEventListener('click', openProfileModal);
-  elements.profileMenuSettings?.addEventListener('click', openProfileModal);
+  elements.profileMenuProfile?.addEventListener('click', () => {
+    setProfileMenu(false);
+    setView('profile');
+  });
+  elements.profileMenuSettings?.addEventListener('click', () => {
+    setProfileMenu(false);
+    setView('settings');
+  });
 
   elements.profileWrap?.addEventListener('mouseenter', () => setProfileMenu(true));
   elements.profileWrap?.addEventListener('mouseleave', () => setProfileMenu(false));
 
   document.addEventListener('click', (event) => {
-    if (!event.target.closest('.crm-icon-button') && !event.target.closest('.crm-popover')) {
-      hidePopovers();
-    }
-    if (!event.target.closest('.crm-profile-wrap')) {
-      setProfileMenu(false);
-    }
+    if (!event.target.closest('.crm-icon-button') && !event.target.closest('.crm-popover')) hidePopovers();
+    if (!event.target.closest('.crm-profile-wrap')) setProfileMenu(false);
   });
 
   elements.profilePhotoInput?.addEventListener('change', handleProfilePhotoChange);
   elements.profileReset?.addEventListener('click', resetProfile);
   elements.profileSave?.addEventListener('click', saveProfileChanges);
+  elements.openProfileEditor?.addEventListener('click', openProfileModal);
 
   elements.fileModalClose?.addEventListener('click', closeFileModal);
   elements.fileModal?.addEventListener('click', (event) => {
-    const card = event.target.closest('.crm-file-modal__card');
-    if (!card) {
-      closeFileModal();
-    }
+    if (!event.target.closest('.crm-file-modal__card')) closeFileModal();
   });
 
   if (isLocalDev) {
     window.addEventListener('storage', (event) => {
-      if (event.key === ADMIN_KEY_STORAGE) {
-        elements.adminKey.value = readAdminKey();
-      }
+      if (event.key === ADMIN_KEY_STORAGE) elements.adminKey.value = readAdminKey();
     });
   }
 }
@@ -211,30 +233,29 @@ function configureAccessMode() {
   if (isLocalDev) {
     elements.adminKey.value = readAdminKey();
     elements.adminKeyBox.hidden = false;
-    return;
+  } else {
+    elements.adminKeyBox.hidden = true;
   }
-  elements.adminKeyBox.hidden = true;
 }
 
 function setView(view) {
   state.currentView = view;
   elements.navItems.forEach((item) => item.classList.toggle('is-active', item.dataset.view === view));
   elements.viewPanels.forEach((panel) => panel.classList.toggle('is-active', panel.dataset.viewPanel === view));
-  elements.viewTitle.textContent = ({
-    dashboard: 'Dashboard del asesor',
-    leads: 'Leads y seguimiento',
-    agenda: 'Agenda comercial',
-  })[view] || 'CRM';
-  elements.topbarActiveView.textContent = capitalize(view);
+  const meta = VIEW_META[view] || { title: 'CRM', crumb: 'CRM', copy: '' };
+  elements.viewTitle.textContent = meta.title;
+  elements.topbarActiveView.textContent = meta.crumb;
+  elements.viewCopy.textContent = meta.copy;
 }
 
 async function bootstrap() {
   try {
     state.session = await getSession();
     const displayName = state.profile.name || state.session.actorEmail || 'Asesor';
-    elements.sessionStatus.textContent = `${state.session.actorEmail || 'Acceso OK'} · ${state.session.authMode}`;
+    elements.sessionStatus.textContent = state.session.actorEmail || 'Acceso OK';
     elements.sidebarUserName.textContent = displayName;
-    paintAvatar(elements.sidebarAvatar, displayName);
+    applyProfileToUI();
+    hydrateProfileSections();
     await loadLeads();
   } catch (error) {
     elements.sessionStatus.textContent = error.message;
@@ -280,8 +301,8 @@ function renderLeadsView() {
 
 function refreshDashboard() {
   const rangeItems = filterItemsByRange(state.items, state.selectedRange);
-  const previousRangeItems = filterItemsByPreviousRange(state.items, state.selectedRange);
-  renderDashboard(rangeItems, previousRangeItems);
+  const previousItems = filterItemsByPreviousRange(state.items, state.selectedRange);
+  renderDashboard(rangeItems, previousItems);
 }
 
 function renderDashboard(items = [], previousItems = []) {
@@ -307,115 +328,21 @@ function renderDashboard(items = [], previousItems = []) {
     { values: series.closed, color: '#12284a', fill: 'rgba(18,40,74,0.08)' },
   ]);
 
-  const buckets = ISAPRE_BUCKETS.map((label) => ({
+  renderDonut(ISAPRE_BUCKETS.map((label) => ({
     label,
     count: items.filter((item) => resolveSystemBucket(item) === label).length,
-  }));
-  renderDonut(buckets);
+  })));
 
   const statuses = LEAD_STATUSES
     .map((label) => ({ label, count: items.filter((item) => item.status === label).length }))
     .filter((entry) => entry.count > 0)
     .sort((a, b) => b.count - a.count);
+
   elements.statusBreakdown.innerHTML = statuses.length
     ? statuses.map((entry) => renderStatusRow(entry.label, entry.count, totalLeads || 1)).join('')
     : '<p class="crm-muted">Sin movimientos para el periodo seleccionado.</p>';
 
   hydratePopovers(items);
-}
-
-function renderDonut(buckets) {
-  const total = buckets.reduce((sum, bucket) => sum + bucket.count, 0);
-  if (!total) {
-    elements.isapreDonut.innerHTML = '<span>0</span><small>Sin leads</small>';
-    elements.isapreDonut.style.background = 'linear-gradient(180deg, #eaf1f8 0%, #dfe9f6 100%)';
-    elements.isapreLegend.innerHTML = '<p class="crm-muted">No hay distribución disponible todavía.</p>';
-    return;
-  }
-
-  const palette = [
-    '#1668dc',
-    '#0f9d58',
-    '#f59e0b',
-    '#ef4444',
-    '#6d28d9',
-    '#14b8a6',
-    '#2563eb',
-    '#db2777',
-    '#64748b',
-  ];
-
-  let current = 0;
-  const segments = [];
-  const legend = [];
-  buckets.forEach((bucket, index) => {
-    const percent = bucket.count / total;
-    const start = current * 360;
-    const end = (current + percent) * 360;
-    const color = palette[index % palette.length];
-    segments.push(`${color} ${start}deg ${end}deg`);
-    legend.push(`
-      <div class="crm-legend-row">
-        <span class="crm-legend-row__dot" style="background:${color}"></span>
-        <strong>${escapeHtml(bucket.label)}</strong>
-        <span>${bucket.count}</span>
-      </div>
-    `);
-    current += percent;
-  });
-
-  elements.isapreDonut.style.background = `conic-gradient(${segments.join(', ')})`;
-  elements.isapreDonut.innerHTML = `<span>${total}</span><small>Leads</small>`;
-  elements.isapreLegend.innerHTML = legend.join('');
-}
-
-function renderStatusRow(label, count, total) {
-  const percent = Math.round((count / Math.max(total, 1)) * 100);
-  return `
-    <div class="crm-status-row">
-      <div class="crm-status-row__head">
-        <strong>${escapeHtml(label)}</strong>
-        <span>${count} · ${percent}%</span>
-      </div>
-      <div class="crm-status-row__track">
-        <div class="crm-status-row__fill" style="width:${percent}%"></div>
-      </div>
-    </div>
-  `;
-}
-
-function hydratePopovers(items) {
-  const notifications = items.filter((item) => ['Nuevo', 'Por contactar'].includes(item.status)).slice(0, 5);
-  const updates = items.slice().sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)).slice(0, 5);
-  const messages = buildAppointments(items).filter((item) => !item.status || ['Pendiente', 'Por coordinar'].includes(item.status)).slice(0, 5);
-
-  elements.notificationCount.textContent = String(notifications.length);
-  elements.updatesCount.textContent = String(updates.length);
-  elements.messagesCount.textContent = String(messages.length);
-
-  elements.notificationPopover.innerHTML = buildPopoverList('Leads por contactar', notifications.map((item) => ({
-    title: item.nombre || 'Sin nombre',
-    meta: item.telefono || item.email || 'Sin contacto',
-    leadId: item.id,
-  })));
-  elements.updatesPopover.innerHTML = buildPopoverList('Updates recientes', updates.map((item) => ({
-    title: item.nombre || 'Sin nombre',
-    meta: `${formatDateTime(item.updated_at || item.created_at)} · ${item.status || 'Sin estado'}`,
-    leadId: item.id,
-  })));
-  elements.messagesPopover.innerHTML = buildPopoverList('Citas pendientes', messages.map((item) => ({
-    title: item.nombre || 'Sin nombre',
-    meta: `${formatDateTime(item.cita_fecha_hora)} · ${item.cita_estado || 'Pendiente'}`,
-    leadId: item.id,
-  })));
-
-  document.querySelectorAll('.crm-popover [data-lead-id]').forEach((button) => {
-    button.addEventListener('click', async () => {
-      hidePopovers();
-      setView('leads');
-      await loadLeadDetail(button.dataset.leadId);
-    });
-  });
 }
 
 function renderAgenda(items = []) {
@@ -425,47 +352,19 @@ function renderAgenda(items = []) {
   const nextWeek = new Date(now);
   nextWeek.setDate(nextWeek.getDate() + 7);
 
-  const total = appointments.length;
-  const todayCount = appointments.filter((item) => item.rawDate.slice(0, 10) === todayIso).length;
-  const pendingCount = appointments.filter((item) => !item.status || ['Pendiente', 'Por coordinar'].includes(item.status)).length;
-  const upcomingCount = appointments.filter((item) => item.date >= now && item.date <= nextWeek).length;
-
-  elements.agendaCountTotal.textContent = String(total);
-  elements.agendaCountToday.textContent = String(todayCount);
-  elements.agendaCountPending.textContent = String(pendingCount);
-  elements.agendaCountUpcoming.textContent = String(upcomingCount);
+  elements.agendaCountTotal.textContent = String(appointments.length);
+  elements.agendaCountToday.textContent = String(appointments.filter((item) => item.rawDate.slice(0, 10) === todayIso).length);
+  elements.agendaCountPending.textContent = String(appointments.filter((item) => !item.status || ['Pendiente', 'Por coordinar'].includes(item.status)).length);
+  elements.agendaCountUpcoming.textContent = String(appointments.filter((item) => item.date >= now && item.date <= nextWeek).length);
 
   const markup = appointments.length
     ? appointments.slice(0, 8).map(renderAppointmentItem).join('')
     : '<p class="crm-muted">Cuando empieces a agendar reuniones, aparecerán aquí.</p>';
 
-  elements.agendaListCaption.textContent = appointments.length
-    ? `${appointments.length} citas cargadas`
-    : 'Sin citas por ahora';
+  elements.agendaListCaption.textContent = appointments.length ? `${appointments.length} citas cargadas` : 'Sin citas por ahora';
   elements.agendaList.innerHTML = markup;
   elements.agendaSectionList.innerHTML = markup;
   bindAgendaClicks();
-}
-
-function renderAppointmentItem(appointment) {
-  return `
-    <button type="button" class="crm-agenda-item" data-lead-id="${appointment.id}">
-      <div>
-        <strong>${escapeHtml(appointment.nombre || 'Sin nombre')}</strong>
-        <span>${escapeHtml(formatDateTime(appointment.cita_fecha_hora))}</span>
-      </div>
-      <span class="crm-badge">${escapeHtml(appointment.status || 'Pendiente')}</span>
-    </button>
-  `;
-}
-
-function bindAgendaClicks() {
-  document.querySelectorAll('.crm-agenda-item[data-lead-id]').forEach((button) => {
-    button.addEventListener('click', async () => {
-      setView('leads');
-      await loadLeadDetail(button.dataset.leadId);
-    });
-  });
 }
 
 function renderList(items) {
@@ -479,28 +378,27 @@ function renderList(items) {
   items.forEach((item) => {
     const node = elements.leadRowTemplate.content.firstElementChild.cloneNode(true);
     node.dataset.leadId = item.id;
-    if (item.id === state.selectedLeadId) {
-      node.classList.add('is-active');
-    }
+    if (item.id === state.selectedLeadId) node.classList.add('is-active');
 
     const avatar = node.querySelector('[data-field="avatar"]');
     paintAvatar(avatar, item.nombre || item.email || item.telefono || item.id);
     node.querySelector('[data-field="nombre"]').textContent = item.nombre || 'Sin nombre';
-    node.querySelector('[data-field="contacto"]').textContent = [item.telefono, item.email].filter(Boolean).join(' · ') || 'Sin contacto';
+    node.querySelector('[data-field="contacto"]').textContent = [item.rut ? formatRut(item.rut) : '', item.telefono, item.email].filter(Boolean).join(' · ') || 'Sin contacto';
     node.querySelector('[data-field="sistema"]').textContent = item.sistema_actual || 'Sin sistema';
     node.querySelector('[data-field="isapre"]').textContent = item.isapre_especifica || 'Sin isapre';
-    node.querySelector('[data-field="status"]').textContent = item.status || 'Sin estado';
+    const statusNode = node.querySelector('[data-field="status"]');
+    statusNode.textContent = item.status || 'Sin estado';
+    statusNode.className = `crm-badge ${statusBadgeClass(item.status)}`;
     node.querySelector('[data-field="created"]').textContent = formatDate(item.created_at);
     node.querySelector('[data-field="region"]').textContent = item.region || 'Sin región';
 
     const attachButton = node.querySelector('[data-field="attach"]');
-    attachButton.hidden = !item.has_file;
-    attachButton.disabled = !item.has_file;
+    const hasAttachment = Boolean(item.has_file && item.pdf_object_key);
+    attachButton.hidden = !hasAttachment;
+    attachButton.disabled = !hasAttachment;
     attachButton.addEventListener('click', (event) => {
       event.stopPropagation();
-      if (item.has_file) {
-        openFileModal(item.id, item.nombre || 'Lead', item.pdf_original_name || 'Adjunto');
-      }
+      if (hasAttachment) openFileModal(item.id, item.nombre || 'Lead', item.pdf_original_name || 'Adjunto');
     });
 
     node.addEventListener('click', () => loadLeadDetail(item.id));
@@ -510,6 +408,7 @@ function renderList(items) {
         loadLeadDetail(item.id);
       }
     });
+
     fragment.appendChild(node);
   });
 
@@ -520,7 +419,6 @@ async function loadLeadDetail(leadId) {
   try {
     const payload = await getLeadDetail(leadId);
     state.selectedLeadId = leadId;
-    state.selectedLead = payload.lead;
     renderList(state.filteredItems);
     renderDetail(payload);
   } catch (error) {
@@ -532,9 +430,7 @@ function renderDetail(payload, errorMessage = '') {
   if (!payload?.lead) {
     elements.leadDetail.hidden = true;
     elements.leadDetailEmpty.hidden = false;
-    elements.leadDetailEmpty.innerHTML = errorMessage
-      ? `<h3>Error</h3><p>${escapeHtml(errorMessage)}</p>`
-      : '<h3>Selecciona un lead</h3><p>Aquí verás datos, comentarios, RUT, notas internas y acciones del caso.</p>';
+    elements.leadDetailEmpty.innerHTML = errorMessage ? `<div class="crm-empty__message"><h3>Error</h3><p>${escapeHtml(errorMessage)}</p></div>` : '';
     return;
   }
 
@@ -571,7 +467,6 @@ function renderDetail(payload, errorMessage = '') {
       ${renderRutCard(lead)}
       ${renderActionsCard(lead)}
       ${renderAppointmentCard(lead)}
-      ${renderAttachmentCard(lead)}
       <div class="crm-card crm-card--detail-wide">
         <div class="crm-card__header">
           <h3>Notas internas</h3>
@@ -602,18 +497,16 @@ function renderDetailHeader(lead) {
         <div>
           <h2>${escapeHtml(lead.nombre || 'Sin nombre')}</h2>
           <div class="crm-chip-row crm-chip-row--compact">
-            ${lead.email ? `<span class="crm-chip">${escapeHtml(lead.email)}</span>` : ''}
+            ${lead.rut ? `<span class="crm-chip crm-chip--accent">${escapeHtml(formatRut(lead.rut))}</span>` : ''}
             ${lead.telefono ? `<span class="crm-chip">${escapeHtml(lead.telefono)}</span>` : ''}
-            ${lead.comuna ? `<span class="crm-chip">${escapeHtml(lead.comuna)}</span>` : ''}
-            ${lead.region ? `<span class="crm-chip">${escapeHtml(lead.region)}</span>` : ''}
-            ${lead.sistema_actual ? `<span class="crm-chip crm-chip--accent">${escapeHtml(lead.sistema_actual)}</span>` : ''}
+            ${lead.email ? `<span class="crm-chip">${escapeHtml(lead.email)}</span>` : ''}
+            ${lead.sistema_actual ? `<span class="crm-chip crm-chip--outline">${escapeHtml(lead.sistema_actual)}</span>` : ''}
             ${lead.isapre_especifica ? `<span class="crm-chip">${escapeHtml(lead.isapre_especifica)}</span>` : ''}
           </div>
         </div>
       </div>
       <div class="crm-detail-summary__side">
-        <span class="crm-badge">${escapeHtml(lead.status || 'Sin estado')}</span>
-        ${lead.has_file ? `<button type="button" class="button button--ghost button--compact" id="open-detail-file"><i class="fas fa-paperclip" aria-hidden="true"></i> Ver adjunto</button>` : ''}
+        <span class="crm-badge ${statusBadgeClass(lead.status)}">${escapeHtml(lead.status || 'Sin estado')}</span>
       </div>
     </div>
   `;
@@ -621,13 +514,6 @@ function renderDetailHeader(lead) {
 
 function bindDetailActions(lead) {
   paintAvatar(document.getElementById('detail-avatar'), lead.nombre || lead.email || lead.telefono || lead.id);
-
-  document.getElementById('open-detail-file')?.addEventListener('click', () => {
-    openFileModal(lead.id, lead.nombre || 'Lead', lead.pdf_original_name || 'Adjunto');
-  });
-  document.getElementById('open-detail-file-secondary')?.addEventListener('click', () => {
-    openFileModal(lead.id, lead.nombre || 'Lead', lead.pdf_original_name || 'Adjunto');
-  });
 
   const statusSelect = document.getElementById('lead-status');
   const saveStatusButton = document.getElementById('save-status');
@@ -643,10 +529,10 @@ function bindDetailActions(lead) {
     rutFeedback.textContent = '';
     rutInput.classList.remove('is-invalid');
   });
+
   rutInput?.addEventListener('blur', () => {
     rutInput.value = formatRut(rutInput.value);
-    const trimmed = rutInput.value.trim();
-    if (trimmed && !isValidRut(trimmed)) {
+    if (rutInput.value.trim() && !isValidRut(rutInput.value)) {
       rutInput.classList.add('is-invalid');
       rutFeedback.textContent = 'RUT inválido.';
     }
@@ -719,26 +605,24 @@ function bindDetailActions(lead) {
 
 function renderInfoCard(lead) {
   const rows = [
-    ['Correo', lead.email],
-    ['Teléfono', lead.telefono],
-    ['Edad', lead.rango_edad],
-    ['Comuna', lead.comuna],
-    ['Región', lead.region],
-    ['Sistema', lead.sistema_actual],
-    ['Isapre', lead.isapre_especifica],
-    ['Cargas', lead.num_cargas],
-    ['Edad cargas', lead.edad_cargas],
-    ['Renta', lead.rango_renta],
+    ['Correo', lead.email || 'Sin correo'],
+    ['Teléfono', lead.telefono || 'Sin teléfono'],
+    ['RUT', lead.rut ? formatRut(lead.rut) : 'Sin RUT'],
+    ['Edad', lead.rango_edad || 'Sin dato'],
+    ['Comuna', lead.comuna || 'Sin dato'],
+    ['Región', lead.region || 'Sin dato'],
+    ['Sistema', lead.sistema_actual || 'Sin dato'],
+    ['Isapre', lead.isapre_especifica || 'Sin dato'],
+    ['Cargas', lead.num_cargas || 'Sin dato'],
+    ['Edad cargas', lead.edad_cargas || 'Sin dato'],
+    ['Renta', lead.rango_renta || 'Sin dato'],
     ['Creado', formatDateTime(lead.created_at)],
-  ]
-    .filter(([, value]) => value)
-    .map(([label, value]) => `
+  ].map(([label, value]) => `
       <div class="crm-kv">
         <span>${escapeHtml(label)}</span>
         <strong>${escapeHtml(value)}</strong>
       </div>
-    `)
-    .join('');
+    `).join('');
 
   return `
     <div class="crm-card">
@@ -752,9 +636,9 @@ function renderInfoCard(lead) {
 
 function renderCommentCard(lead) {
   return `
-    <div class="crm-card">
+    <div class="crm-card crm-card--comment">
       <div class="crm-card__header">
-        <h3>Comentario del lead</h3>
+        <h3>Comentario</h3>
       </div>
       <div class="crm-comment-box">
         <p class="crm-long-text">${escapeHtml(lead.comentarios || 'Sin comentario entregado.')}</p>
@@ -776,8 +660,8 @@ function renderRutCard(lead) {
           <input id="lead-rut" type="text" inputmode="text" autocomplete="off" placeholder="12.345.678-5" value="${escapeHtml(rut)}" />
         </label>
         <div class="crm-actions__buttons crm-actions__buttons--stack">
-          <button type="button" id="save-rut" class="button button--secondary">Guardar RUT</button>
-          <small id="rut-feedback" class="crm-inline-feedback">${rut ? 'RUT cargado.' : 'Sin RUT ingresado.'}</small>
+          <button type="button" id="save-rut" class="button button--secondary button--compact">Guardar RUT</button>
+          <small id="rut-feedback" class="crm-inline-feedback">${rut ? `RUT actual: ${escapeHtml(rut)}` : 'Sin RUT ingresado.'}</small>
         </div>
       </div>
     </div>
@@ -785,10 +669,7 @@ function renderRutCard(lead) {
 }
 
 function renderActionsCard(lead) {
-  const statusOptions = LEAD_STATUSES.map((status) => `
-    <option value="${escapeHtml(status)}" ${lead.status === status ? 'selected' : ''}>${escapeHtml(status)}</option>
-  `).join('');
-
+  const options = LEAD_STATUSES.map((status) => `<option value="${escapeHtml(status)}" ${lead.status === status ? 'selected' : ''}>${escapeHtml(status)}</option>`).join('');
   return `
     <div class="crm-card">
       <div class="crm-card__header">
@@ -797,7 +678,7 @@ function renderActionsCard(lead) {
       <div class="crm-actions">
         <label>
           <span>Estado</span>
-          <select id="lead-status">${statusOptions}</select>
+          <select id="lead-status">${options}</select>
         </label>
         <div class="crm-actions__buttons">
           <button type="button" id="save-status" class="button button--primary">Guardar estado</button>
@@ -820,7 +701,7 @@ function renderAppointmentCard(lead) {
       <div class="crm-card__header">
         <h3>Agenda / cita</h3>
       </div>
-      <div class="crm-kv-grid">
+      <div class="crm-kv-grid crm-kv-grid--single">
         <div class="crm-kv">
           <span>Estado cita</span>
           <strong>${escapeHtml(appointmentStatus)}</strong>
@@ -831,21 +712,6 @@ function renderAppointmentCard(lead) {
         </div>
       </div>
       <div class="crm-inline-link">${appointmentLink}</div>
-    </div>
-  `;
-}
-
-function renderAttachmentCard(lead) {
-  return `
-    <div class="crm-card">
-      <div class="crm-card__header">
-        <h3>Adjunto</h3>
-      </div>
-      ${
-        lead.has_file
-          ? `<button type="button" class="button button--ghost button--compact" id="open-detail-file-secondary"><i class="fas fa-paperclip" aria-hidden="true"></i> Abrir archivo adjunto</button>`
-          : '<p class="crm-muted">Este lead no tiene adjunto.</p>'
-      }
     </div>
   `;
 }
@@ -873,15 +739,7 @@ function applyLeadFilters(items) {
     if (isapre && !normalizeText(item.isapre_especifica || '').includes(isapre)) return false;
 
     if (query) {
-      const haystack = normalizeText([
-        item.nombre,
-        item.email,
-        item.telefono,
-        item.comuna,
-        item.region,
-        item.isapre_especifica,
-        item.rut,
-      ].filter(Boolean).join(' '));
+      const haystack = normalizeText([item.nombre, item.email, item.telefono, item.comuna, item.region, item.isapre_especifica, item.rut].filter(Boolean).join(' '));
       if (!haystack.includes(query)) return false;
     }
 
@@ -897,11 +755,7 @@ function filterItemsByRange(items, rangeKey) {
   const now = new Date();
   const start = new Date(now);
   start.setHours(0, 0, 0, 0);
-
-  if (days === 1) {
-    return items.filter((item) => new Date(item.created_at) >= start);
-  }
-
+  if (days === 1) return items.filter((item) => new Date(item.created_at) >= start);
   start.setDate(start.getDate() - (days - 1));
   return items.filter((item) => new Date(item.created_at) >= start && new Date(item.created_at) <= now);
 }
@@ -916,7 +770,6 @@ function filterItemsByPreviousRange(items, rangeKey) {
   previousEnd.setMilliseconds(-1);
   const previousStart = new Date(previousEnd);
   previousStart.setDate(previousStart.getDate() - (days - 1));
-
   return items.filter((item) => {
     const created = new Date(item.created_at);
     return created >= previousStart && created <= previousEnd;
@@ -955,17 +808,12 @@ function buildSeries(items, rangeKey) {
   const closed = Array.from({ length: bucketCount }, () => 0);
   const start = new Date(now);
   start.setHours(0, 0, 0, 0);
-  if (rangeKey !== 'today') {
-    start.setDate(start.getDate() - (days - 1));
-  }
+  if (rangeKey !== 'today') start.setDate(start.getDate() - (days - 1));
 
   for (let index = 0; index < bucketCount; index += 1) {
     const bucketDate = new Date(start);
-    if (rangeKey === 'today') {
-      bucketDate.setHours(8 + index * 2, 0, 0, 0);
-    } else {
-      bucketDate.setDate(start.getDate() + Math.round(index * stepDays));
-    }
+    if (rangeKey === 'today') bucketDate.setHours(8 + index * 2, 0, 0, 0);
+    else bucketDate.setDate(start.getDate() + Math.round(index * stepDays));
     labels.push(new Intl.DateTimeFormat('es-CL', labelFormat).format(bucketDate).replace('.', ''));
   }
 
@@ -973,17 +821,13 @@ function buildSeries(items, rangeKey) {
     const created = new Date(item.created_at);
     if (Number.isNaN(created.getTime())) return;
     let index = 0;
-    if (rangeKey === 'today') {
-      const hour = created.getHours();
-      index = Math.min(bucketCount - 1, Math.max(0, Math.floor((hour - 8) / 2)));
-    } else {
+    if (rangeKey === 'today') index = Math.min(bucketCount - 1, Math.max(0, Math.floor((created.getHours() - 8) / 2)));
+    else {
       const diffDays = Math.max(0, Math.floor((created - start) / 86400000));
       index = Math.min(bucketCount - 1, Math.floor(diffDays / Math.max(stepDays, 1)));
     }
     leads[index] += 1;
-    if (item.status === 'Cerrado') {
-      closed[index] += 1;
-    }
+    if (item.status === 'Cerrado') closed[index] += 1;
   });
 
   return { labels, leads, closed };
@@ -996,7 +840,6 @@ function buildLineChartSvg(labels, datasets) {
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
   const max = Math.max(1, ...datasets.flatMap((dataset) => dataset.values));
-
   const pointsFor = (values) => values.map((value, index) => {
     const x = padding.left + (chartWidth / Math.max(values.length - 1, 1)) * index;
     const y = padding.top + chartHeight - ((value / max) * chartHeight);
@@ -1023,66 +866,80 @@ function buildLineChartSvg(labels, datasets) {
     return `<text x="${x}" y="${height - 6}" text-anchor="middle" fill="#73819a" font-size="11">${escapeHtml(label)}</text>`;
   }).join('');
 
-  return `
-    <svg viewBox="0 0 ${width} ${height}" class="crm-chart-svg" aria-hidden="true">
-      ${grid}
-      ${lines}
-      ${xLabels}
-    </svg>
-  `;
+  return `<svg viewBox="0 0 ${width} ${height}" class="crm-chart-svg" aria-hidden="true">${grid}${lines}${xLabels}</svg>`;
 }
 
-function resolveSystemBucket(item) {
-  if ((item.sistema_actual || '').toLowerCase() === 'fonasa') return 'Fonasa';
-  const normalized = normalizeText(item.isapre_especifica || '');
-  if (!normalized) return 'Otros';
-  if (normalized.includes('banmedica')) return 'Banmédica';
-  if (normalized.includes('colmena')) return 'Colmena';
-  if (normalized.includes('consalud')) return 'Consalud';
-  if (normalized.includes('cruz blanca')) return 'Cruz Blanca';
-  if (normalized.includes('esencial')) return 'Esencial';
-  if (normalized.includes('nueva masvida') || normalized.includes('masvida')) return 'Nueva Masvida';
-  if (normalized.includes('vida tres')) return 'Vida Tres';
-  return 'Otros';
+function renderDonut(buckets) {
+  const total = buckets.reduce((sum, bucket) => sum + bucket.count, 0);
+  if (!total) {
+    elements.isapreDonut.innerHTML = '<span>0</span><small>Sin leads</small>';
+    elements.isapreDonut.style.background = 'linear-gradient(180deg, #eaf1f8 0%, #dfe9f6 100%)';
+    elements.isapreLegend.innerHTML = '<p class="crm-muted">No hay distribución disponible todavía.</p>';
+    return;
+  }
+
+  const palette = ['#1668dc', '#0f9d58', '#f59e0b', '#ef4444', '#6d28d9', '#14b8a6', '#2563eb', '#db2777', '#64748b'];
+  let current = 0;
+  const segments = [];
+  const legend = [];
+
+  buckets.forEach((bucket, index) => {
+    const percent = bucket.count / total;
+    const start = current * 360;
+    const end = (current + percent) * 360;
+    const color = palette[index % palette.length];
+    segments.push(`${color} ${start}deg ${end}deg`);
+    legend.push(`<div class="crm-legend-row"><span class="crm-legend-row__dot" style="background:${color}"></span><strong>${escapeHtml(bucket.label)}</strong><span>${bucket.count}</span></div>`);
+    current += percent;
+  });
+
+  elements.isapreDonut.style.background = `conic-gradient(${segments.join(', ')})`;
+  elements.isapreDonut.innerHTML = `<span>${total}</span><small>Leads</small>`;
+  elements.isapreLegend.innerHTML = legend.join('');
 }
 
 function buildAppointments(items) {
   return (items || [])
     .filter((item) => item.cita_fecha_hora)
-    .map((item) => ({
-      ...item,
-      rawDate: item.cita_fecha_hora,
-      date: new Date(item.cita_fecha_hora),
-      status: item.cita_estado,
-    }))
+    .map((item) => ({ ...item, rawDate: item.cita_fecha_hora, date: new Date(item.cita_fecha_hora), status: item.cita_estado }))
     .filter((item) => !Number.isNaN(item.date.getTime()))
     .sort((a, b) => a.date - b.date);
 }
 
-function renderTrend(element, current, previous) {
-  const delta = previous === 0 ? (current > 0 ? 100 : 0) : (((current - previous) / previous) * 100);
-  const rounded = Math.round(delta);
-  element.textContent = `${rounded >= 0 ? '+' : ''}${rounded}%`;
-  element.classList.toggle('is-positive', rounded >= 0);
-  element.classList.toggle('is-negative', rounded < 0);
+function renderAppointmentItem(appointment) {
+  return `<button type="button" class="crm-agenda-item" data-lead-id="${appointment.id}"><div><strong>${escapeHtml(appointment.nombre || 'Sin nombre')}</strong><span>${escapeHtml(formatDateTime(appointment.cita_fecha_hora))}</span></div><span class="crm-badge ${statusBadgeClass(appointment.status)}">${escapeHtml(appointment.status || 'Pendiente')}</span></button>`;
+}
+
+function bindAgendaClicks() {
+  document.querySelectorAll('.crm-agenda-item[data-lead-id]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      setView('leads');
+      await loadLeadDetail(button.dataset.leadId);
+    });
+  });
+}
+
+function hydratePopovers(items) {
+  const notifications = items.filter((item) => ['Nuevo', 'Por contactar'].includes(item.status)).slice(0, 5);
+  const updates = items.slice().sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)).slice(0, 5);
+  const messages = buildAppointments(items).filter((item) => !item.status || ['Pendiente', 'Por coordinar'].includes(item.status)).slice(0, 5);
+  elements.notificationCount.textContent = String(notifications.length);
+  elements.updatesCount.textContent = String(updates.length);
+  elements.messagesCount.textContent = String(messages.length);
+  elements.notificationPopover.innerHTML = buildPopoverList('Leads por contactar', notifications.map((item) => ({ title: item.nombre || 'Sin nombre', meta: item.telefono || item.email || 'Sin contacto', leadId: item.id })));
+  elements.updatesPopover.innerHTML = buildPopoverList('Updates recientes', updates.map((item) => ({ title: item.nombre || 'Sin nombre', meta: `${formatDateTime(item.updated_at || item.created_at)} · ${item.status || 'Sin estado'}`, leadId: item.id })));
+  elements.messagesPopover.innerHTML = buildPopoverList('Citas pendientes', messages.map((item) => ({ title: item.nombre || 'Sin nombre', meta: `${formatDateTime(item.cita_fecha_hora)} · ${item.cita_estado || 'Pendiente'}`, leadId: item.id })));
+  document.querySelectorAll('.crm-popover [data-lead-id]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      hidePopovers();
+      setView('leads');
+      await loadLeadDetail(button.dataset.leadId);
+    });
+  });
 }
 
 function buildPopoverList(title, rows) {
-  return `
-    <div class="crm-popover__title">${escapeHtml(title)}</div>
-    <div class="crm-popover__list">
-      ${
-        rows.length
-          ? rows.map((row) => `
-            <button type="button" class="crm-popover__item" data-lead-id="${row.leadId}">
-              <strong>${escapeHtml(row.title)}</strong>
-              <span>${escapeHtml(row.meta)}</span>
-            </button>
-          `).join('')
-          : '<p class="crm-muted">Sin movimientos.</p>'
-      }
-    </div>
-  `;
+  return `<div class="crm-popover__title">${escapeHtml(title)}</div><div class="crm-popover__list">${rows.length ? rows.map((row) => `<button type="button" class="crm-popover__item" data-lead-id="${row.leadId}"><strong>${escapeHtml(row.title)}</strong><span>${escapeHtml(row.meta)}</span></button>`).join('') : '<p class="crm-muted">Sin movimientos.</p>'}</div>`;
 }
 
 function togglePopover(key) {
@@ -1104,26 +961,24 @@ function toggleProfileMenu() {
   setProfileMenu(!state.profileMenuOpen);
 }
 
+function openProfileModal() {
+  const fallbackName = state.profile.name || state.session?.actorEmail || 'Asesor';
+  elements.profileNameInput.value = fallbackName;
+  renderProfilePreview(state.profile.photoDataUrl || '', fallbackName);
+  elements.profileModal.showModal();
+}
+
 function setProfileMenu(open) {
   state.profileMenuOpen = open;
   elements.profileMenu.hidden = !open;
   elements.profileWrap.classList.toggle('is-open', open);
 }
 
-function openProfileModal() {
-  setProfileMenu(false);
-  elements.profileNameInput.value = state.profile.name || state.session?.actorEmail || '';
-  renderProfilePreview(state.profile.photoDataUrl, state.profile.name || state.session?.actorEmail || 'Asesor');
-  elements.profileModal.showModal();
-}
-
 function handleProfilePhotoChange() {
   const file = elements.profilePhotoInput.files?.[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = () => {
-    renderProfilePreview(reader.result, elements.profileNameInput.value || state.session?.actorEmail || 'Asesor');
-  };
+  reader.onload = () => renderProfilePreview(reader.result, elements.profileNameInput.value || state.session?.actorEmail || 'Asesor');
   reader.readAsDataURL(file);
 }
 
@@ -1133,6 +988,7 @@ function resetProfile() {
   elements.profileNameInput.value = state.session?.actorEmail || '';
   elements.profilePhotoInput.value = '';
   applyProfileToUI();
+  hydrateProfileSections();
   renderProfilePreview('', state.session?.actorEmail || 'Asesor');
 }
 
@@ -1142,6 +998,7 @@ function saveProfileChanges() {
   state.profile = { name, photoDataUrl };
   window.localStorage.setItem(PROFILE_STORAGE, JSON.stringify(state.profile));
   applyProfileToUI();
+  hydrateProfileSections();
   elements.profileModal.close();
 }
 
@@ -1150,8 +1007,16 @@ function applyProfileToUI() {
   elements.profileName.textContent = fallbackName;
   elements.sidebarUserName.textContent = fallbackName;
   paintAvatar(elements.profileAvatar, fallbackName);
-  paintAvatar(elements.sidebarAvatar, fallbackName);
   toggleAvatarPhoto(elements.profilePhoto, elements.profileAvatar, state.profile.photoDataUrl, fallbackName);
+}
+
+function hydrateProfileSections() {
+  const fallbackName = state.profile.name || state.session?.actorEmail || 'Asesor';
+  elements.profilePageName.textContent = fallbackName;
+  elements.profilePageNameValue.textContent = fallbackName;
+  elements.profilePageAccess.textContent = isLocalDev ? 'Clave manual local' : 'Cloudflare Access';
+  elements.profilePageEmail.textContent = state.session?.actorEmail || '-';
+  toggleAvatarPhoto(elements.profilePagePhoto, elements.profilePageAvatar, state.profile.photoDataUrl, fallbackName);
 }
 
 function renderProfilePreview(photoDataUrl, name) {
@@ -1175,23 +1040,19 @@ function toggleAvatarPhoto(imageElement, avatarElement, photoDataUrl, avatarSeed
 function paintAvatar(element, seed) {
   if (!element) return;
   const hue = hashCode(seed || 'PlanesPro') % 360;
-  element.style.background = `linear-gradient(135deg, hsl(${hue} 76% 45%), hsl(${(hue + 28) % 360} 78% 66%))`;
+  element.style.background = `linear-gradient(135deg, hsl(${hue} 72% 42%), hsl(${(hue + 26) % 360} 70% 62%))`;
   element.innerHTML = '<i class="fas fa-user" aria-hidden="true"></i>';
 }
 
 function openFileModal(leadId, leadName, fileName) {
-  state.activeFileLeadId = leadId;
-  const url = getFileUrl(leadId);
   elements.fileModalTitle.textContent = `${leadName} · ${fileName}`;
-  elements.fileModalOpen.href = url;
-  elements.fileModalFrame.src = url;
+  elements.fileModalFrame.src = getFileUrl(leadId);
   elements.fileModal.showModal();
 }
 
 function closeFileModal() {
   elements.fileModal.close();
   elements.fileModalFrame.src = 'about:blank';
-  state.activeFileLeadId = '';
 }
 
 function loadProfile() {
@@ -1203,39 +1064,42 @@ function loadProfile() {
   }
 }
 
+function loadSidebarState() {
+  try {
+    return window.localStorage.getItem(SIDEBAR_STORAGE) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function persistSidebarState() {
+  try {
+    window.localStorage.setItem(SIDEBAR_STORAGE, state.sidebarCollapsed ? '1' : '0');
+  } catch {
+    // no-op
+  }
+}
+
+function applySidebarState() {
+  elements.sidebar?.classList.toggle('is-collapsed', state.sidebarCollapsed);
+}
+
 function formatDate(value) {
   if (!value) return 'Sin fecha';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return 'Sin fecha';
-  return new Intl.DateTimeFormat('es-CL', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  }).format(date);
+  return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date);
 }
 
 function formatDateTime(value) {
   if (!value) return 'Sin fecha';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return 'Sin fecha';
-  return new Intl.DateTimeFormat('es-CL', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(date);
+  return new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: 'numeric', minute: '2-digit' }).format(date);
 }
 
 function normalizeText(value = '') {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase();
-}
-
-function capitalize(value = '') {
-  return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
 function escapeHtml(value = '') {
@@ -1260,16 +1124,13 @@ function formatRut(value = '') {
   if (cleaned.length < 2) return cleaned;
   const body = cleaned.slice(0, -1);
   const dv = cleaned.slice(-1);
-  const withDots = body.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return `${withDots}-${dv}`;
+  return `${body.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}-${dv}`;
 }
 
 function isValidRut(value = '') {
   const cleaned = cleanRut(value);
   if (!/^\d{7,8}[0-9K]$/.test(cleaned)) return false;
-  const body = cleaned.slice(0, -1);
-  const dv = cleaned.slice(-1);
-  return calculateRutDv(body) === dv;
+  return calculateRutDv(cleaned.slice(0, -1)) === cleaned.slice(-1);
 }
 
 function calculateRutDv(body) {
@@ -1287,4 +1148,34 @@ function calculateRutDv(body) {
 
 function hashCode(value = '') {
   return Math.abs(Array.from(String(value)).reduce((acc, char) => ((acc << 5) - acc) + char.charCodeAt(0), 0));
+}
+
+function resolveSystemBucket(item) {
+  if ((item.sistema_actual || '').toLowerCase() === 'fonasa') return 'Fonasa';
+  const normalized = normalizeText(item.isapre_especifica || '');
+  if (!normalized) return 'Otros';
+  if (normalized.includes('banmedica')) return 'Banmédica';
+  if (normalized.includes('colmena')) return 'Colmena';
+  if (normalized.includes('consalud')) return 'Consalud';
+  if (normalized.includes('cruz blanca')) return 'Cruz Blanca';
+  if (normalized.includes('esencial')) return 'Esencial';
+  if (normalized.includes('nueva masvida') || normalized.includes('masvida')) return 'Nueva Masvida';
+  if (normalized.includes('vida tres')) return 'Vida Tres';
+  return 'Otros';
+}
+
+function renderTrend(element, current, previous) {
+  const delta = previous === 0 ? (current > 0 ? 100 : 0) : (((current - previous) / previous) * 100);
+  const rounded = Math.round(delta);
+  element.textContent = `${rounded >= 0 ? '+' : ''}${rounded}%`;
+  element.classList.toggle('is-positive', rounded >= 0);
+  element.classList.toggle('is-negative', rounded < 0);
+}
+
+function statusBadgeClass(status = '') {
+  const normalized = normalizeText(status);
+  if (normalized.includes('cerrado')) return 'crm-badge--success';
+  if (normalized.includes('contactado') || normalized.includes('propuesta')) return 'crm-badge--accent';
+  if (normalized.includes('archivado') || normalized.includes('descartado')) return 'crm-badge--muted';
+  return 'crm-badge--neutral';
 }
