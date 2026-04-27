@@ -50,8 +50,8 @@
       "purpose": "Servir UI privada del CRM y proxear endpoints admin al backend real",
       "upstream_admin_backend": "https://ppforms.hentimes.workers.dev",
       "reason_for_workers_dev_upstream": "Cuando el worker ppcrm intentó proxear a https://form.planespro.cl/api/admin/* apareció error 525 SSL handshake failed entre Cloudflare y el host form.planespro.cl. Para destrabar la etapa 1, el proxy del CRM quedó apuntando al endpoint técnico workers.dev del worker ppforms.",
-      "current_publication_status": "unpublished_temporarily",
-      "current_usage_mode": "local_only"
+      "current_publication_status": "published_and_protected_by_access",
+      "current_usage_mode": "production_via_cloudflare_access_and_local_via_manual_key"
     },
     "separation_of_responsibilities": {
       "ppforms": [
@@ -89,6 +89,16 @@
         "worker": "ppcrm",
         "action": "created_and_deployed",
         "reason": "Servir la UI del CRM en asesores.planespro.cl"
+      },
+      {
+        "worker": "ppcrm",
+        "action": "redeployed",
+        "reason": "Quitar el fallback de clave manual en producción y exigir Cloudflare Access en el proxy público"
+      },
+      {
+        "worker": "ppforms",
+        "action": "redeployed",
+        "reason": "Agregar campos de cita al listado admin para alimentar la agenda mínima del CRM"
       }
     ],
     "database_migrations_applied": [
@@ -107,13 +117,13 @@
         "record": "asesores.planespro.cl",
         "content": "hentimes.workers.dev",
         "proxied": true,
-        "current_status": "deleted_after_testing"
+        "current_status": "active"
       },
       {
         "type": "Workers Route",
         "pattern": "asesores.planespro.cl/*",
         "script": "ppcrm",
-        "current_status": "deleted_after_testing"
+        "current_status": "active"
       }
     ]
   },
@@ -180,6 +190,10 @@
       {
         "path": "FORM-CLOUDFLARE-SETUP.md",
         "purpose": "Documentar el nuevo estado del backend, CRM y bloqueo de Access"
+      },
+      {
+        "path": "ROADMAP-CRM.md",
+        "purpose": "Checklist maestro del CRM, actualizado con agenda/citas"
       }
     ]
   },
@@ -235,6 +249,9 @@
         "isapre",
         "from",
         "to",
+        "cita_estado",
+        "cita_fecha_hora",
+        "cita_calendar_url",
         "limit",
         "offset"
       ],
@@ -271,6 +288,8 @@
       "Verificación de sesión al cargar",
       "Campo de clave admin temporal",
       "Listado de leads",
+      "Resumen de agenda",
+      "Lista de próximas citas",
       "Filtro por texto",
       "Filtro por estado",
       "Filtro por sistema",
@@ -278,6 +297,7 @@
       "Filtro por rango de fechas",
       "Panel de detalle",
       "Visualización inline del archivo adjunto en iframe",
+      "Bloque de agenda/cita en la ficha del lead",
       "Alta de notas",
       "Cambio de estado",
       "Archivado"
@@ -288,7 +308,35 @@
     },
     "important_runtime_behavior": [
       "Cuando se abre desde asesores.planespro.cl, la UI pega al mismo origen y el worker ppcrm proxea a ppforms",
-      "Cuando se abre localmente, la UI pega directo a form.planespro.cl y usa la clave admin manual"
+      "Cuando se abre localmente, la UI pega directo a form.planespro.cl y usa la clave admin manual",
+      "La caja de clave manual se oculta automáticamente fuera de localhost/127.0.0.1",
+      "En producción el proxy ppcrm ya no acepta clave manual; exige Cloudflare Access"
+    ]
+  },
+  "agenda_minima_stage": {
+    "status": "implemented",
+    "purpose": "Preparar el CRM para gestionar citas futuras antes de integrar Google Calendar real",
+    "implemented_in": [
+      "crm/index.html",
+      "crm/app.js",
+      "crm/styles.css",
+      "cloudflare/form-worker.js",
+      "ROADMAP-CRM.md"
+    ],
+    "features": [
+      "KPIs de agenda en la cabecera: total, hoy, pendientes, próximas",
+      "Lista de próximas citas en la columna izquierda",
+      "Tarjeta Agenda / cita en la ficha del lead",
+      "Visualización de cita_estado",
+      "Visualización de cita_fecha_hora",
+      "Visualización de cita_calendar_url si existe"
+    ],
+    "not_implemented_yet": [
+      "Creación real de eventos en Google Calendar",
+      "Reprogramación desde UI",
+      "Cambio manual de estado de cita desde UI",
+      "Calendario semanal/mensual",
+      "Disponibilidad por asesor"
     ]
   },
   "file_upload_and_attachment_behavior": {
@@ -300,27 +348,27 @@
   },
   "security_state": {
     "what_is_secure_now": [
-      "La API admin del CRM no responde sin Cloudflare Access o clave manual",
+      "La UI pública del CRM está detrás de Cloudflare Access",
+      "La API admin pública del CRM no responde sin Cloudflare Access",
       "La visualización de archivos pasa por el backend y no expone el bucket R2 públicamente"
     ],
     "temporary_security_compromise": {
       "name": "manual_admin_key_fallback",
       "exists_in": [
-        "ppforms via ADMIN_API_KEY",
-        "ppcrm via ADMIN_PROXY_KEY"
+        "ppforms via ADMIN_API_KEY"
       ],
-      "reason": "Permitir pruebas mientras no se termina Cloudflare Access",
+      "reason": "Permitir pruebas en entorno local sin depender del flujo de Cloudflare Access",
       "known_current_value": "ppcrm_dev_20260425_9f6c2c8e1a4b",
-      "important_warning": "Esta clave debe rotarse o eliminarse cuando Cloudflare Access quede operativo. No debería quedar como método permanente en producción."
+      "important_warning": "Esta clave ya no debe usarse como mecanismo público de producción. Solo debe vivir para desarrollo local, o eliminarse si luego se implementa una estrategia local diferente."
     },
     "cloudflare_access_status": {
       "desired_state": "asesores.planespro.cl protegido por Cloudflare Access usando login Google/email",
-      "actual_state": "No automatizado todavía y el subdominio fue retirado temporalmente de producción",
+      "actual_state": "Operativo en producción sobre asesores.planespro.cl",
       "blocker": {
         "type": "permissions",
-        "details": "Al consultar el endpoint de Access/Zero Trust con el token actual se obtuvo 403 Authentication error",
+        "details": "El token actual sigue sin permitir administrar Access/Zero Trust por API, aunque la aplicación ya fue configurada manualmente y funciona",
         "request_that_failed": "GET https://api.cloudflare.com/client/v4/accounts/{account_id}/access/apps",
-        "meaning": "El token actual no tiene permisos suficientes para administrar Access Apps/Policies"
+        "meaning": "Otra IA no debe asumir que puede crear o editar Access por API con este token. Debe trabajar con el panel manual o pedir un token con permisos Zero Trust."
       }
     }
   },
@@ -336,7 +384,7 @@
       {
         "name": "ppcrm",
         "public_domain": "https://asesores.planespro.cl",
-        "current_status": "worker_deployed_but_without_public_route"
+        "current_status": "active_and_protected_by_access"
       }
     ],
     "routes": [
@@ -347,7 +395,7 @@
       {
         "pattern": "asesores.planespro.cl/*",
         "script": "ppcrm",
-        "current_status": "deleted_after_testing"
+        "current_status": "active"
       }
     ],
     "dns_records": [
@@ -356,7 +404,7 @@
         "type": "CNAME",
         "content": "hentimes.workers.dev",
         "proxied": true,
-        "current_status": "deleted_after_testing"
+        "current_status": "active"
       }
     ],
     "d1": {
@@ -378,11 +426,8 @@
       "Migración 003 aplicada contra D1 por API",
       "Worker ppforms redeploy exitoso",
       "Worker ppcrm deploy exitoso",
-      "GET https://asesores.planespro.cl/ responde HTML del CRM",
-      "GET https://asesores.planespro.cl/app.js responde JS del CRM",
-      "GET https://asesores.planespro.cl/api/admin/session sin clave responde 401",
-      "GET https://asesores.planespro.cl/api/admin/session con clave manual responde 200",
-      "GET https://asesores.planespro.cl/api/admin/leads?limit=2 con clave manual responde 200",
+      "GET https://asesores.planespro.cl/ responde 302 hacia Cloudflare Access",
+      "GET https://asesores.planespro.cl/api/admin/session responde 302 hacia Cloudflare Access cuando no hay sesión",
       "GET https://form.planespro.cl/api/admin/leads/:id/file con clave manual devuelve PDF inline"
     ],
     "cleanup_performed": [
@@ -392,66 +437,70 @@
   },
   "exact_pending_work_to_finish_stage_1": {
     "summary": "La etapa 1 está funcional, pero no está terminada al estándar deseado porque falta cerrar autenticación seria con Cloudflare Access.",
+    "reality_check": "La autenticación seria con Cloudflare Access ya quedó funcional para producción. Lo pendiente de la etapa 1 ya no es el acceso, sino la consolidación visual/operativa del CRM y la futura agenda real.",
     "pending_items": [
       {
-        "id": "stage1-auth-1",
-        "title": "Crear Cloudflare Access app para asesores.planespro.cl",
-        "required": true,
-        "details": [
-          "Crear aplicación self-hosted para asesores.planespro.cl/*",
-          "Configurar política allow para los correos autorizados",
-          "Idealmente login con Google/email"
-        ]
-      },
-      {
-        "id": "stage1-auth-2",
-        "title": "Validar paso del header de identidad al worker ppcrm",
-        "required": true,
-        "details": [
-          "El worker ppcrm espera Cf-Access-Authenticated-User-Email",
-          "Debe confirmarse que ese header llegue efectivamente desde Access",
-          "Si llega, ppcrm ya acepta esa vía y no necesita clave manual"
-        ]
-      },
-      {
         "id": "stage1-auth-3",
-        "title": "Eliminar o rotar el bypass temporal por clave manual",
+        "title": "Mantener o eliminar conscientemente el bypass local por clave manual",
         "required": true,
         "details": [
-          "ADMIN_PROXY_KEY en ppcrm y ADMIN_API_KEY en ppforms son transitorios",
-          "Una vez funcionando Access, hay que decidir si se eliminan o se dejan solo para desarrollo",
-          "Si se dejan, deben rotarse y documentarse mejor"
+          "ppcrm ya no usa la clave en producción",
+          "ppforms sigue aceptando ADMIN_API_KEY para permitir desarrollo local",
+          "Hay que decidir si ese bypass local se mantiene, se rota periódicamente o se reemplaza por otra estrategia"
+        ]
+      },
+      {
+        "id": "stage1-ui-1",
+        "title": "Aplicar la iteración visual premium del CRM",
+        "required": true,
+        "details": [
+          "El usuario pidió explícitamente un look más premium inspirado en una referencia externa",
+          "La lógica ya está montada; la siguiente prioridad recomendada por el plan maestro es rediseñar la UI sin alterar arquitectura",
+          "Debe mejorar cabecera, KPIs, bandeja de leads, panel derecho y agenda"
         ]
       },
       {
         "id": "stage1-ops-1",
-        "title": "Documentar operación diaria del CRM",
+        "title": "Consolidar operación diaria del CRM",
         "required": false,
         "details": [
           "Cómo ingresar",
           "Qué estados usar",
           "Cómo agregar notas",
-          "Qué significa archivar"
+          "Qué significa archivar",
+          "Cómo usar la agenda mínima"
+        ]
+      },
+      {
+        "id": "stage1-agenda-1",
+        "title": "Definir estados y flujo exacto de citas",
+        "required": true,
+        "details": [
+          "Definir catálogo de estados de cita",
+          "Definir cuándo una cita pasa a confirmada, realizada, cancelada o no asistió",
+          "Definir cómo se cargará la primera fecha/hora desde formulario o desde CRM"
         ]
       }
     ]
   },
   "recommended_next_steps_for_another_ai": {
     "priority_order": [
-      "Conseguir un token Cloudflare con permisos para Access/Zero Trust",
-      "Montar Access sobre asesores.planespro.cl",
-      "Validar login real sin clave manual",
-      "Eliminar/rotar bypass manual",
-      "Opcional: agregar documentación de operación"
+      "Aplicar la iteración visual premium del CRM sin tocar arquitectura",
+      "Consolidar operación diaria y estados finales del lead",
+      "Expandir la agenda mínima hacia una agenda operativa real",
+      "Preparar integración con Google Calendar",
+      "Mantener actualizada la documentación/handoff después de cada bloque"
     ],
     "what_token_permissions_are_likely_missing": [
       "Cloudflare Zero Trust / Access Apps edit/read",
       "Policies edit/read"
     ],
     "exact_follow_up_checks": [
-      "Abrir https://asesores.planespro.cl y verificar redirección/login de Access",
-      "Después del login, llamar /api/admin/session y confirmar actorEmail != local-admin",
-      "Probar listado, detalle, archivo, notas, estado y archivado ya sin clave manual"
+      "Abrir https://asesores.planespro.cl y verificar login real por Cloudflare Access",
+      "Después del login, comprobar que la caja de clave manual no aparece",
+      "Probar listado, detalle, archivo, notas, estado y archivado en producción",
+      "Probar el CRM local con la clave manual",
+      "Confirmar que la agenda mínima no rompe cuando no existen citas"
     ]
   },
   "important_code_references": {
@@ -468,10 +517,11 @@
   },
   "current_operational_note": {
     "how_to_use_right_now": [
-      "Levantar un servidor local sobre el repo",
-      "Abrir http://127.0.0.1:<puerto>/crm/ o http://localhost:<puerto>/crm/",
-      "Ingresar la clave temporal en el campo 'Clave admin'",
-      "Usar el CRM normalmente contra https://form.planespro.cl"
+      "Producción: abrir https://asesores.planespro.cl y entrar por Cloudflare Access",
+      "Local: levantar un servidor local sobre el repo",
+      "Local: abrir http://127.0.0.1:<puerto>/crm/ o http://localhost:<puerto>/crm/",
+      "Local: ingresar la clave temporal en el campo 'Clave admin'",
+      "Local: usar el CRM normalmente contra https://form.planespro.cl"
     ],
     "temporary_admin_key": "ppcrm_dev_20260425_9f6c2c8e1a4b",
     "warning": "Esta clave existe solo para pruebas de la etapa 1. No debe considerarse solución final."
