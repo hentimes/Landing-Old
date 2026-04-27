@@ -49,9 +49,10 @@
 - [x] Reemplazar iniciales por avatar de silueta con colores dinamicos
 - [x] Usar iconos Font Awesome consistentes en toda la UI
 - [x] Agregar menu hover de perfil y settings del asesor
-- [x] Mover el perfil del asesor al header superior derecho
+- [x] Alinear el perfil al header superior derecho
 - [x] Crear vistas reales de `Profile` y `Settings`
 - [x] Dejar el clip como ?nico acceso al adjunto
+- [x] Ocultar el estado vacio descriptivo del detalle del lead
 - [x] Ocultar el estado vac?o descriptivo del detalle del lead
 - [ ] No permitir borrado fisico desde UI
 

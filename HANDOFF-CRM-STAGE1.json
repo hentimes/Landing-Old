@@ -1,6 +1,6 @@
 {
   "document_type": "ai_handoff_master",
-  "document_version": "2026-04-27.crm-stage1.v3",
+  "document_version": "2026-04-27.crm-stage1.v4",
   "project": {
     "name": "PlanesPro Landing / CRM",
     "repository_root": "C:\\Users\\henti\\OneDrive\\Documentos\\ISAPRE\\PlanesPro\\Landing Old",
@@ -412,7 +412,8 @@
       "Confirmar que Actualizado no se muestra en la ficha",
       "Confirmar que profile hover muestra Profile y Settings",
       "Confirmar que las vistas Profile y Settings existen y son navegables",
-      "Confirmar que el estado vac?o del detalle no muestra texto operativo"
+      "Confirmar que el estado vac?o del detalle no muestra texto operativo",
+      "Confirmar que el clip solo aparece en leads con adjunto"
     ],
     "known_gap_after_deploy": [
       "La validacion visual completa de asesores.planespro.cl sigue siendo manual porque el acceso esta detras de Cloudflare Access"
