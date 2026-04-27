@@ -129,7 +129,7 @@ Ya quedó preparada una segunda capa para el backoffice:
 - frontend base en `crm/`
 - worker de frontend/proxy generado en `cloudflare/crm-worker.js`
 - script generador: `cloudflare/build-crm-worker.mjs`
-- subdominio objetivo: `https://asesores.planespro.cl`
+- subdominio objetivo futuro: `https://asesores.planespro.cl`
 
 Arquitectura actual:
 
@@ -140,8 +140,11 @@ Arquitectura actual:
 Estado:
 
 - `ppcrm` ya puede operar el CRM
-- `asesores.planespro.cl` ya responde con la UI del CRM
-- la API admin bajo `asesores.planespro.cl/api/admin/*` exige temporalmente una clave manual
+- el CRM quedó retirado de producción temporalmente
+- la route pública `asesores.planespro.cl/*` fue eliminada
+- el DNS público `asesores.planespro.cl` fue eliminado
+- el uso actual del CRM es local: `http://127.0.0.1:<puerto>/crm/`
+- en local, `crm/config.js` apunta a `https://form.planespro.cl` como backend
 - la protección final con Cloudflare Access sigue pendiente porque el token actual devuelve `403 Authentication error` al llamar `accounts/{account_id}/access/apps`
 
 Clave temporal de desarrollo:

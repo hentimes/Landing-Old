@@ -49,7 +49,9 @@
       "worker_name": "ppcrm",
       "purpose": "Servir UI privada del CRM y proxear endpoints admin al backend real",
       "upstream_admin_backend": "https://ppforms.hentimes.workers.dev",
-      "reason_for_workers_dev_upstream": "Cuando el worker ppcrm intentó proxear a https://form.planespro.cl/api/admin/* apareció error 525 SSL handshake failed entre Cloudflare y el host form.planespro.cl. Para destrabar la etapa 1, el proxy del CRM quedó apuntando al endpoint técnico workers.dev del worker ppforms."
+      "reason_for_workers_dev_upstream": "Cuando el worker ppcrm intentó proxear a https://form.planespro.cl/api/admin/* apareció error 525 SSL handshake failed entre Cloudflare y el host form.planespro.cl. Para destrabar la etapa 1, el proxy del CRM quedó apuntando al endpoint técnico workers.dev del worker ppforms.",
+      "current_publication_status": "unpublished_temporarily",
+      "current_usage_mode": "local_only"
     },
     "separation_of_responsibilities": {
       "ppforms": [
@@ -104,12 +106,14 @@
         "type": "DNS",
         "record": "asesores.planespro.cl",
         "content": "hentimes.workers.dev",
-        "proxied": true
+        "proxied": true,
+        "current_status": "deleted_after_testing"
       },
       {
         "type": "Workers Route",
         "pattern": "asesores.planespro.cl/*",
-        "script": "ppcrm"
+        "script": "ppcrm",
+        "current_status": "deleted_after_testing"
       }
     ]
   },
@@ -311,7 +315,7 @@
     },
     "cloudflare_access_status": {
       "desired_state": "asesores.planespro.cl protegido por Cloudflare Access usando login Google/email",
-      "actual_state": "No automatizado todavía",
+      "actual_state": "No automatizado todavía y el subdominio fue retirado temporalmente de producción",
       "blocker": {
         "type": "permissions",
         "details": "Al consultar el endpoint de Access/Zero Trust con el token actual se obtuvo 403 Authentication error",
@@ -331,7 +335,8 @@
       },
       {
         "name": "ppcrm",
-        "public_domain": "https://asesores.planespro.cl"
+        "public_domain": "https://asesores.planespro.cl",
+        "current_status": "worker_deployed_but_without_public_route"
       }
     ],
     "routes": [
@@ -341,7 +346,8 @@
       },
       {
         "pattern": "asesores.planespro.cl/*",
-        "script": "ppcrm"
+        "script": "ppcrm",
+        "current_status": "deleted_after_testing"
       }
     ],
     "dns_records": [
@@ -349,7 +355,8 @@
         "hostname": "asesores.planespro.cl",
         "type": "CNAME",
         "content": "hentimes.workers.dev",
-        "proxied": true
+        "proxied": true,
+        "current_status": "deleted_after_testing"
       }
     ],
     "d1": {
@@ -461,9 +468,10 @@
   },
   "current_operational_note": {
     "how_to_use_right_now": [
-      "Abrir https://asesores.planespro.cl",
+      "Levantar un servidor local sobre el repo",
+      "Abrir http://127.0.0.1:<puerto>/crm/ o http://localhost:<puerto>/crm/",
       "Ingresar la clave temporal en el campo 'Clave admin'",
-      "Usar el CRM normalmente"
+      "Usar el CRM normalmente contra https://form.planespro.cl"
     ],
     "temporary_admin_key": "ppcrm_dev_20260425_9f6c2c8e1a4b",
     "warning": "Esta clave existe solo para pruebas de la etapa 1. No debe considerarse solución final."
