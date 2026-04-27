@@ -34,83 +34,103 @@
     <link rel="stylesheet" href="css/styles.css?v=20260425_form_base" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@graph": [
-                {
-                    "@type": "Organization",
-                    "@id": "https://planespro.cl/#organization",
-                    "name": "PlanesPro.cl",
-                    "url": "https://planespro.cl/",
-                    "logo": "https://planespro.cl/assets/logos_pp/logo-planespro.cla.webp",
-                    "email": "contacto@planespro.cl",
-                    "telephone": "+56 9 5878 5580",
-                    "sameAs": [
-                        "https://www.instagram.com/planespro.cl",
-                        "https://www.facebook.com/planespro.cl/",
-                        "https://www.tiktok.com/@planespro.cl"
-                    ]
-                },
-                {
-                    "@type": "WebSite",
-                    "name": "PlanesPro.cl",
-                    "url": "https://planespro.cl/",
-                    "inLanguage": "es-CL"
-                },
-                {
-                    "@type": "Service",
-                    "serviceType": "Asesoría en planes de salud e Isapres",
-                    "provider": {
-                        "@id": "https://planespro.cl/#organization"
-                    },
-                    "areaServed": "CL",
-                    "availableLanguage": "es-CL",
-                    "description": "Asesoría para comparar Fonasa e Isapres, optimizar cotizaciones y elegir mejor cobertura de salud en Chile."
-                }
-            ]
-        }
-    </script>
-    <!-- Schema SEO: FAQ Estructurado -->
-    <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [{
-        "@type": "Question",
-        "name": "¿Realmente la asesoría es gratuita?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Sí, absolutamente. Nuestro servicio es financiado por las instituciones de salud, por lo que para ti es 100% gratuito, sin cobros ocultos ni compromisos de permanencia."
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://planespro.cl/#organization",
+          "name": "PlanesPro.cl",
+          "url": "https://planespro.cl/",
+          "logo": {
+            "@type": "ImageObject",
+            "@id": "https://planespro.cl/#logo",
+            "url": "https://planespro.cl/assets/logos_pp/logo-planespro.cla.webp",
+            "contentUrl": "https://planespro.cl/assets/logos_pp/logo-planespro.cla.webp",
+            "caption": "PlanesPro.cl"
+          },
+          "email": "contacto@planespro.cl",
+          "telephone": "+56 9 5878 5580",
+          "sameAs": [
+            "https://www.instagram.com/planespro.cl",
+            "https://www.facebook.com/planespro.cl/",
+            "https://www.tiktok.com/@planespro.cl"
+          ]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://planespro.cl/#website",
+          "name": "PlanesPro.cl",
+          "url": "https://planespro.cl/",
+          "publisher": { "@id": "https://planespro.cl/#organization" },
+          "inLanguage": "es-CL"
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://planespro.cl/#webpage",
+          "url": "https://planespro.cl/",
+          "name": "PlanesPro.cl | Asesoría en Isapres y optimización de plan",
+          "isPartOf": { "@id": "https://planespro.cl/#website" },
+          "about": { "@id": "https://planespro.cl/#organization" },
+          "mainEntity": { "@id": "https://planespro.cl/#faq" },
+          "description": "Compara Isapre y Fonasa con asesoría clara, gratuita y honesta. Optimiza tu 7%, mejora tu cobertura y toma decisiones de salud con más claridad."
+        },
+        {
+          "@type": "Service",
+          "@id": "https://planespro.cl/#service",
+          "serviceType": "Asesoría en planes de salud e Isapres",
+          "provider": { "@id": "https://planespro.cl/#organization" },
+          "areaServed": "CL",
+          "availableLanguage": "es-CL",
+          "description": "Asesoría para comparar Fonasa e Isapres, optimizar cotizaciones y elegir mejor cobertura de salud en Chile."
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://planespro.cl/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "¿Realmente la asesoría es gratuita?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí, absolutamente. Nuestro servicio es financiado por las instituciones de salud, por lo que para ti es 100% gratuito, sin cobros ocultos ni compromisos de permanencia."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Ustedes representan a las Isapres?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Somos asesores independientes. Trabajamos con todas las Isapres del mercado chileno, pero nuestra prioridad es encontrar el plan que mejor se adapte a tu perfil y presupuesto actual."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Cuánto tiempo toma el análisis de mi plan?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Entendemos que tu tiempo es valioso. Normalmente, tras recibir tus datos, realizamos el estudio comparativo y te contactamos en menos de 24 horas hábiles."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Qué pasa con mi excedente actual?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Tus excedentes son tuyos. Si decides cambiarte, estos se traspasan legalmente a tu nueva Isapre. Nosotros te explicamos cómo se calcula y cómo aprovecharlo mejor."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "¿Gestionan el trámite de cambio?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "¡Claro! Nos encargamos de toda la burocracia. Te guiamos en la firma (digital o física) y hacemos seguimiento hasta que tu nuevo plan esté 100% vigente."
+              }
+            }
+          ]
         }
-      }, {
-        "@type": "Question",
-        "name": "¿Ustedes representan a las Isapres?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Somos asesores independientes. Trabajamos con todas las Isapres del mercado chileno, pero nuestra prioridad es encontrar el plan que mejor se adapte a tu perfil y presupuesto actual."
-        }
-      }, {
-        "@type": "Question",
-        "name": "¿Cuánto tiempo toma el análisis de mi plan?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Entendemos que tu tiempo es valioso. Normalmente, tras recibir tus datos, realizamos el estudio comparativo y te contactamos en menos de 24 horas hábiles."
-        }
-      }, {
-        "@type": "Question",
-        "name": "¿Qué pasa con mi excedente actual?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Tus excedentes son tuyos. Si decides cambiarte, estos se traspasan legalmente a tu nueva Isapre. Nosotros te explicamos cómo se calcula y cómo aprovecharlo mejor."
-        }
-      }, {
-        "@type": "Question",
-        "name": "¿Gestionan el trámite de cambio?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "¡Claro! Nos encargamos de toda la burocracia. Te guiamos en la firma (digital o física) y hacemos seguimiento hasta que tu nuevo plan esté 100% vigente."
-        }
-      }]
+      ]
     }
     </script>
 
