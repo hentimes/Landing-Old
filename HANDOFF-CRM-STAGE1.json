@@ -16,7 +16,7 @@
       "Una IA sucesora debe documentar todo cambio que haga en este handoff, pero no debe borrar ni reescribir el contenido ya establecido en este documento; debe agregar o actualizar solamente los bloques de estado operativo y changelog futuro si el usuario lo pide.",
       "Si una IA sucesora detecta una contradiccion entre el codigo y este handoff, debe priorizar el estado real del codigo desplegado, corregir el handoff y dejar evidencia clara del ajuste.",
       "No introducir auth propia, chat, marketplace, multicliente o permisos complejos antes de completar la etapa 1 y la capa operativa definida en el roadmap.",
-      "Mantener separacion estricta entre el formulario p?blico y el CRM privado.",
+      "Mantener separacion estricta entre el formulario publico y el CRM privado.",
       "Mantener el CRM fuera de indexacion publica. Debe seguir siendo noindex/nofollow y estar protegido por Cloudflare Access en produccion."
     ],
     "documentation_protocol": {
@@ -37,9 +37,9 @@
     "current_priority_order": [
       "1. CRM privado de asesor estable y usable",
       "2. Dashboard premium del asesor",
-      "3. Capa operativa: RUT, seguimiento, prioridad, acci?nes comerciales",
+      "3. Capa operativa pendiente: prioridad, ultimo_contacto, proxima_accion, motivo_archivado",
       "4. Agenda/citas mas rica",
-      "5. Atribuci?n por asesor",
+      "5. Atribucion por asesor",
       "6. Roles, colaboracion y derivacion",
       "7. Comunidad y luego marketplace"
     ],
@@ -49,10 +49,6 @@
         "Subdominio privado para asesores",
         "Cloudflare Access en produccion",
         "Listado de leads",
-        "Filtros",
-        "Detalle del lead",
-        "Notas internas",
-        "Cambio de estado",
         "Archivado logico",
         "Visualizacion de adjunto",
         "Agenda minima",
@@ -64,7 +60,7 @@
         "Chat",
         "Marketplace",
         "Compra/venta de leads",
-        "Asignacion automatica por advisor_id en produccion"
+        "Asignación automática por advisor_id en producción"
       ]
     }
   },
@@ -72,7 +68,7 @@
     "public_form_side": {
       "public_url": "https://form.planespro.cl",
       "worker": "ppforms",
-      "purpose": "Captaci?n publica del formulario y API admin real",
+      "purpose": "Captacion publica del formulario y API admin real",
       "database": {
         "name": "ppforms_db",
         "id": "3bca5190-8e8f-4d53-bbf4-c7b15ade1cf6"
@@ -81,6 +77,21 @@
         "type": "R2",
         "bucket": "ppforms-uploads",
         "key_pattern": "leads/YYYY-MM-DD_nombre-normalizado_leadIdCorto.ext"
+      },
+      "google_calendar_integration": {
+        "status": "implemented_optional",
+        "where": "cloudflare/form-worker.js -> maybeCreateCalendarEvent()",
+        "trigger": "Cuando llega cita_fecha_hora en /api/form/leads",
+        "requires_worker_env": [
+          "GCAL_SA_EMAIL (service account client_email)",
+          "GCAL_SA_PRIVATE_KEY (PKCS8 PEM; usar \\n en secrets)",
+          "GCAL_CALENDAR_ID (calendarId; compartir calendario con SA)",
+          "GCAL_TIMEZONE (opcional; default America/Santiago)"
+        ],
+        "notes": [
+          "Google Calendar no funciona con API key simple para crear eventos; requiere OAuth. Aqui se usa Service Account JWT.",
+          "No commitear credenciales. Usar secrets/env en Cloudflare."
+        ]
       }
     },
     "private_crm_side": {
@@ -94,7 +105,7 @@
     },
     "separation_of_concerns": {
       "ppforms": [
-        "Recibe leads p?blicos",
+        "Recibe leads publicos",
         "Guarda metadata en D1",
         "Guarda adjuntos en R2",
         "Expone endpoints admin reales"
@@ -145,13 +156,13 @@
         "sheet_name",
         "nombre",
         "email",
-        "tel?fono",
+        "telefono",
         "rut",
         "rango_edad",
         "comuna",
         "region",
         "sistema_actual",
-        "isapre_espec?fica",
+        "isapre_especifica",
         "num_cargas",
         "edad_cargas",
         "rango_renta",
@@ -224,12 +235,12 @@
           "status",
           "nombre",
           "email",
-          "tel?fono",
+          "telefono",
           "rut",
           "comuna",
           "region",
           "sistema_actual",
-          "isapre_espec?fica",
+          "isapre_especifica",
           "comentarios",
           "cita_estado",
           "cita_fecha_hora",
@@ -286,7 +297,18 @@
     "rut_validation_rule": {
       "client_side": "El frontend limpia caracteres, formatea con puntos y guion y solo persiste si pasa modulo 11",
       "server_side": "El worker normaliza y vuelve a validar antes de escribir"
-    }
+    },
+    "form_routes": [
+      {
+        "method": "POST",
+        "path": "/api/form/leads",
+        "supports": [
+          "multipart FormData",
+          "JSON"
+        ],
+        "appointment_behavior": "Si cita_fecha_hora viene y GCAL_* esta configurado, crea evento en Calendar y guarda cita_calendar_event_id/url"
+      }
+    ]
   },
   "frontend_state": {
     "runtime_files": [
@@ -330,14 +352,12 @@
       "Ficha de lead mas compacta",
       "Campo RUT editable con validacion y formateo",
       "Comentario del lead contenido en caja mas compacta",
-      "Actualizado no visible en la UI principal del lead, pero updated_at sigue persistido"
+      "updated_at no visible en la UI principal del lead, pero sigue persistido"
     ],
     "features_removed_or_compacted": [
       "Hero grande del lead seleccionado",
-      "Badge textual Adjunto/Sin adjunto en la fila compacta",
-      "Vista inline grande del adjunto dentro del detalle",
-      "Estado vacio descriptivo del lead seleccionado",
-      "Bloque visible de Actualizado en la ficha del lead",
+      "Acceso inline grande al adjunto dentro del detalle",
+      "Bloque visible de updated_at en la ficha del lead",
       "Iniciales del lead como avatar principal en la bandeja"
     ],
     "known_ui_behavior": [
@@ -360,7 +380,7 @@
       "Worker Cloudflare en cloudflare/form-worker.js",
       "Toda mutacion admin debe registrar evento en lead_events",
       "Toda mutacion relevante debe actualizar updated_at",
-      "No exponer R2 p?blico; servir adjuntos solo via worker"
+      "No exponer R2 publico; servir adjuntos solo via worker"
     ],
     "deploy": [
       "Regenerar cloudflare/crm-worker.js con node cloudflare/build-crm-worker.mjs cada vez que cambie crm/*",
@@ -388,10 +408,10 @@
     ]
   },
   "deployment_and_validation_status": {
-    "last_substantive_ui_scope": "Refactor de la UI del asesor hacia layout tipo template: sidebar abierto/cerrado, topbar con profile arriba a la derecha, vistas Profile/Settings reales, bandeja de leads m?s compacta, clip como ?nico acceso al adjunto, campo RUT persistente y tags compactos",
+    "last_substantive_ui_scope": "Limpieza del CRM: se eliminaron capas falsas de persistencia no respaldadas por backend y se mantuvo solo la funcionalidad real del panel del asesor.",
     "deployed_for_this_scope": [
       "Migracion de columna rut aplicada en ppforms_db",
-      "ppforms redeployado con endpoint POST /api/admin/leads/:id/rut, b?squeda por rut y CORS local actualizado",
+      "ppforms redeployado con endpoint POST /api/admin/leads/:id/rut, busqueda por rut y CORS local actualizado",
       "cloudflare/crm-worker.js regenerado desde crm/*",
       "ppcrm redeployado con la UI compacta del asesor"
     ],
@@ -404,15 +424,13 @@
     ],
     "manual_checks_expected_after_deploy": [
       "Entrar a asesores.planespro.cl via Cloudflare Access",
-      "Verificar que el dashboard carga m?tricas y graficos",
-      "Abrir un lead y confirmar que el hero grande ya no existe",
+      "Verificar que el dashboard carga metricas y graficos",
       "Abrir adjunto solo desde el clip de la fila",
       "Guardar un RUT valido y verificar persistencia visual en la ficha",
       "Intentar guardar un RUT invalido y verificar rechazo visual",
-      "Confirmar que Actualizado no se muestra en la ficha",
+      "Confirmar que updated_at no se muestra en la ficha",
       "Confirmar que profile hover muestra Profile y Settings",
       "Confirmar que las vistas Profile y Settings existen y son navegables",
-      "Confirmar que el estado vac?o del detalle no muestra texto operativo",
       "Confirmar que el clip solo aparece en leads con adjunto"
     ],
     "known_gap_after_deploy": [
@@ -422,7 +440,7 @@
   "known_open_work_after_this_scope": {
     "next_priority": [
       "Pulir visualmente el dashboard para acercarlo aun mas al template de referencia sin agregar modulos irrelevantes",
-      "Agregar capa operativa: prioridad, ultimo contacto, proxima acci?n, motivo de archivado",
+      "Implementar la capa operativa real en backend y frontend: prioridad, ultimo_contacto, proxima_accion, motivo_archivado",
       "Profundizar agenda/citas antes de Google Calendar real"
     ],
     "not_ready_yet": [
@@ -446,6 +464,7 @@
     "No mover el CRM a form.planespro.cl/crm. Esa arquitectura ya fue evaluada y descartada. El CRM privado vive en asesores.planespro.cl.",
     "Si se toca el flujo de adjuntos, mantener el almacenamiento en R2 y la exposicion controlada por el worker.",
     "Si se toca el RUT, validar en cliente y servidor. No confiar solo en la mascara visual.",
-    "Si se cambia la UI del dashboard, conservar la orientacion a panel de asesor, no a panel de administrador global."
+    "Si se cambia la UI del dashboard, conservar la orientacion a panel de asesor, no a panel de administrador global.",
+    "No reintroducir persistencia local falsa para campos operativos que no existan en el backend real."
   ]
 }

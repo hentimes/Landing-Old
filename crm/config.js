@@ -28,12 +28,12 @@ export const RANGE_OPTIONS = {
   '1m': { label: '1 mes', days: 30 },
   '3m': { label: '3 meses', days: 90 },
   '6m': { label: '6 meses', days: 180 },
-  '1y': { label: '1 año', days: 365 },
+  '1y': { label: '1 ano', days: 365 },
 };
 
 export const ISAPRE_BUCKETS = [
   'Fonasa',
-  'Banmédica',
+  'Banmedica',
   'Colmena',
   'Consalud',
   'Cruz Blanca',

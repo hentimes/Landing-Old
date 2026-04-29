@@ -40,6 +40,9 @@ const state = {
   openPopover: '',
   profileMenuOpen: false,
   sidebarCollapsed: loadSidebarState(),
+  sortBy: 'created',
+  sortOrder: 'desc',
+  calendarDate: new Date(),
 };
 
 const elements = {
@@ -78,14 +81,14 @@ const elements = {
   leadDetailEmpty: document.getElementById('lead-detail-empty'),
   leadRowTemplate: document.getElementById('lead-row-template'),
   rangeChips: Array.from(document.querySelectorAll('.crm-range-chip')),
-  metricLeads: document.getElementById('metric-leads'),
-  metricClosed: document.getElementById('metric-closed'),
-  metricProposals: document.getElementById('metric-proposals'),
-  metricPending: document.getElementById('metric-pending'),
-  trendLeads: document.getElementById('trend-leads'),
-  trendClosed: document.getElementById('trend-closed'),
-  trendProposals: document.getElementById('trend-proposals'),
-  trendPending: document.getElementById('trend-pending'),
+  metricLeads: document.getElementById('tb-metric-leads'),
+  metricClosed: document.getElementById('tb-metric-closed'),
+  metricProposals: document.getElementById('tb-metric-proposals'),
+  metricPending: document.getElementById('tb-metric-pending'),
+  trendLeads: document.getElementById('tb-trend-leads'),
+  trendClosed: document.getElementById('tb-trend-closed'),
+  trendProposals: document.getElementById('tb-trend-proposals'),
+  trendPending: document.getElementById('tb-trend-pending'),
   overviewLineChart: document.getElementById('overview-line-chart'),
   overviewCaption: document.getElementById('overview-caption'),
   isapreDonut: document.getElementById('isapre-donut'),
@@ -98,6 +101,14 @@ const elements = {
   agendaListCaption: document.getElementById('agenda-list-caption'),
   agendaList: document.getElementById('agenda-list'),
   agendaSectionList: document.getElementById('agenda-section-list'),
+  leadsMetricNew: document.getElementById('leads-metric-new'),
+  leadsMetricContacted: document.getElementById('leads-metric-contacted'),
+  leadsMetricAnalysis: document.getElementById('leads-metric-analysis'),
+  leadsMetricProposals: document.getElementById('leads-metric-proposals'),
+  leadsBoxNew: document.getElementById('leads-metric-box-new'),
+  leadsBoxContacted: document.getElementById('leads-metric-box-contacted'),
+  leadsBoxAnalysis: document.getElementById('leads-metric-box-analysis'),
+  leadsBoxProposals: document.getElementById('leads-metric-box-proposals'),
   notificationButton: document.getElementById('notification-button'),
   updatesButton: document.getElementById('updates-button'),
   messagesButton: document.getElementById('messages-button'),
@@ -124,6 +135,15 @@ const elements = {
   fileModalTitle: document.getElementById('file-modal-title'),
   fileModalClose: document.getElementById('file-modal-close'),
   fileModalFrame: document.getElementById('file-modal-frame'),
+  calendarMonthYear: document.getElementById('calendar-month-year'),
+  calendarGrid: document.getElementById('calendar-grid'),
+  calendarPrev: document.getElementById('prev-month'),
+  calendarNext: document.getElementById('next-month'),
+  calendarToday: document.getElementById('today-month'),
+  calendarDayDetails: document.getElementById('calendar-day-details'),
+  selectedDayLabel: document.getElementById('selected-day-label'),
+  dayAppointmentsList: document.getElementById('day-appointments-list'),
+  closeDayDetails: document.getElementById('close-details'),
 };
 
 init();
@@ -165,12 +185,12 @@ function bindEvents() {
 
   elements.applyFilters?.addEventListener('click', renderLeadsView);
   elements.clearFilters?.addEventListener('click', () => {
-    elements.filterQ.value = '';
-    elements.filterStatus.value = '';
-    elements.filterSistema.value = '';
-    elements.filterIsapre.value = '';
-    elements.filterFrom.value = '';
-    elements.filterTo.value = '';
+    if (elements.filterQ) elements.filterQ.value = '';
+    if (elements.filterStatus) elements.filterStatus.value = '';
+    if (elements.filterSistema) elements.filterSistema.value = '';
+    if (elements.filterIsapre) elements.filterIsapre.value = '';
+    if (elements.filterFrom) elements.filterFrom.value = '';
+    if (elements.filterTo) elements.filterTo.value = '';
     renderLeadsView();
   });
 
@@ -215,12 +235,48 @@ function bindEvents() {
   elements.profilePhotoInput?.addEventListener('change', handleProfilePhotoChange);
   elements.profileReset?.addEventListener('click', resetProfile);
   elements.profileSave?.addEventListener('click', saveProfileChanges);
+
+  // Calendar navigation
+  elements.calendarPrev?.addEventListener('click', () => {
+    state.calendarDate.setMonth(state.calendarDate.getMonth() - 1);
+    renderCalendar();
+  });
+  elements.calendarNext?.addEventListener('click', () => {
+    state.calendarDate.setMonth(state.calendarDate.getMonth() + 1);
+    renderCalendar();
+  });
+  elements.calendarToday?.addEventListener('click', () => {
+    state.calendarDate = new Date();
+    renderCalendar();
+  });
+  elements.closeDayDetails?.addEventListener('click', () => {
+    elements.calendarDayDetails.hidden = true;
+  });
+
   elements.openProfileEditor?.addEventListener('click', openProfileModal);
 
   elements.fileModalClose?.addEventListener('click', closeFileModal);
   elements.fileModal?.addEventListener('click', (event) => {
     if (!event.target.closest('.crm-file-modal__card')) closeFileModal();
   });
+
+  document.querySelectorAll('.crm-sort-header').forEach((header) => {
+    header.addEventListener('click', () => {
+      const field = header.dataset.sort;
+      if (state.sortBy === field) {
+        state.sortOrder = state.sortOrder === 'asc' ? 'desc' : 'asc';
+      } else {
+        state.sortBy = field;
+        state.sortOrder = 'asc';
+      }
+      renderLeadsView();
+    });
+  });
+  
+  elements.leadsBoxNew?.addEventListener('click', () => quickFilterByStatus('Nuevo'));
+  elements.leadsBoxContacted?.addEventListener('click', () => quickFilterByStatus('Contactado'));
+  elements.leadsBoxAnalysis?.addEventListener('click', () => quickFilterByStatus('En analisis'));
+  elements.leadsBoxProposals?.addEventListener('click', () => quickFilterByStatus('Propuesta enviada'));
 
   if (isLocalDev) {
     window.addEventListener('storage', (event) => {
@@ -243,14 +299,15 @@ function setView(view) {
   elements.navItems.forEach((item) => item.classList.toggle('is-active', item.dataset.view === view));
   elements.viewPanels.forEach((panel) => panel.classList.toggle('is-active', panel.dataset.viewPanel === view));
   const meta = VIEW_META[view] || { title: 'CRM', crumb: 'CRM', copy: '' };
-  elements.viewTitle.textContent = meta.title;
-  elements.topbarActiveView.textContent = meta.crumb;
-  elements.viewCopy.textContent = meta.copy;
+  if (elements.viewTitle) elements.viewTitle.textContent = meta.title;
+  if (elements.topbarActiveView) elements.topbarActiveView.textContent = meta.crumb;
+  if (elements.viewCopy) elements.viewCopy.textContent = meta.copy;
 }
 
 async function bootstrap() {
   try {
     state.session = await getSession();
+
     const displayName = state.profile.name || state.session.actorEmail || 'Asesor';
     elements.sessionStatus.textContent = state.session.actorEmail || 'Acceso OK';
     elements.sidebarUserName.textContent = displayName;
@@ -266,12 +323,15 @@ async function bootstrap() {
   }
 }
 
-async function loadLeads() {
+async function loadLeads(skipFetch = false) {
   try {
-    const payload = await listLeads({ limit: 300 });
-    state.items = payload.items || [];
+    if (!skipFetch) {
+      const payload = await listLeads({ limit: 300 });
+      state.items = payload.items || [];
+    }
     state.filteredItems = applyLeadFilters(state.items);
     refreshDashboard();
+    renderLeadsMetrics(state.items);
     renderLeadsView();
     renderAgenda(state.items);
 
@@ -295,8 +355,57 @@ async function loadLeads() {
 
 function renderLeadsView() {
   state.filteredItems = applyLeadFilters(state.items);
-  elements.leadCount.textContent = `${state.filteredItems.length} resultados`;
+  
+  // Sort
+  state.filteredItems.sort((a, b) => {
+    let valA = a[state.sortBy];
+    let valB = b[state.sortBy];
+    
+    if (state.sortBy === 'created') {
+      valA = new Date(a.created_at || 0).getTime();
+      valB = new Date(b.created_at || 0).getTime();
+    }
+
+    if (state.sortBy === 'sistema') {
+      valA = normalizeText(a.isapre_especifica || a.sistema_actual || '');
+      valB = normalizeText(b.isapre_especifica || b.sistema_actual || '');
+    }
+
+    if (state.sortBy === 'file') {
+      valA = a.has_file ? 1 : 0;
+      valB = b.has_file ? 1 : 0;
+    }
+    
+    if (valA < valB) return state.sortOrder === 'asc' ? -1 : 1;
+    if (valA > valB) return state.sortOrder === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  // Header & Search merging
+  elements.leadCount.textContent = `${state.filteredItems.length} leads captados`;
+  renderLeadsMetrics(state.items);
   renderList(state.filteredItems);
+}
+
+function renderLeadsMetrics(items = []) {
+  if (!elements.leadsMetricNew) return;
+  
+  const countNew = items.filter(i => i.status === 'Nuevo').length;
+  const countContacted = items.filter(i => i.status === 'Contactado').length;
+  const countAnalysis = items.filter(i => i.status === 'En analisis').length;
+  const countProposals = items.filter(i => i.status === 'Propuesta enviada').length;
+  
+  elements.leadsMetricNew.textContent = String(countNew);
+  elements.leadsMetricContacted.textContent = String(countContacted);
+  elements.leadsMetricAnalysis.textContent = String(countAnalysis);
+  elements.leadsMetricProposals.textContent = String(countProposals);
+}
+
+function quickFilterByStatus(status) {
+  if (elements.filterStatus) {
+    elements.filterStatus.value = status;
+    renderLeadsView();
+  }
 }
 
 function refreshDashboard() {
@@ -345,6 +454,41 @@ function renderDashboard(items = [], previousItems = []) {
   hydratePopovers(items);
 }
 
+function renderStatusRow(label, count, total) {
+  const percent = Math.round((count / total) * 100);
+  const normalized = normalizeText(label);
+  let icon = 'fa-circle';
+  let colorClass = 'neutral';
+
+  if (normalized.includes('completado') || normalized.includes('cerrado')) {
+    icon = 'fa-check-double'; colorClass = 'success';
+  } else if (normalized.includes('contactado') || normalized.includes('propuesta')) {
+    icon = 'fa-phone-alt'; colorClass = 'info';
+  } else if (normalized.includes('analisis') || normalized.includes('evaluacion')) {
+    icon = 'fa-microscope'; colorClass = 'warning';
+  } else if (normalized.includes('nuevo') || normalized.includes('contactar')) {
+    icon = 'fa-star'; colorClass = 'new';
+  } else if (normalized.includes('pendiente') || normalized.includes('espera')) {
+    icon = 'fa-clock'; colorClass = 'pending';
+  }
+
+  return `
+    <div class="crm-status-row">
+      <div class="crm-status-row__main">
+        <i class="fas ${icon} crm-status-icon--${colorClass}"></i>
+        <span class="crm-status-row__label">${escapeHtml(label)}</span>
+      </div>
+      <div class="crm-status-row__data">
+        <div class="crm-status-row__bar-wrap">
+          <div class="crm-status-row__bar crm-status-row__bar--${colorClass}" style="width: ${percent}%"></div>
+        </div>
+        <span class="crm-status-row__count"><strong>${count}</strong></span>
+        <span class="crm-status-row__percent">${percent}%</span>
+      </div>
+    </div>
+  `;
+}
+
 function renderAgenda(items = []) {
   const appointments = buildAppointments(items);
   const now = new Date();
@@ -357,15 +501,68 @@ function renderAgenda(items = []) {
   elements.agendaCountPending.textContent = String(appointments.filter((item) => !item.status || ['Pendiente', 'Por coordinar'].includes(item.status)).length);
   elements.agendaCountUpcoming.textContent = String(appointments.filter((item) => item.date >= now && item.date <= nextWeek).length);
 
-  const markup = appointments.length
-    ? appointments.slice(0, 8).map(renderAppointmentItem).join('')
-    : '<p class="crm-muted">Cuando empieces a agendar reuniones, aparecerán aquí.</p>';
-
-  elements.agendaListCaption.textContent = appointments.length ? `${appointments.length} citas cargadas` : 'Sin citas por ahora';
-  elements.agendaList.innerHTML = markup;
-  elements.agendaSectionList.innerHTML = markup;
-  bindAgendaClicks();
+  renderCalendar();
 }
+
+function renderCalendar() {
+  const year = state.calendarDate.getFullYear();
+  const month = state.calendarDate.getMonth();
+  
+  const monthName = new Intl.DateTimeFormat('es-CL', { month: 'long', year: 'numeric' }).format(state.calendarDate);
+  elements.calendarMonthYear.textContent = monthName;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+  const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+
+  const appointments = buildAppointments(state.items);
+  
+  let html = '';
+  // Padding days
+  for (let i = 0; i < firstDay; i++) {
+    html += '<div class="crm-calendar-day crm-calendar-day--other"></div>';
+  }
+
+  // Actual days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dayIso = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const dayAppointments = appointments.filter(a => a.rawDate.slice(0, 10) === dayIso);
+    const todayClass = (isCurrentMonth && today.getDate() === d) ? 'crm-calendar-day--today' : '';
+    
+    const eventsHtml = dayAppointments.map(a => `
+      <div class="calendar-event calendar-event--${(a.status || 'pending').toLowerCase()}" title="${escapeHtml(a.title)}">
+        ${escapeHtml(a.title)}
+      </div>
+    `).join('');
+
+    html += `
+      <div class="crm-calendar-day ${todayClass}" onclick="handleCalendarDayClick('${dayIso}')">
+        <span class="day-number">${d}</span>
+        <div class="crm-calendar-events">${eventsHtml}</div>
+      </div>
+    `;
+  }
+
+  elements.calendarGrid.innerHTML = html;
+}
+
+window.handleCalendarDayClick = (dayIso) => {
+  const appointments = buildAppointments(state.items);
+  const dayAppointments = appointments.filter(a => a.rawDate.slice(0, 10) === dayIso);
+  const dateObj = new Date(`${dayIso}T12:00:00`);
+  const dateLabel = new Intl.DateTimeFormat('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }).format(dateObj);
+
+  elements.selectedDayLabel.textContent = dateLabel;
+  elements.calendarDayDetails.hidden = false;
+
+  if (dayAppointments.length === 0) {
+    elements.dayAppointmentsList.innerHTML = '<p class="crm-muted">Sin citas para este día.</p>';
+  } else {
+    elements.dayAppointmentsList.innerHTML = dayAppointments.map(renderAppointmentItem).join('');
+    bindAgendaClicks();
+  }
+};
 
 function renderList(items) {
   elements.leadList.innerHTML = '';
@@ -382,12 +579,21 @@ function renderList(items) {
 
     const avatar = node.querySelector('[data-field="avatar"]');
     paintAvatar(avatar, item.nombre || item.email || item.telefono || item.id);
-    node.querySelector('[data-field="nombre"]').textContent = item.nombre || 'Sin nombre';
-    node.querySelector('[data-field="contacto"]').textContent = [item.rut ? formatRut(item.rut) : '', item.telefono, item.email].filter(Boolean).join(' · ') || 'Sin contacto';
-    node.querySelector('[data-field="sistema"]').textContent = item.sistema_actual || 'Sin sistema';
-    node.querySelector('[data-field="isapre"]').textContent = item.isapre_especifica || 'Sin isapre';
+    
+    // Nombre + RUT Icon
+    const nameNode = node.querySelector('[data-field="nombre"]');
+    const rutIcon = item.rut ? ' <i class="fas fa-address-card crm-rut-icon" title="RUT registrado"></i>' : '';
+    nameNode.innerHTML = `${escapeHtml(item.nombre || 'Sin nombre')}${rutIcon}`;
+    
+    node.querySelector('[data-field="contacto"]').textContent = [item.telefono, item.email].filter(Boolean).join(' · ') || 'Sin contacto';
+    // Sistema / Isapre flip (Nombre Isapre arriba, Tipo abajo)
+    const systemName = item.isapre_especifica || item.sistema_actual || 'Sin dato';
+    const systemType = item.isapre_especifica ? (item.sistema_actual || 'Isapre') : (item.sistema_actual || '');
+    node.querySelector('[data-field="sistema"]').textContent = systemName;
+    node.querySelector('[data-field="isapre"]').textContent = systemType;
+    
     const statusNode = node.querySelector('[data-field="status"]');
-    statusNode.textContent = item.status || 'Sin estado';
+    statusNode.textContent = (item.status || 'Sin estado').slice(0, 12);
     statusNode.className = `crm-badge ${statusBadgeClass(item.status)}`;
     node.querySelector('[data-field="created"]').textContent = formatDate(item.created_at);
     node.querySelector('[data-field="region"]').textContent = item.region || 'Sin región';
@@ -461,27 +667,17 @@ function renderDetail(payload, errorMessage = '') {
 
   elements.leadDetail.innerHTML = `
     ${renderDetailHeader(lead)}
-    <div class="crm-detail-grid crm-detail-grid--compact">
-      ${renderInfoCard(lead)}
-      ${renderCommentCard(lead)}
-      ${renderRutCard(lead)}
-      ${renderActionsCard(lead)}
-      ${renderAppointmentCard(lead)}
-      <div class="crm-card crm-card--detail-wide">
-        <div class="crm-card__header">
-          <h3>Notas internas</h3>
-        </div>
-        <form id="note-form" class="crm-note-form">
-          <textarea id="note-text" rows="3" placeholder="Registrar seguimiento, contexto comercial o acuerdos."></textarea>
-          <button type="submit" class="button button--primary">Guardar nota</button>
-        </form>
-        <div class="crm-note-list">${notesHtml}</div>
+    <div class="crm-detail-layout-grid">
+      <div class="crm-detail-main-col">
+        ${renderCommentCard(lead)}
+        ${renderNotesCard(notes)}
+        ${renderEventsCard(events)}
       </div>
-      <div class="crm-card crm-card--detail-wide">
-        <div class="crm-card__header">
-          <h3>Historial</h3>
-        </div>
-        <div class="crm-event-list">${eventsHtml}</div>
+      <div class="crm-detail-side-col">
+        ${renderInfoCard(lead)}
+        ${renderRutCard(lead)}
+        ${renderActionsCard(lead)}
+        ${renderAppointmentCard(lead)}
       </div>
     </div>
   `;
@@ -497,9 +693,9 @@ function renderDetailHeader(lead) {
         <div>
           <h2>${escapeHtml(lead.nombre || 'Sin nombre')}</h2>
           <div class="crm-chip-row crm-chip-row--compact">
-            ${lead.rut ? `<span class="crm-chip crm-chip--accent">${escapeHtml(formatRut(lead.rut))}</span>` : ''}
-            ${lead.telefono ? `<span class="crm-chip">${escapeHtml(lead.telefono)}</span>` : ''}
-            ${lead.email ? `<span class="crm-chip">${escapeHtml(lead.email)}</span>` : ''}
+            ${lead.rut ? `<span class="crm-chip crm-chip--accent"><i class="fas fa-id-card"></i> ${escapeHtml(formatRut(lead.rut))}</span>` : ''}
+            ${lead.telefono ? `<span class="crm-chip"><i class="fas fa-phone"></i> ${escapeHtml(lead.telefono)}</span>` : ''}
+            ${lead.email ? `<span class="crm-chip"><i class="fas fa-envelope"></i> ${escapeHtml(lead.email)}</span>` : ''}
             ${lead.sistema_actual ? `<span class="crm-chip crm-chip--outline">${escapeHtml(lead.sistema_actual)}</span>` : ''}
             ${lead.isapre_especifica ? `<span class="crm-chip">${escapeHtml(lead.isapre_especifica)}</span>` : ''}
           </div>
@@ -576,7 +772,8 @@ function bindDetailActions(lead) {
   });
 
   archiveButton?.addEventListener('click', async () => {
-    const reason = window.prompt('Motivo de archivado (opcional):', '');
+    const reason = window.prompt('Motivo de archivado:', '');
+    if (reason === null) return;
     archiveButton.disabled = true;
     try {
       await archiveLead(lead.id, reason || '');
@@ -601,10 +798,17 @@ function bindDetailActions(lead) {
       window.alert(error.message);
     }
   });
+
+  // Collapsible logic
+  document.querySelectorAll('.crm-card--collapsible .crm-card__header').forEach(header => {
+    header.addEventListener('click', () => {
+      header.parentElement.classList.toggle('is-collapsed');
+    });
+  });
 }
 
 function renderInfoCard(lead) {
-  const rows = [
+  const data = [
     ['Correo', lead.email || 'Sin correo'],
     ['Teléfono', lead.telefono || 'Sin teléfono'],
     ['RUT', lead.rut ? formatRut(lead.rut) : 'Sin RUT'],
@@ -617,51 +821,102 @@ function renderInfoCard(lead) {
     ['Edad cargas', lead.edad_cargas || 'Sin dato'],
     ['Renta', lead.rango_renta || 'Sin dato'],
     ['Creado', formatDateTime(lead.created_at)],
-  ].map(([label, value]) => `
-      <div class="crm-kv">
+  ];
+  
+  const rows = data.map(([label, value]) => `
+      <div class="crm-kv crm-kv--compact">
         <span>${escapeHtml(label)}</span>
         <strong>${escapeHtml(value)}</strong>
       </div>
     `).join('');
 
   return `
-    <div class="crm-card">
+    <div class="crm-card crm-card--compact-data">
       <div class="crm-card__header">
         <h3>Datos del lead</h3>
       </div>
-      <div class="crm-kv-grid">${rows}</div>
+      <div class="crm-kv-grid crm-kv-grid--dense">${rows}</div>
     </div>
   `;
 }
 
 function renderCommentCard(lead) {
+  const hasComment = !!lead.comentarios;
   return `
-    <div class="crm-card crm-card--comment">
+    <div class="crm-card crm-card--comment-compact crm-card--collapsible ${!hasComment ? 'is-collapsed' : ''}">
       <div class="crm-card__header">
-        <h3>Comentario</h3>
+        <h3>Comentario del lead</h3>
       </div>
-      <div class="crm-comment-box">
-        <p class="crm-long-text">${escapeHtml(lead.comentarios || 'Sin comentario entregado.')}</p>
+      <div class="crm-comment-box-compact">
+        <p class="crm-long-text-compact">${escapeHtml(lead.comentarios || 'Sin comentario adicional.')}</p>
       </div>
     </div>
   `;
 }
 
+function renderNotesCard(notes = []) {
+  const notesHtml = notes.length
+    ? notes.map((note) => `
+      <article class="crm-note">
+        <header>
+          <strong>${escapeHtml(note.author_email)}</strong>
+          <span>${formatDateTime(note.created_at)}</span>
+        </header>
+        <p>${escapeHtml(note.note_text)}</p>
+      </article>
+    `).join('')
+    : '<p class="crm-muted">Sin notas internas todavía.</p>';
+
+  return `
+    <div class="crm-card crm-card--detail-wide crm-card--collapsible">
+      <div class="crm-card__header">
+        <h3>Notas internas</h3>
+      </div>
+      <form id="note-form" class="crm-note-form">
+        <textarea id="note-text" rows="2" placeholder="Registrar seguimiento comercial..."></textarea>
+        <button type="submit" class="button button--primary button--compact">Guardar nota</button>
+      </form>
+      <div class="crm-note-list">${notesHtml}</div>
+    </div>
+  `;
+}
+
+function renderEventsCard(events = []) {
+  const eventsHtml = events.length
+    ? events.map((event) => `
+      <article class="crm-event">
+        <strong>${escapeHtml(event.event_type)}</strong>
+        <span>${formatDateTime(event.created_at)} · ${escapeHtml(event.actor_email)}</span>
+      </article>
+    `).join('')
+    : '<p class="crm-muted">Sin eventos registrados.</p>';
+
+  return `
+    <div class="crm-card crm-card--detail-wide crm-card--collapsible is-collapsed">
+      <div class="crm-card__header">
+        <h3>Historial</h3>
+      </div>
+      <div class="crm-event-list">${eventsHtml}</div>
+    </div>
+  `;
+}
+
 function renderRutCard(lead) {
+  if (lead.rut) return '';
   const rut = formatRut(lead.rut || '');
   return `
-    <div class="crm-card">
+    <div class="crm-card crm-card--highlight">
       <div class="crm-card__header">
-        <h3>RUT del lead</h3>
+        <h3>Completar RUT</h3>
       </div>
       <div class="crm-actions">
+        <p class="crm-rut-help">Este lead no tiene RUT registrado. Ingrésalo para completar el perfil.</p>
         <label>
-          <span>RUT</span>
           <input id="lead-rut" type="text" inputmode="text" autocomplete="off" placeholder="12.345.678-5" value="${escapeHtml(rut)}" />
         </label>
-        <div class="crm-actions__buttons crm-actions__buttons--stack">
+        <div class="crm-actions__buttons crm-mt-10">
           <button type="button" id="save-rut" class="button button--secondary button--compact">Guardar RUT</button>
-          <small id="rut-feedback" class="crm-inline-feedback">${rut ? `RUT actual: ${escapeHtml(rut)}` : 'Sin RUT ingresado.'}</small>
+          <small id="rut-feedback" class="crm-inline-feedback"></small>
         </div>
       </div>
     </div>
@@ -726,12 +981,14 @@ function hydrateStatusOptions() {
 }
 
 function applyLeadFilters(items) {
-  const query = normalizeText(elements.filterQ.value.trim());
-  const status = elements.filterStatus.value;
-  const sistema = elements.filterSistema.value;
-  const isapre = normalizeText(elements.filterIsapre.value.trim());
-  const from = elements.filterFrom.value ? new Date(`${elements.filterFrom.value}T00:00:00`) : null;
-  const to = elements.filterTo.value ? new Date(`${elements.filterTo.value}T23:59:59`) : null;
+  const query = normalizeText(elements.filterQ?.value?.trim() || '');
+  const status = elements.filterStatus?.value || '';
+  const sistema = elements.filterSistema?.value || '';
+  const isapre = normalizeText(elements.filterIsapre?.value?.trim() || '');
+  const fromValue = elements.filterFrom?.value;
+  const toValue = elements.filterTo?.value;
+  const from = fromValue ? new Date(`${fromValue}T00:00:00`) : null;
+  const to = toValue ? new Date(`${toValue}T23:59:59`) : null;
 
   return items.filter((item) => {
     if (status && item.status !== status) return false;
@@ -834,39 +1091,63 @@ function buildSeries(items, rangeKey) {
 }
 
 function buildLineChartSvg(labels, datasets) {
-  const width = 760;
-  const height = 248;
-  const padding = { top: 12, right: 18, bottom: 28, left: 18 };
+  const width = 800;
+  const height = 200;
+  const padding = { top: 2, right: 16, bottom: 25, left: 16 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
-  const max = Math.max(1, ...datasets.flatMap((dataset) => dataset.values));
-  const pointsFor = (values) => values.map((value, index) => {
-    const x = padding.left + (chartWidth / Math.max(values.length - 1, 1)) * index;
-    const y = padding.top + chartHeight - ((value / max) * chartHeight);
-    return [x, y];
-  });
+  const max = Math.max(1, ...datasets.flatMap((dataset) => dataset.values)) * 1.1;
 
-  const lines = datasets.map((dataset) => {
-    const points = pointsFor(dataset.values);
-    const path = points.map(([x, y], index) => `${index === 0 ? 'M' : 'L'} ${x} ${y}`).join(' ');
-    const area = `${path} L ${points.at(-1)[0]} ${padding.top + chartHeight} L ${points[0][0]} ${padding.top + chartHeight} Z`;
+  const pointsFor = (values) => values.map((value, index) => ({
+    x: padding.left + (chartWidth / Math.max(values.length - 1, 1)) * index,
+    y: padding.top + chartHeight - ((value / max) * chartHeight)
+  }));
+
+  const getBezierPath = (points) => {
+    if (points.length === 0) return '';
+    let d = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const cp1x = p0.x + (p1.x - p0.x) / 2.5;
+      const cp2x = p1.x - (p1.x - p0.x) / 2.5;
+      d += ` C ${cp1x} ${p0.y}, ${cp2x} ${p1.y}, ${p1.x} ${p1.y}`;
+    }
+    return d;
+  };
+
+  const drawDatasets = datasets.map((dataset, dIdx) => {
+    const pts = pointsFor(dataset.values);
+    const pathData = getBezierPath(pts);
+    const gradId = `grad-${dIdx}`;
+    const areaPath = `${pathData} L ${pts[pts.length - 1].x} ${padding.top + chartHeight} L ${pts[0].x} ${padding.top + chartHeight} Z`;
+    const softColor = dIdx === 0 ? '#4285f4' : '#64748b'; // Azul claro para leads
+
     return `
-      <path d="${area}" fill="${dataset.fill}" stroke="none"></path>
-      <path d="${path}" fill="none" stroke="${dataset.color}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+      <defs>
+        <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${softColor}" stop-opacity="0.2" />
+          <stop offset="100%" stop-color="${softColor}" stop-opacity="0" />
+        </linearGradient>
+      </defs>
+      <path d="${areaPath}" fill="url(#${gradId})" stroke="none" />
+      <path d="${pathData}" fill="none" stroke="${softColor}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
     `;
   }).join('');
 
-  const grid = Array.from({ length: 4 }, (_, index) => {
-    const y = padding.top + (chartHeight / 3) * index;
-    return `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="#d7e3f1" stroke-dasharray="4 6"></line>`;
-  }).join('');
-
-  const xLabels = labels.map((label, index) => {
+  const vGrid = labels.map((_, index) => {
     const x = padding.left + (chartWidth / Math.max(labels.length - 1, 1)) * index;
-    return `<text x="${x}" y="${height - 6}" text-anchor="middle" fill="#73819a" font-size="11">${escapeHtml(label)}</text>`;
+    return `<line x1="${x}" y1="${padding.top}" x2="${x}" y2="${padding.top + chartHeight}" stroke="#f1f5f9" stroke-width="1" />`;
   }).join('');
 
-  return `<svg viewBox="0 0 ${width} ${height}" class="crm-chart-svg" aria-hidden="true">${grid}${lines}${xLabels}</svg>`;
+  const xAxis = `<line x1="${padding.left}" y1="${padding.top + chartHeight}" x2="${padding.left + chartWidth}" y2="${padding.top + chartHeight}" stroke="#e2e8f0" stroke-width="0.8" />`;
+
+  const xLabelsMarkup = labels.map((label, index) => {
+    const x = padding.left + (chartWidth / Math.max(labels.length - 1, 1)) * index;
+    return `<text x="${x}" y="${height - 2}" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="500">${escapeHtml(label)}</text>`;
+  }).join('');
+
+  return `<svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" style="width:100%;height:100%;display:block">${vGrid}${xAxis}${drawDatasets}${xLabelsMarkup}</svg>`;
 }
 
 function renderDonut(buckets) {

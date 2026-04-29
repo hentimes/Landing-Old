@@ -222,6 +222,32 @@ export function initPhoneField() {
     });
 }
 
+// ─── Toggle agenda/cita ─────────────────────────────────────────
+export function initAppointmentToggle() {
+    const checkbox = document.getElementById('sb-agendar-cita');
+    const wrap = document.getElementById('sb-cita-wrap');
+    const dt = document.getElementById('sb-cita-fecha-hora');
+    const estado = document.getElementById('sb-cita-estado');
+    if (!checkbox || !wrap || !dt) return;
+
+    const update = () => {
+        const active = checkbox.checked;
+        wrap.classList.toggle('sb-field-hidden', !active);
+        if (active) {
+            if (estado) estado.value = 'Pendiente';
+            dt.focus?.();
+        } else {
+            dt.value = '';
+            if (estado) estado.value = '';
+            wrap.classList.remove('sb-has-error');
+        }
+    };
+
+    checkbox.addEventListener('change', update);
+    update();
+}
+
+
 // ─── Validación del formulario ────────────────────────────────
 export function validateSidebar(form) {
     let valid = true;
@@ -243,6 +269,19 @@ export function validateSidebar(form) {
     if (tel && tel.value.replace(/\D/g, '').length !== 9) {
         tel.closest('.sb-field-group')?.classList.add('sb-has-error');
         valid = false;
+    }
+
+
+    // Cita opcional: si se activa, requiere fecha/hora
+    const agendar = form.querySelector('#sb-agendar-cita');
+    const citaWrap = form.querySelector('#sb-cita-wrap');
+    const citaDt = form.querySelector('#sb-cita-fecha-hora');
+    if (agendar?.checked) {
+        const empty = !String(citaDt?.value || '').trim();
+        citaWrap?.classList.toggle('sb-has-error', empty);
+        if (empty) valid = false;
+    } else {
+        citaWrap?.classList.remove('sb-has-error');
     }
     return valid;
 }

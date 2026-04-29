@@ -18,7 +18,7 @@
   <div class="crm-appshell">
     <aside class="crm-sidebar" id="crm-sidebar">
       <div class="crm-sidebar__top">
-        <button type="button" class="crm-sidebar__toggle" id="sidebar-toggle" aria-label="Expandir o contraer menú">
+        <button type="button" class="crm-sidebar__toggle" id="sidebar-toggle" aria-label="Expandir o contraer menÃƒÂº">
           <i class="fas fa-bars" aria-hidden="true"></i>
         </button>
         <div class="crm-sidebar__brand">
@@ -57,6 +57,7 @@
         </button>
       </nav>
 
+
       <div class="crm-sidebar__meta">
         <p class="crm-sidebar__label">Acceso</p>
         <div class="crm-keybox" id="admin-keybox">
@@ -66,7 +67,7 @@
             <button type="button" id="save-admin-key" class="button button--secondary">Guardar</button>
           </div>
         </div>
-        <p class="crm-sidebar__hint">Producción usa Cloudflare Access. Local sigue disponible para iterar.</p>
+        <p class="crm-sidebar__hint">Produccion usa Cloudflare Access. Local sigue disponible para iterar.</p>
       </div>
     </aside>
 
@@ -79,6 +80,7 @@
             <i class="fas fa-chevron-right" aria-hidden="true"></i>
             <strong id="topbar-active-view">Dashboard</strong>
           </div>
+          <div class="crm-header-metrics" id="header-metrics"></div>
         </div>
 
         <div class="crm-topbar__controls">
@@ -124,9 +126,129 @@
       </header>
 
       <div class="crm-page-toolbar">
-        <div>
+        <div class="crm-toolbar-metrics-container" id="dashboard-toolbar-metrics">
+          <div class="crm-metric-box">
+            <div class="crm-metric-box__val">
+              <strong id="tb-metric-leads">0</strong>
+              <span class="crm-metric-box__trend" id="tb-trend-leads">+0%</span>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-users" aria-hidden="true"></i>
+              <span>Leads</span>
+            </div>
+          </div>
+          <div class="crm-metric-box">
+            <div class="crm-metric-box__val">
+              <strong id="tb-metric-proposals">0</strong>
+              <span class="crm-metric-box__trend" id="tb-trend-proposals">+0%</span>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-file-invoice" aria-hidden="true"></i>
+              <span>Propuestas</span>
+            </div>
+          </div>
+          <div class="crm-metric-box">
+            <div class="crm-metric-box__val">
+              <strong id="tb-metric-closed">0</strong>
+              <span class="crm-metric-box__trend" id="tb-trend-closed">+0%</span>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-check-circle" aria-hidden="true"></i>
+              <span>Cerrados</span>
+            </div>
+          </div>
+          <div class="crm-metric-box">
+            <div class="crm-metric-box__val">
+              <strong id="tb-metric-pending">0</strong>
+              <span class="crm-metric-box__trend" id="tb-trend-pending">+0%</span>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-clock" aria-hidden="true"></i>
+              <span>Nuevos</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="crm-toolbar-metrics-container" id="leads-toolbar-metrics">
+          <div class="crm-metric-box crm-metric-box--clickable" id="leads-metric-box-new">
+            <div class="crm-metric-box__val">
+              <strong id="leads-metric-new">0</strong>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-star" aria-hidden="true"></i>
+              <span>Nuevo</span>
+            </div>
+          </div>
+          <div class="crm-metric-box crm-metric-box--clickable" id="leads-metric-box-contacted">
+            <div class="crm-metric-box__val">
+              <strong id="leads-metric-contacted">0</strong>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-phone-alt" aria-hidden="true"></i>
+              <span>Contactados</span>
+            </div>
+          </div>
+          <div class="crm-metric-box crm-metric-box--clickable" id="leads-metric-box-analysis">
+            <div class="crm-metric-box__val">
+              <strong id="leads-metric-analysis">0</strong>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-microscope" aria-hidden="true"></i>
+              <span>En anÃ¡lisis</span>
+            </div>
+          </div>
+          <div class="crm-metric-box crm-metric-box--clickable" id="leads-metric-box-proposals">
+            <div class="crm-metric-box__val">
+              <strong id="leads-metric-proposals">0</strong>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-file-invoice" aria-hidden="true"></i>
+              <span>Propuesta enviada</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="crm-toolbar-metrics-container" id="agenda-toolbar-metrics">
+          <div class="crm-metric-box">
+            <div class="crm-metric-box__val">
+              <strong id="agenda-count-total">0</strong>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-list-check" aria-hidden="true"></i>
+              <span>Citas registradas</span>
+            </div>
+          </div>
+          <div class="crm-metric-box">
+            <div class="crm-metric-box__val">
+              <strong id="agenda-count-today">0</strong>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-calendar-day" aria-hidden="true"></i>
+              <span>Hoy</span>
+            </div>
+          </div>
+          <div class="crm-metric-box">
+            <div class="crm-metric-box__val">
+              <strong id="agenda-count-pending">0</strong>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-hourglass-half" aria-hidden="true"></i>
+              <span>Pendientes</span>
+            </div>
+          </div>
+          <div class="crm-metric-box">
+            <div class="crm-metric-box__val">
+              <strong id="agenda-count-upcoming">0</strong>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-calendar-week" aria-hidden="true"></i>
+              <span>PrÃ³ximos 7 dÃ­as</span>
+            </div>
+          </div>
+        </div>
+        <div id="view-title-container">
           <h1 id="view-title">Dashboard</h1>
-          <p class="crm-page-toolbar__copy">Métricas, pipeline comercial y agenda del asesor.</p>
+          <p class="crm-page-toolbar__copy" hidden>Panel administrativo de leads</p>
         </div>
         <div class="crm-page-toolbar__right">
           <div class="crm-toolbar-summary">
@@ -140,148 +262,78 @@
             <button type="button" class="crm-range-chip" data-range="1m">1 mes</button>
             <button type="button" class="crm-range-chip" data-range="3m">3 meses</button>
             <button type="button" class="crm-range-chip" data-range="6m">6 meses</button>
-            <button type="button" class="crm-range-chip" data-range="1y">1 año</button>
+            <button type="button" class="crm-range-chip" data-range="1y">1 aÃ±o</button>
           </div>
         </div>
       </div>
 
       <section class="crm-view is-active" data-view-panel="dashboard">
-        <section class="crm-metric-grid">
-          <article class="crm-metric-card crm-metric-card--icon">
-            <div class="crm-metric-card__head">
-              <span class="crm-metric-card__icon"><i class="fas fa-users" aria-hidden="true"></i></span>
-              <span class="crm-metric-card__trend" id="trend-leads">0%</span>
-            </div>
-            <strong id="metric-leads">0</strong>
-            <span class="crm-metric-card__label">Leads</span>
-            <span class="crm-metric-card__meta">Captados en el periodo</span>
-          </article>
-          <article class="crm-metric-card crm-metric-card--icon">
-            <div class="crm-metric-card__head">
-              <span class="crm-metric-card__icon"><i class="fas fa-handshake" aria-hidden="true"></i></span>
-              <span class="crm-metric-card__trend" id="trend-proposals">0%</span>
-            </div>
-            <strong id="metric-proposals">0</strong>
-            <span class="crm-metric-card__label">Propuestas</span>
-            <span class="crm-metric-card__meta">Estado Propuesta enviada</span>
-          </article>
-          <article class="crm-metric-card crm-metric-card--icon">
-            <div class="crm-metric-card__head">
-              <span class="crm-metric-card__icon"><i class="fas fa-circle-check" aria-hidden="true"></i></span>
-              <span class="crm-metric-card__trend" id="trend-closed">0%</span>
-            </div>
-            <strong id="metric-closed">0</strong>
-            <span class="crm-metric-card__label">Cerrados</span>
-            <span class="crm-metric-card__meta">Estado Cerrado</span>
-          </article>
-          <article class="crm-metric-card crm-metric-card--icon">
-            <div class="crm-metric-card__head">
-              <span class="crm-metric-card__icon"><i class="fas fa-phone-volume" aria-hidden="true"></i></span>
-              <span class="crm-metric-card__trend" id="trend-pending">0%</span>
-            </div>
-            <strong id="metric-pending">0</strong>
-            <span class="crm-metric-card__label">Por contactar</span>
-            <span class="crm-metric-card__meta">Nuevos o primer contacto</span>
-          </article>
-        </section>
-
-        <section class="crm-dashboard-grid">
-          <article class="crm-card crm-card--chart">
-            <div class="crm-card__header">
-              <div>
-                <p class="crm-eyebrow">Overview</p>
-                <h2>Ingresos y cierres</h2>
+        <div class="crm-dashboard-content">
+          <div class="crm-dashboard-grid">
+            <article class="crm-card crm-card--chart">
+              <div class="crm-card__header">
+                <div>
+                  <p class="crm-eyebrow">Overview</p>
+                  <h2>Ingresos y cierres</h2>
+                </div>
+                <span class="crm-card__hint" id="overview-caption">Serie del periodo seleccionado</span>
               </div>
-              <span class="crm-card__hint" id="overview-caption">Serie del periodo seleccionado</span>
-            </div>
-            <div class="crm-line-chart" id="overview-line-chart"></div>
-            <div class="crm-line-chart__legend">
-              <span><i class="crm-legend-dot crm-legend-dot--primary"></i> Leads</span>
-              <span><i class="crm-legend-dot crm-legend-dot--dark"></i> Cerrados</span>
-            </div>
-          </article>
-
-          <article class="crm-card crm-card--compact">
-            <div class="crm-card__header">
-              <div>
-                <p class="crm-eyebrow">Distribución</p>
-                <h2>Fonasa / isapres</h2>
+              <div class="crm-line-chart" id="overview-line-chart"></div>
+              <div class="crm-chart-legend">
+                <div class="crm-legend-item"><span class="crm-dot" style="background:#2f80ed"></span> Leads</div>
+                <div class="crm-legend-item"><span class="crm-dot" style="background:#12284a"></span> Cerrados</div>
               </div>
-            </div>
-            <div class="crm-donut-wrap">
-              <div class="crm-donut" id="isapre-donut"></div>
-              <div class="crm-donut-legend" id="isapre-legend"></div>
-            </div>
-          </article>
+            </article>
 
-          <article class="crm-card crm-card--wide">
-            <div class="crm-card__header">
-              <div>
-                <p class="crm-eyebrow">Pipeline</p>
-                <h2>Estados de tus leads</h2>
+            <article class="crm-card crm-card--compact">
+              <div class="crm-card__header">
+                <div>
+                  <p class="crm-eyebrow">DistribuciÃ³n</p>
+                  <h2>Fonasa / isapres</h2>
+                </div>
               </div>
-              <span class="crm-card__hint">Vista compacta</span>
-            </div>
-            <div class="crm-status-list" id="status-breakdown"></div>
-          </article>
+              <div class="crm-donut-wrap">
+                <div class="crm-donut" id="isapre-donut"></div>
+                <div class="crm-legend" id="isapre-legend"></div>
+              </div>
+            </article>
 
-          <article class="crm-card crm-card--wide">
-            <div class="crm-card__header">
-              <div>
-                <p class="crm-eyebrow">Próximas citas</p>
-                <h2>Agenda inmediata</h2>
+            <article class="crm-card crm-card--wide">
+              <div class="crm-card__header">
+                <div>
+                  <p class="crm-eyebrow">Pipeline</p>
+                  <h2>Estados de tus leads</h2>
+                </div>
+                <span class="crm-card__hint">Vista compacta</span>
               </div>
-              <span id="agenda-list-caption" class="crm-card__hint">Sin citas por ahora</span>
-            </div>
-            <div id="agenda-list" class="crm-agenda-grid"></div>
-          </article>
-        </section>
+              <div id="status-breakdown"></div>
+            </article>
+
+            <article class="crm-card crm-card--wide">
+              <div class="crm-card__header">
+                <div>
+                  <p class="crm-eyebrow">PrÃ³ximas citas</p>
+                  <h2>Agenda inmediata</h2>
+                </div>
+                <span id="agenda-list-caption" class="crm-card__hint">Sin citas por ahora</span>
+              </div>
+              <div id="agenda-list"></div>
+            </article>
+          </div>
+        </div>
       </section>
 
       <section class="crm-view" data-view-panel="leads">
-        <section class="crm-filters">
-          <div class="crm-filters__header">
-            <div>
-              <p class="crm-eyebrow">Segmentación</p>
-              <h2>Bandeja de leads</h2>
-            </div>
-            <p class="crm-card__hint">Filtra por estado, sistema, isapre, texto o fechas.</p>
-          </div>
+        <section class="crm-filters crm-filters--compact">
           <div class="crm-filters__grid">
-            <label>
-              <span>Buscar</span>
-              <input id="filter-q" type="search" placeholder="Nombre, correo, teléfono, comuna o RUT" />
-            </label>
-            <label>
-              <span>Estado</span>
-              <select id="filter-status">
-                <option value="">Todos</option>
-              </select>
-            </label>
-            <label>
-              <span>Sistema</span>
-              <select id="filter-sistema">
-                <option value="">Todos</option>
-                <option value="Fonasa">Fonasa</option>
-                <option value="Isapre">Isapre</option>
-              </select>
-            </label>
-            <label>
-              <span>Isapre</span>
-              <input id="filter-isapre" type="text" placeholder="Colmena, Cruz Blanca..." />
-            </label>
-            <label>
-              <span>Desde</span>
-              <input id="filter-from" type="date" />
-            </label>
-            <label>
-              <span>Hasta</span>
-              <input id="filter-to" type="date" />
-            </label>
-          </div>
-          <div class="crm-filters__actions">
-            <button type="button" id="apply-filters" class="button button--primary">Aplicar filtros</button>
-            <button type="button" id="clear-filters" class="button button--ghost">Limpiar</button>
+            <input id="filter-q" type="search" placeholder="Nombre, RUT, Email..." />
+            <select id="filter-status"><option value="">Todos los estados</option></select>
+            <select id="filter-sistema"><option value="">Todos los sistemas</option><option value="Fonasa">Fonasa</option><option value="Isapre">Isapre</option></select>
+            <input id="filter-isapre" type="text" placeholder="Isapre especÃ­fica..." />
+            <div class="crm-filters__actions">
+              <button type="button" id="apply-filters" class="button button--primary button--compact">Filtrar</button>
+              <button type="button" id="clear-filters" class="button button--ghost button--compact">Limpiar</button>
+            </div>
           </div>
         </section>
 
@@ -295,11 +347,14 @@
               <strong id="lead-count">0 resultados</strong>
             </div>
             <div class="crm-list-head">
+              <span class="crm-list-head__avatar"></span>
               <span>Lead</span>
-              <span>Sistema</span>
-              <span>Estado</span>
-              <span>Ingreso</span>
-              <span class="crm-list-head__attach"><i class="fas fa-paperclip" aria-hidden="true"></i></span>
+                            <span class="crm-sort-header" data-sort="sistema">Sistema <i class="fas fa-sort"></i></span>
+              <span class="crm-sort-header" data-sort="status">Estado <i class="fas fa-sort"></i></span>
+              <span class="crm-sort-header" data-sort="created">Ingreso <i class="fas fa-sort"></i></span>
+              <span class="crm-sort-header crm-list-head__attach" data-sort="file" title="Ordenar por adjuntos">
+                <i class="fas fa-paperclip"></i>
+              </span>
             </div>
             <div id="lead-list" class="crm-list__items"></div>
           </article>
@@ -309,42 +364,60 @@
             <div id="lead-detail" class="crm-detail__content" hidden></div>
           </aside>
         </section>
-      </section>
 
       <section class="crm-view" data-view-panel="agenda">
-        <section class="crm-metric-grid crm-metric-grid--agenda">
-          <article class="crm-metric-card">
-            <span class="crm-metric-card__label">Citas registradas</span>
-            <strong id="agenda-count-total">0</strong>
-            <span class="crm-metric-card__meta">Total visible</span>
-          </article>
-          <article class="crm-metric-card">
-            <span class="crm-metric-card__label">Hoy</span>
-            <strong id="agenda-count-today">0</strong>
-            <span class="crm-metric-card__meta">Compromisos del día</span>
-          </article>
-          <article class="crm-metric-card">
-            <span class="crm-metric-card__label">Pendientes</span>
-            <strong id="agenda-count-pending">0</strong>
-            <span class="crm-metric-card__meta">Por coordinar o confirmar</span>
-          </article>
-          <article class="crm-metric-card">
-            <span class="crm-metric-card__label">Próximas 7 días</span>
-            <strong id="agenda-count-upcoming">0</strong>
-            <span class="crm-metric-card__meta">Agenda inmediata</span>
-          </article>
-        </section>
-
-        <section class="crm-card">
-          <div class="crm-card__header">
-            <div>
-              <p class="crm-eyebrow">Vista compacta</p>
-              <h2>Próximas citas</h2>
+        <div class="crm-calendar-wrapper">
+          <div class="crm-calendar-header">
+            <div class="crm-calendar-current">
+              <h2 id="calendar-month-year">Abril 2026</h2>
             </div>
-            <span class="crm-card__hint">En el futuro aquí entra Google Calendar</span>
+            <div class="crm-calendar-nav">
+              <button type="button" class="button button--ghost button--icon" id="prev-month" title="Mes anterior">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <button type="button" class="button button--ghost" id="today-month">Hoy</button>
+              <button type="button" class="button button--ghost button--icon" id="next-month" title="Mes siguiente">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
           </div>
-          <div id="agenda-section-list" class="crm-agenda-table"></div>
-        </section>
+
+          <div class="crm-calendar">
+            <div class="crm-calendar-weekdays">
+              <span>Dom</span>
+              <span>Lun</span>
+              <span>Mar</span>
+              <span>MiÃ©</span>
+              <span>Jue</span>
+              <span>Vie</span>
+              <span>SÃ¡b</span>
+            </div>
+            <div class="crm-calendar-grid" id="calendar-grid">
+              <!-- Los dÃ­as se generarÃ¡n dinÃ¡micamente -->
+            </div>
+          </div>
+
+          <div class="crm-calendar-footer">
+            <div class="crm-calendar-legend">
+              <span class="legend-item"><span class="dot dot--pending"></span> Pendiente</span>
+              <span class="legend-item"><span class="dot dot--confirmed"></span> Confirmada</span>
+              <span class="legend-item"><span class="dot dot--completed"></span> Realizada</span>
+            </div>
+            <span class="crm-card__hint">Conecta Google Calendar para sincronizar tu disponibilidad real</span>
+          </div>
+        </div>
+
+        <div id="calendar-day-details" class="crm-calendar-details" hidden>
+          <div class="crm-calendar-details-header">
+            <h3>Citas para el <span id="selected-day-label">--</span></h3>
+            <button type="button" class="button button--ghost" id="close-details">Cerrar</button>
+          </div>
+          <div id="day-appointments-list" class="crm-appointment-list">
+            <!-- Citas filtradas por dÃ­a -->
+          </div>
+        </div>
+
+        <div id="agenda-section-list" class="crm-agenda-table"></div>
       </section>
 
       <section class="crm-view" data-view-panel="profile">
@@ -363,6 +436,7 @@
                 <strong id="profile-page-name">Asesor</strong>
                 <span>Panel del asesor PlanesPro</span>
               </div>
+              <button type="button" id="open-profile-editor" class="button button--secondary button--compact crm-profile-page__cta">Editar perfil</button>
             </div>
             <div class="crm-profile-page__grid">
               <div class="crm-card crm-card--inner">
@@ -375,37 +449,35 @@
               </div>
               <div class="crm-card crm-card--inner">
                 <div class="crm-card__header"><h3>Preferencias</h3></div>
-                <p class="crm-long-text">La foto y el nombre visibles del asesor se editan desde el menú superior. Esta sección resume cómo se presenta tu cuenta dentro del CRM.</p>
+                <p class="crm-long-text">La foto y el nombre visibles del asesor se editan desde el menÃƒÂº superior. Esta secciÃƒÂ³n resume cÃƒÂ³mo se presenta tu cuenta dentro del CRM.</p>
               </div>
             </div>
           </div>
         </section>
-      </section>
 
       <section class="crm-view" data-view-panel="settings">
         <section class="crm-card crm-card--page">
           <div class="crm-card__header">
             <div>
               <p class="crm-eyebrow">Settings</p>
-              <h2>Configuración del CRM</h2>
+              <h2>ConfiguraciÃƒÂ³n del CRM</h2>
             </div>
           </div>
           <div class="crm-settings-grid">
             <div class="crm-card crm-card--inner">
               <div class="crm-card__header"><h3>Acceso</h3></div>
               <div class="crm-kv-grid crm-kv-grid--single">
-                <div class="crm-kv"><span>Modo producción</span><strong>Cloudflare Access</strong></div>
+                <div class="crm-kv"><span>Modo producciÃƒÂ³n</span><strong>Cloudflare Access</strong></div>
                 <div class="crm-kv"><span>Modo local</span><strong>Clave manual</strong></div>
                 <div class="crm-kv"><span>Backend</span><strong>form.planespro.cl</strong></div>
               </div>
             </div>
             <div class="crm-card crm-card--inner">
               <div class="crm-card__header"><h3>Notas</h3></div>
-              <p class="crm-long-text">Esta etapa sigue orientada al asesor dueño de sus leads. Las capas de prioridad, último contacto, próxima acción y agenda avanzada siguen pendientes según el roadmap.</p>
+              <p class="crm-long-text">Esta etapa sigue orientada al asesor dueno de sus leads. El foco actual es mantener una operacion clara, estable y trazable.</p>
             </div>
           </div>
         </section>
-      </section>
     </main>
   </div>
 
@@ -474,12 +546,17 @@
         <strong data-field="created"></strong>
         <span data-field="region"></span>
       </div>
-      <button type="button" class="crm-lead-row__attach" data-field="attach" title="Ver adjunto" aria-label="Ver adjunto" hidden>
-        <i class="fas fa-paperclip" aria-hidden="true"></i>
-      </button>
+      <div class="crm-lead-row__attach-cell">
+        <button type="button" class="crm-lead-row__attach" data-field="attach" title="Ver adjunto" aria-label="Ver adjunto" hidden>
+          <i class="fas fa-paperclip" aria-hidden="true"></i>
+        </button>
+      </div>
     </article>
   </template>
 
   <script type="module" src="./app.js"></script>
 </body>
 </html>
+
+
+

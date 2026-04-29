@@ -10,6 +10,7 @@ import {
     initSistemaToggle,
     initCargasModal,
     initPhoneField,
+    initAppointmentToggle,
     validateSidebar,
 } from './fields.js';
 import {
@@ -33,6 +34,7 @@ export function initSidebar() {
         initSistemaToggle();
         initCargasModal();
         initPhoneField();
+        initAppointmentToggle();
         bindFormSubmit();
         bindFileUpload();
         bindProgressSave();
@@ -257,6 +259,28 @@ function injectHTML() {
         <!-- ── SECCIÓN 3: Extras ────────────────────────── -->
         <div class="sb-section sb-section--last">
 
+          <!-- Agenda (opcional) -->
+          <div class="sb-field-group">
+            <label class="sb-label" for="sb-agendar-cita">
+              Agendar cita
+              <span class="sb-badge-opt">Opcional</span>
+            </label>
+            <label class="sb-checkbox">
+              <input type="checkbox" id="sb-agendar-cita" name="agendar_cita" value="1" />
+              <span>Quiero agendar una llamada</span>
+            </label>
+          </div>
+
+          <div class="sb-field-group sb-field-hidden" id="sb-cita-wrap">
+            <label class="sb-label" for="sb-cita-fecha-hora">
+              Fecha y hora
+              <span class="sb-req">*</span>
+            </label>
+            <input type="datetime-local" id="sb-cita-fecha-hora" name="cita_fecha_hora" class="sb-input" />
+            <span class="sb-field-error">Selecciona fecha y hora</span>
+            <p class="sb-hint">Duración estimada: 30 minutos.</p>
+          </div>
+
           <!-- Archivo -->
           <div class="sb-field-group">
             <label class="sb-label" for="sb-archivo">
@@ -286,7 +310,6 @@ function injectHTML() {
 
           <!-- Error envío -->
           <input type="hidden" id="sb-cita-estado" name="cita_estado" value="" />
-          <input type="hidden" id="sb-cita-fecha-hora" name="cita_fecha_hora" value="" />
           <input type="hidden" id="sb-cita-calendar-event-id" name="cita_calendar_event_id" value="" />
           <input type="hidden" id="sb-cita-calendar-url" name="cita_calendar_url" value="" />
 

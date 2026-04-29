@@ -155,7 +155,49 @@ async function handleLeadCreate(request, env) {
     JSON.stringify(normalized.raw_payload)
   ).run();
 
-  return json({ ok: true, leadId }, 200, env, request);
+  const calendarResult = await maybeCreateCalendarEvent(env, normalized).catch((error) => ({
+    ok: false,
+    error: error?.message || 'calendar_error',
+  }));
+
+  if (calendarResult?.ok) {
+    const nowUpdate = new Date().toISOString();
+    await env.FORM_DB.prepare(`
+      UPDATE form_leads
+      SET
+        updated_at = ?,
+        cita_estado = ?,
+        cita_fecha_hora = ?,
+        cita_calendar_event_id = ?,
+        cita_calendar_url = ?
+      WHERE id = ?
+    `).bind(
+      nowUpdate,
+      calendarResult.cita_estado || normalized.cita_estado || 'Agendada',
+      calendarResult.cita_fecha_hora || normalized.cita_fecha_hora || '',
+      calendarResult.cita_calendar_event_id || '',
+      calendarResult.cita_calendar_url || '',
+      leadId
+    ).run();
+
+    await insertLeadEvent(env, {
+      leadId,
+      eventType: 'appointment_created',
+      actorEmail: 'system',
+      payload: {
+        cita_fecha_hora: calendarResult.cita_fecha_hora || normalized.cita_fecha_hora || '',
+        cita_calendar_event_id: calendarResult.cita_calendar_event_id || '',
+      },
+      createdAt: nowUpdate,
+    });
+  }
+
+  return json(
+    { ok: true, leadId, calendar: calendarResult?.ok ? calendarResult : undefined },
+    200,
+    env,
+    request
+  );
 }
 
 async function handleLeadAbandoned(request, env) {
@@ -576,6 +618,172 @@ function normalizeLead(payload, leadId, now, fallbackStatus) {
     cita_calendar_url: payload.cita_calendar_url || '',
     raw_payload: payload,
   };
+}
+
+async function maybeCreateCalendarEvent(env, normalizedLead) {
+  const citaRaw = String(normalizedLead?.cita_fecha_hora || '').trim();
+  if (!citaRaw) return { ok: false, skipped: true };
+
+  const saEmail = String(env.GCAL_SA_EMAIL || '').trim();
+  const privateKeyRaw = String(env.GCAL_SA_PRIVATE_KEY || '').trim();
+  const calendarId = String(env.GCAL_CALENDAR_ID || '').trim();
+  if (!saEmail || !privateKeyRaw || !calendarId) {
+    // Calendar integration is not configured; keep the lead as-is.
+    return { ok: false, skipped: true };
+  }
+
+  const timezone = String(env.GCAL_TIMEZONE || 'America/Santiago').trim() || 'America/Santiago';
+  const startLocal = normalizeLocalDateTime(citaRaw);
+  const endLocal = addMinutesToLocalDateTime(startLocal, 30);
+
+  const accessToken = await getGoogleServiceAccountAccessToken({
+    saEmail,
+    privateKey: privateKeyRaw,
+    scope: 'https://www.googleapis.com/auth/calendar.events',
+  });
+
+  const summaryName = (normalizedLead?.nombre || 'Lead').trim() || 'Lead';
+  const systemLabel = (normalizedLead?.sistema_actual || '').trim();
+  const isapreLabel = (normalizedLead?.isapre_especifica || '').trim();
+
+  const descriptionLines = [
+    'Lead PlanesPro',
+    '',
+    summaryName ? `Nombre: ${summaryName}` : null,
+    normalizedLead?.telefono ? `Telefono: ${normalizedLead.telefono}` : null,
+    normalizedLead?.email ? `Email: ${normalizedLead.email}` : null,
+    normalizedLead?.comuna ? `Comuna: ${normalizedLead.comuna}` : null,
+    normalizedLead?.region ? `Region: ${normalizedLead.region}` : null,
+    systemLabel ? `Sistema: ${systemLabel}` : null,
+    isapreLabel ? `Isapre: ${isapreLabel}` : null,
+    normalizedLead?.rut ? `RUT: ${normalizedLead.rut}` : null,
+    normalizedLead?.comentarios ? `Comentario: ${normalizedLead.comentarios}` : null,
+  ].filter(Boolean);
+
+  const body = {
+    summary: `Cita PlanesPro - ${summaryName}`,
+    description: descriptionLines.join('\n').slice(0, 8000),
+    start: { dateTime: startLocal, timeZone: timezone },
+    end: { dateTime: endLocal, timeZone: timezone },
+  };
+
+  const response = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    }
+  );
+
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message = result?.error?.message || result?.message || 'Failed to create calendar event';
+    throw new Error(message);
+  }
+
+  return {
+    ok: true,
+    cita_estado: 'Agendada',
+    cita_fecha_hora: startLocal,
+    cita_calendar_event_id: result?.id || '',
+    cita_calendar_url: result?.htmlLink || '',
+  };
+}
+
+function normalizeLocalDateTime(value) {
+  const raw = String(value || '').trim();
+  // Accept ISO, datetime-local, or ISO with seconds. Keep as RFC3339 without offset.
+  // Examples: 2026-04-28T15:30, 2026-04-28T15:30:00, 2026-04-28T15:30:00.000Z
+  const match = raw.match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
+  if (!match) return raw;
+  const date = match[1];
+  const hh = match[2];
+  const mm = match[3];
+  const ss = match[4] || '00';
+  return `${date}T${hh}:${mm}:${ss}`;
+}
+
+function addMinutesToLocalDateTime(start, minutes) {
+  const match = String(start || '').match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})$/);
+  if (!match) return start;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const hour = Number(match[4]);
+  const minute = Number(match[5]);
+  const second = Number(match[6]);
+
+  const base = Date.UTC(year, month - 1, day, hour, minute, second);
+  const end = new Date(base + Number(minutes || 0) * 60_000);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${end.getUTCFullYear()}-${pad(end.getUTCMonth() + 1)}-${pad(end.getUTCDate())}T${pad(end.getUTCHours())}:${pad(end.getUTCMinutes())}:${pad(end.getUTCSeconds())}`;
+}
+
+async function getGoogleServiceAccountAccessToken({ saEmail, privateKey, scope }) {
+  const now = Math.floor(Date.now() / 1000);
+  const jwtHeader = { alg: 'RS256', typ: 'JWT' };
+  const jwtPayload = {
+    iss: saEmail,
+    scope,
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now,
+    exp: now + 3600,
+  };
+
+  const encodedHeader = base64UrlEncode(JSON.stringify(jwtHeader));
+  const encodedPayload = base64UrlEncode(JSON.stringify(jwtPayload));
+  const unsigned = `${encodedHeader}.${encodedPayload}`;
+  const signature = await signRs256(unsigned, privateKey);
+  const assertion = `${unsigned}.${signature}`;
+
+  const tokenResp = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion,
+    }),
+  });
+  const tokenJson = await tokenResp.json().catch(() => ({}));
+  if (!tokenResp.ok || !tokenJson?.access_token) {
+    const message = tokenJson?.error_description || tokenJson?.error || 'Failed to fetch access token';
+    throw new Error(message);
+  }
+  return tokenJson.access_token;
+}
+
+function base64UrlEncode(input) {
+  const bytes = new TextEncoder().encode(String(input));
+  let binary = '';
+  for (const b of bytes) binary += String.fromCharCode(b);
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+async function signRs256(unsigned, privateKeyRaw) {
+  const pem = String(privateKeyRaw || '').replace(/\\n/g, '\n').trim();
+  const b64 = pem
+    .replace('-----BEGIN PRIVATE KEY-----', '')
+    .replace('-----END PRIVATE KEY-----', '')
+    .replace(/\s+/g, '');
+
+  const der = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)).buffer;
+  const key = await crypto.subtle.importKey(
+    'pkcs8',
+    der,
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+
+  const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(unsigned));
+  const sigBytes = new Uint8Array(sig);
+  let binary = '';
+  for (const b of sigBytes) binary += String.fromCharCode(b);
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
 
 async function formDataToFields(formData) {
