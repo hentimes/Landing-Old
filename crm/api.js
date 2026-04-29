@@ -67,6 +67,14 @@ export async function listLeads(filters) {
   return fetchJson(`/api/admin/leads?${params.toString()}`);
 }
 
+export async function updateAppointment(leadId, payload) {
+  return fetchJson('/api/form/appointments', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ leadId, ...(payload || {}) }),
+  });
+}
+
 export async function getLeadDetail(leadId) {
   return fetchJson(`/api/admin/leads/${leadId}`);
 }

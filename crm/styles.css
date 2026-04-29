@@ -1123,6 +1123,236 @@ body:has([data-view-panel="leads"].is-active) #view-title-container { display: n
 body:has([data-view-panel="agenda"].is-active) #agenda-toolbar-metrics { display: flex; }
 body:has([data-view-panel="agenda"].is-active) #view-title-container { display: none; }
 
+/* Agenda calendar */
+.crm-calendar-wrapper {
+  display: grid;
+  gap: 14px;
+  max-width: 1100px;
+}
+
+.crm-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.crm-calendar-current h2 {
+  margin: 0;
+  font-size: 18px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.crm-calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.crm-calendar {
+  border: 1px solid var(--crm-border);
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.crm-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0;
+  padding: 10px 12px;
+  background: var(--crm-surface-soft);
+  border-bottom: 1px solid var(--crm-border);
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--crm-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.crm-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0;
+}
+
+.crm-calendar-day {
+  min-height: 110px;
+  padding: 10px;
+  border-right: 1px solid rgba(219, 229, 241, 0.7);
+  border-bottom: 1px solid rgba(219, 229, 241, 0.7);
+  cursor: pointer;
+  background: #fff;
+  position: relative;
+}
+
+.crm-calendar-day--other {
+  background: #fbfcff;
+  cursor: default;
+}
+
+.crm-calendar-day--today {
+  background: rgba(25, 118, 210, 0.08);
+}
+
+.crm-calendar-day .day-number {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--crm-muted);
+}
+
+.crm-calendar-events {
+  margin-top: 8px;
+  display: grid;
+  gap: 6px;
+}
+
+.calendar-event {
+  display: block;
+  font-size: 10px;
+  line-height: 1.25;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(100, 116, 139, 0.12);
+  color: #334155;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-event--pendiente,
+.calendar-event--por coordinar,
+.calendar-event--pending {
+  background: rgba(99, 102, 241, 0.12);
+  color: #4338ca;
+}
+
+.calendar-event--agendada,
+.calendar-event--confirmada {
+  background: rgba(15, 157, 88, 0.12);
+  color: #047857;
+}
+
+.calendar-event--cancelada {
+  background: rgba(217, 45, 32, 0.10);
+  color: #b42318;
+}
+
+.crm-calendar-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
+}
+
+.crm-calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--crm-muted);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 99px;
+  background: #cbd5e1;
+}
+
+.dot--pending { background: #6366f1; }
+.dot--confirmed { background: #0f9d58; }
+.dot--completed { background: #2f80ed; }
+
+.crm-calendar-details {
+  max-width: 1100px;
+  border: 1px solid var(--crm-border);
+  border-radius: 12px;
+  background: #fff;
+  padding: 12px;
+}
+
+.crm-calendar-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.crm-appointment-list {
+  display: grid;
+  gap: 8px;
+}
+
+.crm-agenda-table {
+  margin-top: 12px;
+  display: grid;
+  gap: 12px;
+  max-width: 1100px;
+}
+
+.crm-agenda-day__rows {
+  display: grid;
+  gap: 6px;
+}
+
+.crm-agenda-row {
+  display: grid;
+  grid-template-columns: 64px 1fr 120px auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid rgba(219, 229, 241, 0.7);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.crm-agenda-row__time {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  color: var(--crm-primary-dark);
+  font-size: 13px;
+}
+
+.crm-agenda-row__main strong {
+  display: block;
+  font-size: 13px;
+}
+
+.crm-agenda-row__main span {
+  display: block;
+  font-size: 11px;
+  color: var(--crm-muted);
+}
+
+.crm-agenda-row__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.crm-link {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--crm-primary-dark);
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(25, 118, 210, 0.10);
+  border: 1px solid rgba(25, 118, 210, 0.18);
+}
+
+.crm-link:hover { background: rgba(25, 118, 210, 0.16); }
+
 .crm-metric-box { flex: 1; background: #fff; border: 1px solid var(--crm-border); border-radius: 10px; padding: 10px 14px; display: flex; flex-direction: column; justify-content: center; gap: 4px; box-shadow: 0 6px 14px rgba(10,33,70,0.04); transition: all 0.2s; }
 .crm-metric-box--clickable { cursor: pointer; }
 .crm-metric-box--clickable:hover { border-color: var(--crm-primary); background: var(--crm-primary-soft); transform: translateY(-1px); }

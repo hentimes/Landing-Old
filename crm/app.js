@@ -15,6 +15,7 @@ import {
   listLeads,
   readAdminKey,
   saveAdminKey,
+  updateAppointment,
   updateLeadRut,
   updateLeadStatus,
 } from './api.js';
@@ -180,6 +181,9 @@ function bindEvents() {
       state.selectedRange = button.dataset.range;
       elements.rangeChips.forEach((chip) => chip.classList.toggle('is-active', chip === button));
       refreshDashboard();
+      renderLeadsMetrics(filterItemsByRange(state.items, state.selectedRange));
+      renderLeadsView();
+      renderAgenda(filterItemsByRange(state.items, state.selectedRange));
     });
   });
 
@@ -331,9 +335,9 @@ async function loadLeads(skipFetch = false) {
     }
     state.filteredItems = applyLeadFilters(state.items);
     refreshDashboard();
-    renderLeadsMetrics(state.items);
+    renderLeadsMetrics(filterItemsByRange(state.items, state.selectedRange));
     renderLeadsView();
-    renderAgenda(state.items);
+    renderAgenda(filterItemsByRange(state.items, state.selectedRange));
 
     if (state.selectedLeadId) {
       const exists = state.items.some((item) => item.id === state.selectedLeadId);
@@ -502,6 +506,7 @@ function renderAgenda(items = []) {
   elements.agendaCountUpcoming.textContent = String(appointments.filter((item) => item.date >= now && item.date <= nextWeek).length);
 
   renderCalendar();
+  renderAgendaTable(appointments);
 }
 
 function renderCalendar() {
@@ -516,7 +521,7 @@ function renderCalendar() {
   const today = new Date();
   const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
 
-  const appointments = buildAppointments(state.items);
+  const appointments = buildAppointments(filterItemsByRange(state.items, state.selectedRange));
   
   let html = '';
   // Padding days
@@ -530,11 +535,15 @@ function renderCalendar() {
     const dayAppointments = appointments.filter(a => a.rawDate.slice(0, 10) === dayIso);
     const todayClass = (isCurrentMonth && today.getDate() === d) ? 'crm-calendar-day--today' : '';
     
-    const eventsHtml = dayAppointments.map(a => `
-      <div class="calendar-event calendar-event--${(a.status || 'pending').toLowerCase()}" title="${escapeHtml(a.title)}">
-        ${escapeHtml(a.title)}
-      </div>
-    `).join('');
+    const eventsHtml = dayAppointments.map((appt) => {
+      const statusClass = calendarStatusClass(appt.status || '');
+      const label = calendarEventLabel(appt);
+      return `
+        <div class="calendar-event calendar-event--${statusClass}" title="${escapeHtml(label)}">
+          ${escapeHtml(label)}
+        </div>
+      `;
+    }).join('');
 
     html += `
       <div class="crm-calendar-day ${todayClass}" onclick="handleCalendarDayClick('${dayIso}')">
@@ -547,8 +556,25 @@ function renderCalendar() {
   elements.calendarGrid.innerHTML = html;
 }
 
+function calendarEventLabel(appointment) {
+  const name = appointment.nombre || 'Cita';
+  const time = appointment.date && !Number.isNaN(appointment.date.getTime())
+    ? new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit' }).format(appointment.date)
+    : '';
+  return time ? `${time} · ${name}` : name;
+}
+
+function calendarStatusClass(status) {
+  const normalized = normalizeText(status);
+  if (!normalized) return 'pending';
+  if (normalized.includes('cancel')) return 'cancelada';
+  if (normalized.includes('agend') || normalized.includes('confirm')) return 'agendada';
+  if (normalized.includes('pend') || normalized.includes('coord')) return 'pendiente';
+  return 'pending';
+}
+
 window.handleCalendarDayClick = (dayIso) => {
-  const appointments = buildAppointments(state.items);
+  const appointments = buildAppointments(filterItemsByRange(state.items, state.selectedRange));
   const dayAppointments = appointments.filter(a => a.rawDate.slice(0, 10) === dayIso);
   const dateObj = new Date(`${dayIso}T12:00:00`);
   const dateLabel = new Intl.DateTimeFormat('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }).format(dateObj);
@@ -947,6 +973,7 @@ function renderActionsCard(lead) {
 function renderAppointmentCard(lead) {
   const appointmentDate = lead.cita_fecha_hora ? formatDateTime(lead.cita_fecha_hora) : 'Sin fecha agendada';
   const appointmentStatus = lead.cita_estado || 'Pendiente';
+  const isCanceled = normalizeText(appointmentStatus).includes('cancel');
   const appointmentLink = lead.cita_calendar_url
     ? `<a href="${escapeHtml(lead.cita_calendar_url)}" target="_blank" rel="noopener noreferrer">Abrir en Google Calendar</a>`
     : '<span class="crm-muted">Sin enlace de calendario todavía.</span>';
@@ -981,6 +1008,7 @@ function hydrateStatusOptions() {
 }
 
 function applyLeadFilters(items) {
+  const rangeItems = filterItemsByRange(items, state.selectedRange);
   const query = normalizeText(elements.filterQ?.value?.trim() || '');
   const status = elements.filterStatus?.value || '';
   const sistema = elements.filterSistema?.value || '';
@@ -990,7 +1018,7 @@ function applyLeadFilters(items) {
   const from = fromValue ? new Date(`${fromValue}T00:00:00`) : null;
   const to = toValue ? new Date(`${toValue}T23:59:59`) : null;
 
-  return items.filter((item) => {
+  return rangeItems.filter((item) => {
     if (status && item.status !== status) return false;
     if (sistema && item.sistema_actual !== sistema) return false;
     if (isapre && !normalizeText(item.isapre_especifica || '').includes(isapre)) return false;
@@ -1196,6 +1224,93 @@ function bindAgendaClicks() {
     button.addEventListener('click', async () => {
       setView('leads');
       await loadLeadDetail(button.dataset.leadId);
+    });
+  });
+}
+
+function renderAgendaTable(appointments) {
+  const upcoming = (appointments || [])
+    .filter((item) => !normalizeText(item.status || '').includes('cancel'))
+    .slice()
+    .sort((a, b) => a.date - b.date);
+
+  if (!upcoming.length) {
+    elements.agendaSectionList.innerHTML = '<div class="crm-empty crm-empty--small"><h3>Sin citas para el periodo</h3><p>Agenda vacia para el rango seleccionado.</p></div>';
+    return;
+  }
+
+  const grouped = new Map();
+  upcoming.forEach((appt) => {
+    const dayIso = appt.rawDate.slice(0, 10);
+    if (!grouped.has(dayIso)) grouped.set(dayIso, []);
+    grouped.get(dayIso).push(appt);
+  });
+
+  const dayLabels = Array.from(grouped.keys()).sort().slice(0, 14);
+  elements.agendaSectionList.innerHTML = dayLabels.map((dayIso) => {
+    const dateObj = new Date(`${dayIso}T12:00:00`);
+    const label = new Intl.DateTimeFormat('es-CL', { weekday: 'short', day: '2-digit', month: 'short' }).format(dateObj).replace('.', '');
+    const rows = (grouped.get(dayIso) || [])
+      .sort((a, b) => a.date - b.date)
+      .map((appt) => {
+        const time = new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit' }).format(appt.date);
+        const status = appt.status || 'Pendiente';
+        const badge = statusBadgeClass(status);
+        const hasCalendar = Boolean(appt.cita_calendar_url);
+        const calendarLink = hasCalendar ? `<a class="crm-link" href="${escapeHtml(appt.cita_calendar_url)}" target="_blank" rel="noopener noreferrer">Calendar</a>` : '';
+        const cancelDisabled = normalizeText(status).includes('realiz') || normalizeText(status).includes('cerrad');
+        return `
+          <div class="crm-agenda-row" data-lead-id="${appt.id}">
+            <div class="crm-agenda-row__time">${escapeHtml(time)}</div>
+            <div class="crm-agenda-row__main">
+              <strong>${escapeHtml(appt.nombre || 'Sin nombre')}</strong>
+              <span>${escapeHtml(appt.telefono || appt.email || '')}</span>
+            </div>
+            <span class="crm-badge ${badge}">${escapeHtml(status)}</span>
+            <div class="crm-agenda-row__actions">
+              <button type="button" class="button button--secondary button--compact crm-agenda-open" data-lead-id="${appt.id}">Abrir</button>
+              ${calendarLink}
+              <button type="button" class="button button--ghost button--compact crm-agenda-cancel" data-lead-id="${appt.id}" ${cancelDisabled ? 'disabled' : ''}>Cancelar</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+    return `
+      <section class="crm-card crm-card--inner crm-agenda-day">
+        <div class="crm-card__header">
+          <div>
+            <p class="crm-eyebrow">Agenda</p>
+            <h3>${escapeHtml(label)}</h3>
+          </div>
+        </div>
+        <div class="crm-agenda-day__rows">${rows}</div>
+      </section>
+    `;
+  }).join('');
+
+  elements.agendaSectionList.querySelectorAll('.crm-agenda-open').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      setView('leads');
+      await loadLeadDetail(btn.dataset.leadId);
+    });
+  });
+
+  elements.agendaSectionList.querySelectorAll('.crm-agenda-cancel').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const leadId = btn.dataset.leadId;
+      btn.disabled = true;
+      try {
+        await updateAppointment(leadId, {
+          cita_estado: 'Cancelada',
+          cita_calendar_event_id: '',
+          cita_calendar_url: '',
+        });
+        await loadLeads(false);
+      } catch (error) {
+        btn.disabled = false;
+        alert(error.message || 'No se pudo cancelar la cita');
+      }
     });
   });
 }
