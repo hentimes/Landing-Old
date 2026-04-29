@@ -157,6 +157,8 @@ async function handleLeadCreate(request, env) {
 
   const calendarResult = await maybeCreateCalendarEvent(env, normalized).catch((error) => ({
     ok: false,
+    skipped: false,
+    reason: 'error',
     error: error?.message || 'calendar_error',
   }));
 
@@ -192,12 +194,7 @@ async function handleLeadCreate(request, env) {
     });
   }
 
-  return json(
-    { ok: true, leadId, calendar: calendarResult?.ok ? calendarResult : undefined },
-    200,
-    env,
-    request
-  );
+  return json({ ok: true, leadId, calendar: calendarResult }, 200, env, request);
 }
 
 async function handleLeadAbandoned(request, env) {
@@ -622,14 +619,23 @@ function normalizeLead(payload, leadId, now, fallbackStatus) {
 
 async function maybeCreateCalendarEvent(env, normalizedLead) {
   const citaRaw = String(normalizedLead?.cita_fecha_hora || '').trim();
-  if (!citaRaw) return { ok: false, skipped: true };
+  if (!citaRaw) return { ok: false, skipped: true, reason: 'no_cita_fecha_hora' };
 
   const saEmail = String(env.GCAL_SA_EMAIL || '').trim();
   const privateKeyRaw = String(env.GCAL_SA_PRIVATE_KEY || '').trim();
   const calendarId = String(env.GCAL_CALENDAR_ID || '').trim();
   if (!saEmail || !privateKeyRaw || !calendarId) {
     // Calendar integration is not configured; keep the lead as-is.
-    return { ok: false, skipped: true };
+    return {
+      ok: false,
+      skipped: true,
+      reason: 'missing_config',
+      missing: {
+        GCAL_SA_EMAIL: !saEmail,
+        GCAL_SA_PRIVATE_KEY: !privateKeyRaw,
+        GCAL_CALENDAR_ID: !calendarId,
+      },
+    };
   }
 
   const timezone = String(env.GCAL_TIMEZONE || 'America/Santiago').trim() || 'America/Santiago';
