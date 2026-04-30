@@ -18,7 +18,7 @@
   <div class="crm-appshell">
     <aside class="crm-sidebar" id="crm-sidebar">
       <div class="crm-sidebar__top">
-        <button type="button" class="crm-sidebar__toggle" id="sidebar-toggle" aria-label="Expandir o contraer menÃº">
+        <button type="button" class="crm-sidebar__toggle" id="sidebar-toggle" aria-label="Expandir o contraer menú">
           <i class="fas fa-bars" aria-hidden="true"></i>
         </button>
         <div class="crm-sidebar__brand">
@@ -49,11 +49,11 @@
         </button>
         <button type="button" class="crm-nav-item" data-view="settings">
           <span class="crm-nav-item__icon"><i class="fas fa-gear" aria-hidden="true"></i></span>
-          <span class="crm-nav-item__label">Settings</span>
+          <span class="crm-nav-item__label">Configuración</span>
         </button>
         <button type="button" class="crm-nav-item" data-view="profile">
           <span class="crm-nav-item__icon"><i class="fas fa-user" aria-hidden="true"></i></span>
-          <span class="crm-nav-item__label">Profile</span>
+          <span class="crm-nav-item__label">Perfil</span>
         </button>
       </nav>
 
@@ -67,7 +67,7 @@
             <button type="button" id="save-admin-key" class="button button--secondary">Guardar</button>
           </div>
         </div>
-        <p class="crm-sidebar__hint">Produccion usa Cloudflare Access. Local sigue disponible para iterar.</p>
+        <p class="crm-sidebar__hint">Producción usa Cloudflare Access. Local sigue disponible para iterar.</p>
       </div>
     </aside>
 
@@ -110,11 +110,11 @@
             <div class="crm-profile-menu" id="profile-menu" hidden>
               <button type="button" class="crm-profile-menu__item" id="profile-menu-profile">
                 <i class="fas fa-user" aria-hidden="true"></i>
-                <span>Profile</span>
+                <span>Perfil</span>
               </button>
               <button type="button" class="crm-profile-menu__item" id="profile-menu-settings">
                 <i class="fas fa-gear" aria-hidden="true"></i>
-                <span>Settings</span>
+                <span>Configuración</span>
               </button>
               <a class="crm-profile-menu__logout" href="/cdn-cgi/access/logout">
                 <i class="fas fa-right-from-bracket" aria-hidden="true"></i>
@@ -451,7 +451,7 @@
         <section class="crm-card crm-card--inner crm-availability-panel">
           <div class="crm-card__header">
             <div>
-              <p class="crm-eyebrow">Ocupacion</p>
+              <p class="crm-eyebrow">Ocupación</p>
               <h3>Horas ya bloqueadas</h3>
             </div>
             <span class="crm-card__hint">Google, citas y bloqueos manuales</span>
@@ -466,7 +466,7 @@
         <section class="crm-card crm-card--page">
           <div class="crm-card__header">
             <div>
-              <p class="crm-eyebrow">Profile</p>
+              <p class="crm-eyebrow">Perfil</p>
               <h2>Perfil del asesor</h2>
             </div>
           </div>
@@ -493,10 +493,10 @@
               </div>
               <div class="crm-card crm-card--inner">
                 <div class="crm-card__header"><h3>Agenda</h3></div>
-                <p class="crm-long-text" id="profile-page-calendar-copy">Todav?a no hay un calendario personal conectado a este asesor.</p>
+                <p class="crm-long-text" id="profile-page-calendar-copy">Todavía no hay un calendario personal conectado a este asesor.</p>
                 <div class="crm-actions__buttons crm-mt-10">
                   <button type="button" id="profile-connect-google" class="button button--secondary button--compact">Conectar Google Calendar</button>
-                  <button type="button" id="profile-go-settings" class="button button--ghost button--compact">Abrir settings</button>
+                  <button type="button" id="profile-go-settings" class="button button--ghost button--compact">Abrir configuración</button>
                 </div>
               </div>
             </div>
@@ -508,8 +508,8 @@
         <section class="crm-card crm-card--page">
           <div class="crm-card__header">
             <div>
-              <p class="crm-eyebrow">Settings</p>
-              <h2>ConfiguraciÃ³n del CRM</h2>
+              <p class="crm-eyebrow">Configuración</p>
+              <h2>Configuración del CRM</h2>
             </div>
           </div>
           <div class="crm-settings-grid">
@@ -518,7 +518,7 @@
               <div class="crm-kv-grid crm-kv-grid--single">
                 <div class="crm-kv"><span>Estado</span><strong id="settings-google-status">Sin conectar</strong></div>
                 <div class="crm-kv"><span>Cuenta</span><strong id="settings-google-email">-</strong></div>
-                <div class="crm-kv"><span>?ltima conexi?n</span><strong id="settings-google-updated">-</strong></div>
+                <div class="crm-kv"><span>Última conexión</span><strong id="settings-google-updated">-</strong></div>
               </div>
               <div class="crm-actions__buttons crm-mt-10">
                 <button type="button" id="settings-connect-google" class="button button--secondary button--compact">Conectar Google Calendar</button>
@@ -531,14 +531,14 @@
                 <label class="crm-field"><span>Zona horaria</span><input id="settings-timezone" type="text" value="America/Santiago" /></label>
                 <label class="crm-field"><span>Inicio jornada</span><input id="settings-workday-start" type="time" value="08:00" /></label>
                 <label class="crm-field"><span>Fin jornada</span><input id="settings-workday-end" type="time" value="19:00" /></label>
-                <label class="crm-field"><span>Duraci?n cita</span><input id="settings-slot-duration" type="number" min="15" max="180" step="15" value="45" /></label>
+                <label class="crm-field"><span>Duración cita</span><input id="settings-slot-duration" type="number" min="15" max="180" step="15" value="45" /></label>
                 <label class="crm-field"><span>Buffer</span><input id="settings-slot-buffer" type="number" min="0" max="60" step="5" value="15" /></label>
               </div>
               <label class="crm-toggle-card crm-mt-10">
                 <input id="settings-allow-busy" type="checkbox" />
                 <span>
                   <strong>Permitir solicitudes sobre horas ocupadas</strong>
-                  <small>Por ahora mantenlo apagado. Si se activa, luego el lead podr? pedir revisi?n manual de un horario ocupado.</small>
+                  <small>Por ahora mantenlo apagado. Si se activa, luego el lead podrá pedir revisión manual de un horario ocupado.</small>
                 </span>
               </label>
               <div class="crm-actions__buttons crm-mt-10">
@@ -577,14 +577,14 @@
             <div class="crm-card crm-card--inner">
               <div class="crm-card__header"><h3>Acceso</h3></div>
               <div class="crm-kv-grid crm-kv-grid--single">
-                <div class="crm-kv"><span>Modo producci?n</span><strong>Cloudflare Access</strong></div>
+                <div class="crm-kv"><span>Modo producción</span><strong>Cloudflare Access</strong></div>
                 <div class="crm-kv"><span>Modo local</span><strong>Clave manual</strong></div>
                 <div class="crm-kv"><span>Backend</span><strong>form.planespro.cl</strong></div>
               </div>
             </div>
             <div class="crm-card crm-card--inner">
               <div class="crm-card__header"><h3>Notas</h3></div>
-              <p class="crm-long-text">Cada cita ocupa 45 minutos y deja 15 minutos de margen. Los bloques disponibles salen de tu horario base menos lo ya ocupado en Google Calendar cuando la cuenta est? conectada.</p>
+              <p class="crm-long-text">Cada cita ocupa 45 minutos y deja 15 minutos de margen. Los bloques disponibles salen de tu horario base menos lo ya ocupado en Google Calendar cuando la cuenta está conectada.</p>
             </div>
           </div>
         </section>
@@ -615,7 +615,7 @@
     <form method="dialog" class="crm-profile-form" id="profile-form">
       <div class="crm-card__header">
         <div>
-          <p class="crm-eyebrow">Profile</p>
+          <p class="crm-eyebrow">Perfil</p>
           <h2>Datos visibles del asesor</h2>
         </div>
         <button type="submit" class="button button--ghost">Cerrar</button>

@@ -30,11 +30,11 @@ import {
 const SIDEBAR_STORAGE = 'crm-sidebar-collapsed';
 
 const VIEW_META = {
-  dashboard: { title: 'Dashboard', crumb: 'Dashboard', copy: 'MÃƒÂ©tricas, pipeline comercial y agenda del asesor.' },
+  dashboard: { title: 'Dashboard', crumb: 'Dashboard', copy: 'Métricas, pipeline comercial y agenda del asesor.' },
   leads: { title: 'Leads', crumb: 'Leads', copy: 'Bandeja compacta, seguimiento y acciones comerciales.' },
-  agenda: { title: 'Agenda', crumb: 'Agenda', copy: 'PrÃƒÂ³ximas citas, pendientes y agenda inmediata.' },
+  agenda: { title: 'Agenda', crumb: 'Agenda', copy: 'Próximas citas, pendientes y agenda inmediata.' },
   profile: { title: 'Profile', crumb: 'Profile', copy: 'Datos visibles del asesor dentro del CRM.' },
-  settings: { title: 'Settings', crumb: 'Settings', copy: 'ConfiguraciÃƒÂ³n actual del acceso y del panel privado.' },
+  settings: { title: 'Configuración', crumb: 'Configuración', copy: 'Configuración actual del acceso y del panel privado.' },
 };
 
 const state = {
@@ -605,7 +605,7 @@ function renderAvailabilitySlots() {
   const slots = state.advisorSlots || [];
   const rangeLabel = RANGE_OPTIONS[state.selectedRange]?.label || 'Periodo';
   if (elements.availabilityRangeLabel) {
-    elements.availabilityRangeLabel.textContent = `Bloques Â· ${rangeLabel}`;
+    elements.availabilityRangeLabel.textContent = `Bloques · ${rangeLabel}`;
   }
 
   if (!slots.length) {
@@ -700,7 +700,7 @@ function calendarEventLabel(appointment) {
   const time = appointment.date && !Number.isNaN(appointment.date.getTime())
     ? new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit' }).format(appointment.date)
     : '';
-  return time ? `${time} Ã‚Â· ${name}` : name;
+  return time ? `${time} · ${name}` : name;
 }
 
 function calendarStatusClass(status) {
@@ -895,7 +895,7 @@ function renderList(items) {
     const rutIcon = item.rut ? ' <i class="fas fa-address-card crm-rut-icon" title="RUT registrado"></i>' : '';
     nameNode.innerHTML = `${escapeHtml(item.nombre || 'Sin nombre')}${rutIcon}`;
     
-    node.querySelector('[data-field="contacto"]').textContent = [item.telefono, item.email].filter(Boolean).join(' Ã‚Â· ') || 'Sin contacto';
+    node.querySelector('[data-field="contacto"]').textContent = [item.telefono, item.email].filter(Boolean).join(' · ') || 'Sin contacto';
     // Sistema / Isapre flip (Nombre Isapre arriba, Tipo abajo)
     const systemName = item.isapre_especifica || item.sistema_actual || 'Sin dato';
     const systemType = item.isapre_especifica ? (item.sistema_actual || 'Isapre') : (item.sistema_actual || '');
@@ -906,7 +906,7 @@ function renderList(items) {
     statusNode.textContent = (item.status || 'Sin estado').slice(0, 12);
     statusNode.className = `crm-badge ${statusBadgeClass(item.status)}`;
     node.querySelector('[data-field="created"]').textContent = formatDate(item.created_at);
-    node.querySelector('[data-field="region"]').textContent = item.region || 'Sin regiÃƒÂ³n';
+    node.querySelector('[data-field="region"]').textContent = item.region || 'Sin región';
 
     const attachButton = node.querySelector('[data-field="attach"]');
     const hasAttachment = Boolean(item.has_file && item.pdf_object_key);
@@ -964,13 +964,13 @@ function renderDetail(payload, errorMessage = '') {
         <p>${escapeHtml(note.note_text)}</p>
       </article>
     `).join('')
-    : '<p class="crm-muted">Sin notas internas todavÃƒÂ­a.</p>';
+    : '<p class="crm-muted">Sin notas internas todavía.</p>';
 
   const eventsHtml = (events || []).length
     ? events.map((event) => `
       <article class="crm-event">
         <strong>${escapeHtml(event.event_type)}</strong>
-        <span>${formatDateTime(event.created_at)} Ã‚Â· ${escapeHtml(event.actor_email)}</span>
+        <span>${formatDateTime(event.created_at)} · ${escapeHtml(event.actor_email)}</span>
       </article>
     `).join('')
     : '<p class="crm-muted">Sin eventos registrados.</p>';
@@ -1049,7 +1049,7 @@ function bindDetailActions(lead) {
   saveAppointmentButton?.addEventListener('click', async () => {
     const selectedSlot = appointmentTime?.value || '';
     if (!selectedSlot) {
-      window.alert('Selecciona un bloque vÃ¡lido para la cita.');
+      window.alert('Selecciona un bloque válido para la cita.');
       return;
     }
 
@@ -1096,7 +1096,7 @@ function bindDetailActions(lead) {
     rutInput.value = formatRut(rutInput.value);
     if (rutInput.value.trim() && !isValidRut(rutInput.value)) {
       rutInput.classList.add('is-invalid');
-      rutFeedback.textContent = 'RUT invÃ¡lido.';
+      rutFeedback.textContent = 'RUT inválido.';
     }
   });
 
@@ -1105,7 +1105,7 @@ function bindDetailActions(lead) {
     rutInput.value = formatted;
     if (formatted && !isValidRut(formatted)) {
       rutInput.classList.add('is-invalid');
-      rutFeedback.textContent = 'El RUT ingresado no es vÃ¡lido.';
+      rutFeedback.textContent = 'El RUT ingresado no es válido.';
       return;
     }
 
@@ -1190,11 +1190,11 @@ function bindDetailActions(lead) {
 function renderInfoCard(lead) {
   const data = [
     ['Correo', lead.email || 'Sin correo'],
-    ['TelÃƒÂ©fono', lead.telefono || 'Sin telÃƒÂ©fono'],
+    ['Teléfono', lead.telefono || 'Sin teléfono'],
     ['RUT', lead.rut ? formatRut(lead.rut) : 'Sin RUT'],
     ['Edad', lead.rango_edad || 'Sin dato'],
     ['Comuna', lead.comuna || 'Sin dato'],
-    ['RegiÃƒÂ³n', lead.region || 'Sin dato'],
+    ['Región', lead.region || 'Sin dato'],
     ['Sistema', lead.sistema_actual || 'Sin dato'],
     ['Isapre', lead.isapre_especifica || 'Sin dato'],
     ['Cargas', lead.num_cargas || 'Sin dato'],
@@ -1245,7 +1245,7 @@ function renderNotesCard(notes = []) {
         <p>${escapeHtml(note.note_text)}</p>
       </article>
     `).join('')
-    : '<p class="crm-muted">Sin notas internas todavÃƒÂ­a.</p>';
+    : '<p class="crm-muted">Sin notas internas todavía.</p>';
 
   return `
     <div class="crm-card crm-card--detail-wide crm-card--collapsible">
@@ -1266,7 +1266,7 @@ function renderEventsCard(events = []) {
     ? events.map((event) => `
       <article class="crm-event">
         <strong>${escapeHtml(event.event_type)}</strong>
-        <span>${formatDateTime(event.created_at)} Ã‚Â· ${escapeHtml(event.actor_email)}</span>
+        <span>${formatDateTime(event.created_at)} · ${escapeHtml(event.actor_email)}</span>
       </article>
     `).join('')
     : '<p class="crm-muted">Sin eventos registrados.</p>';
@@ -1290,7 +1290,7 @@ function renderRutCard(lead) {
         <h3>Completar RUT</h3>
       </div>
       <div class="crm-actions">
-        <p class="crm-rut-help">Este lead no tiene RUT registrado. IngrÃƒÂ©salo para completar el perfil.</p>
+        <p class="crm-rut-help">Este lead no tiene RUT registrado. Ingrésalo para completar el perfil.</p>
         <label>
           <input id="lead-rut" type="text" inputmode="text" autocomplete="off" placeholder="12.345.678-5" value="${escapeHtml(rut)}" />
         </label>
@@ -1333,7 +1333,7 @@ function renderAppointmentCard(lead) {
   const groups = buildLeadAppointmentSlotGroups(lead);
   const appointmentLink = lead.cita_calendar_url
     ? `<a href="${escapeHtml(lead.cita_calendar_url)}" target="_blank" rel="noopener noreferrer">Abrir en Google Calendar</a>`
-    : '<span class="crm-muted">Sin enlace de calendario todavÃ­a.</span>';
+    : '<span class="crm-muted">Sin enlace de calendario todavía.</span>';
 
   return `
     <div class="crm-card">
@@ -1343,7 +1343,7 @@ function renderAppointmentCard(lead) {
       <div class="crm-kv-grid crm-kv-grid--single">
         <div class="crm-kv">
           <span>Preferencia</span>
-          <strong>${escapeHtml(preference === 'agendar_reunion' ? 'Agendar reuniÃ³n' : 'Lo antes posible')}</strong>
+          <strong>${escapeHtml(preference === 'agendar_reunion' ? 'Agendar reunión' : 'Lo antes posible')}</strong>
         </div>
         <div class="crm-kv">
           <span>Estado cita</span>
@@ -1362,11 +1362,11 @@ function renderAppointmentCard(lead) {
         </div>
         <div class="crm-form-grid crm-form-grid--two">
           <label class="crm-field">
-            <span>DÃ­a</span>
+            <span>Día</span>
             <select id="lead-appointment-day" ${groups.length ? '' : 'disabled'}>
               ${groups.length
                 ? groups.map((group, index) => `<option value="${escapeHtml(group.day)}" ${index === 0 ? 'selected' : ''}>${escapeHtml(group.label)}</option>`).join('')
-                : '<option value="">Sin dÃ­as disponibles</option>'}
+                : '<option value="">Sin días disponibles</option>'}
             </select>
           </label>
           <label class="crm-field">
@@ -1376,7 +1376,7 @@ function renderAppointmentCard(lead) {
         </div>
         <p id="lead-appointment-help" class="crm-muted crm-appointment-help">
           ${groups.length
-            ? 'Solo se muestran horas libres. Cambia el rango superior si necesitas ver mÃ¡s dÃ­as.'
+            ? 'Solo se muestran horas libres. Cambia el rango superior si necesitas ver más días.'
             : 'No hay slots libres en este rango. Ajusta la disponibilidad o cambia el rango de agenda.'}
         </p>
         <div class="crm-actions__buttons">
@@ -1418,14 +1418,14 @@ function buildLeadAppointmentSlotGroups(lead) {
       if (!grouped.has(day)) {
         grouped.set(day, {
           day,
-          label: `${formatDayLabel(day)} Â· cita actual`,
+          label: `${formatDayLabel(day)} · cita actual`,
           slots: [],
         });
       }
       grouped.get(day).slots.unshift({
         starts_at: normalized,
         ends_at: addMinutesToLocalDateTime(normalized, Number(state.advisorProfile?.advisor?.slot_duration_minutes || 45)),
-        label: `${formatSlotLabel(normalized)} Â· actual`,
+        label: `${formatSlotLabel(normalized)} · actual`,
         isCurrent: true,
       });
     }
@@ -1670,7 +1670,7 @@ function renderDonut(buckets) {
   if (!total) {
     elements.isapreDonut.innerHTML = '<span>0</span><small>Sin leads</small>';
     elements.isapreDonut.style.background = 'linear-gradient(180deg, #eaf1f8 0%, #dfe9f6 100%)';
-    elements.isapreLegend.innerHTML = '<p class="crm-muted">No hay distribuciÃƒÂ³n disponible todavÃƒÂ­a.</p>';
+    elements.isapreLegend.innerHTML = '<p class="crm-muted">No hay distribución disponible todavía.</p>';
     return;
   }
 
@@ -1805,7 +1805,7 @@ function renderAgendaTable(appointments) {
 
 function renderAvailabilityRuleEditor(rules = [], advisor = {}) {
   if (!elements.settingsAvailabilityGrid) return;
-  const dayLabels = ['Domingo', 'Lunes', 'Martes', 'MiÃƒÂ©rcoles', 'Jueves', 'Viernes', 'SÃƒÂ¡bado'];
+  const dayLabels = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
   const byDay = new Map((rules || []).map((rule) => [Number(rule.day_of_week), rule]));
   elements.settingsAvailabilityGrid.innerHTML = dayLabels.map((label, dayOfWeek) => {
     const rule = byDay.get(dayOfWeek) || {};
@@ -1863,12 +1863,12 @@ function appendManualBlockFromForm() {
   const note = elements.settingsBlockNote?.value?.trim() || '';
 
   if (!date || !start || !end) {
-    window.alert('Completa fecha, hora de inicio y hora de termino');
+    window.alert('Completa fecha, hora de inicio y hora de t?rmino');
     return;
   }
 
   if (end <= start) {
-    window.alert('La hora de termino debe ser mayor que la de inicio');
+    window.alert('La hora de t?rmino debe ser mayor que la de inicio');
     return;
   }
 
@@ -2027,8 +2027,8 @@ function hydratePopovers(items) {
   elements.updatesCount.textContent = String(updates.length);
   elements.messagesCount.textContent = String(messages.length);
   elements.notificationPopover.innerHTML = buildPopoverList('Leads por contactar', notifications.map((item) => ({ title: item.nombre || 'Sin nombre', meta: item.telefono || item.email || 'Sin contacto', leadId: item.id })));
-  elements.updatesPopover.innerHTML = buildPopoverList('Updates recientes', updates.map((item) => ({ title: item.nombre || 'Sin nombre', meta: `${formatDateTime(item.updated_at || item.created_at)} Ã‚Â· ${item.status || 'Sin estado'}`, leadId: item.id })));
-  elements.messagesPopover.innerHTML = buildPopoverList('Citas pendientes', messages.map((item) => ({ title: item.nombre || 'Sin nombre', meta: `${formatDateTime(item.cita_fecha_hora)} Ã‚Â· ${item.cita_estado || 'Pendiente'}`, leadId: item.id })));
+  elements.updatesPopover.innerHTML = buildPopoverList('Updates recientes', updates.map((item) => ({ title: item.nombre || 'Sin nombre', meta: `${formatDateTime(item.updated_at || item.created_at)} · ${item.status || 'Sin estado'}`, leadId: item.id })));
+  elements.messagesPopover.innerHTML = buildPopoverList('Citas pendientes', messages.map((item) => ({ title: item.nombre || 'Sin nombre', meta: `${formatDateTime(item.cita_fecha_hora)} · ${item.cita_estado || 'Pendiente'}`, leadId: item.id })));
   document.querySelectorAll('.crm-popover [data-lead-id]').forEach((button) => {
     button.addEventListener('click', async () => {
       hidePopovers();
@@ -2147,7 +2147,7 @@ function hydrateAdvisorUI() {
   if (elements.profilePageCalendarCopy) {
     elements.profilePageCalendarCopy.textContent = connected
       ? `Google Calendar activo para ${google?.google_email || 'esta cuenta'}.`
-      : 'TodavÃƒÂ­a no hay un calendario personal conectado a este asesor.';
+      : 'Todavía no hay un calendario personal conectado a este asesor.';
   }
   if (elements.calendarSyncHint) {
     elements.calendarSyncHint.textContent = connected
@@ -2186,7 +2186,7 @@ function paintAvatar(element, seed) {
 }
 
 function openFileModal(leadId, leadName, fileName) {
-  elements.fileModalTitle.textContent = `${leadName} Ã‚Â· ${fileName}`;
+  elements.fileModalTitle.textContent = `${leadName} · ${fileName}`;
   elements.fileModalFrame.src = getFileUrl(leadId);
   elements.fileModal.showModal();
 }
@@ -2327,7 +2327,7 @@ function resolveSystemBucket(item) {
   if ((item.sistema_actual || '').toLowerCase() === 'fonasa') return 'Fonasa';
   const normalized = normalizeText(item.isapre_especifica || '');
   if (!normalized) return 'Otros';
-  if (normalized.includes('banmedica')) return 'BanmÃƒÂ©dica';
+  if (normalized.includes('banmedica')) return 'Banmédica';
   if (normalized.includes('colmena')) return 'Colmena';
   if (normalized.includes('consalud')) return 'Consalud';
   if (normalized.includes('cruz blanca')) return 'Cruz Blanca';
