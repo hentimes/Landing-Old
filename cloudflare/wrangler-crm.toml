@@ -1,0 +1,13 @@
+name = "ppcrm"
+main = "crm-worker.js"
+compatibility_date = "2026-04-29"
+account_id = "a69ce5c1cf6b705438ee7028f37cb30b"
+
+workers_dev = true
+
+[vars]
+FORM_ADMIN_BASE_URL = "https://form.planespro.cl"
+
+[[routes]]
+pattern = "asesores.planespro.cl/*"
+zone_name = "planespro.cl"

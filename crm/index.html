@@ -255,14 +255,10 @@
             <p class="crm-eyebrow">Panel operativo</p>
             <strong>Leads y seguimiento</strong>
           </div>
-          <div class="crm-chip-range" id="range-selector">
-            <button type="button" class="crm-range-chip is-active" data-range="today">Hoy</button>
-            <button type="button" class="crm-range-chip" data-range="7d">7d</button>
-            <button type="button" class="crm-range-chip" data-range="14d">2 semanas</button>
+                    <div class="crm-chip-range" id="range-selector">
+            <button type="button" class="crm-range-chip is-active" data-range="7d">7d</button>
+            <button type="button" class="crm-range-chip" data-range="2s">2 semanas</button>
             <button type="button" class="crm-range-chip" data-range="1m">1 mes</button>
-            <button type="button" class="crm-range-chip" data-range="3m">3 meses</button>
-            <button type="button" class="crm-range-chip" data-range="6m">6 meses</button>
-            <button type="button" class="crm-range-chip" data-range="1y">1 año</button>
           </div>
         </div>
       </div>
@@ -344,7 +340,10 @@
                 <p class="crm-eyebrow">Resultados</p>
                 <h2>Leads captados</h2>
               </div>
-              <strong id="lead-count">0 resultados</strong>
+              <div class="crm-card__header-actions">
+                <strong id="lead-count">0 resultados</strong>
+                <button type="button" id="create-lead-button" class="button button--secondary button--compact">Nuevo lead</button>
+              </div>
             </div>
             <div class="crm-list-head">
               <span class="crm-list-head__avatar"></span>
@@ -404,7 +403,7 @@
               <span class="legend-item"><span class="dot dot--confirmed"></span> Confirmada</span>
               <span class="legend-item"><span class="dot dot--completed"></span> Realizada</span>
             </div>
-            <span class="crm-card__hint">Conecta Google Calendar para sincronizar tu disponibilidad real</span>
+            <span class="crm-card__hint" id="calendar-sync-hint">Disponibilidad basada en reglas del asesor.</span>
           </div>
         </div>
 
@@ -416,7 +415,49 @@
           <div id="day-appointments-list" class="crm-appointment-list">
             <!-- Citas filtradas por día -->
           </div>
+          <div class="crm-calendar-blocks">
+            <section class="crm-card crm-card--inner">
+              <div class="crm-card__header">
+                <div>
+                  <p class="crm-eyebrow">Bloques libres</p>
+                  <h3>Disponibilidad del día</h3>
+                </div>
+              </div>
+              <div id="day-free-slots" class="crm-slot-list"></div>
+            </section>
+            <section class="crm-card crm-card--inner">
+              <div class="crm-card__header">
+                <div>
+                  <p class="crm-eyebrow">Horas ocupadas</p>
+                  <h3>Bloqueos y citas</h3>
+                </div>
+              </div>
+              <div id="day-busy-slots" class="crm-slot-list"></div>
+            </section>
+          </div>
         </div>
+
+        <section class="crm-card crm-card--inner crm-availability-panel">
+          <div class="crm-card__header">
+            <div>
+              <p class="crm-eyebrow">Disponibilidad</p>
+              <h3>Próximos bloques libres</h3>
+            </div>
+            <span class="crm-card__hint" id="availability-range-label">Próximos 7 días</span>
+          </div>
+          <div id="availability-slots" class="crm-slot-list"></div>
+        </section>
+
+        <section class="crm-card crm-card--inner crm-availability-panel">
+          <div class="crm-card__header">
+            <div>
+              <p class="crm-eyebrow">Ocupacion</p>
+              <h3>Horas ya bloqueadas</h3>
+            </div>
+            <span class="crm-card__hint">Google, citas y bloqueos manuales</span>
+          </div>
+          <div id="busy-intervals" class="crm-slot-list"></div>
+        </section>
 
         <div id="agenda-section-list" class="crm-agenda-table"></div>
       </section>
@@ -446,11 +487,17 @@
                   <div class="crm-kv"><span>Nombre</span><strong id="profile-page-name-value">Asesor</strong></div>
                   <div class="crm-kv"><span>Acceso</span><strong id="profile-page-access">Cloudflare Access</strong></div>
                   <div class="crm-kv"><span>Correo</span><strong id="profile-page-email">-</strong></div>
+                  <div class="crm-kv"><span>Google Calendar</span><strong id="profile-page-google">Sin conectar</strong></div>
+                  <div class="crm-kv"><span>Horario base</span><strong id="profile-page-hours">08:00 - 19:00</strong></div>
                 </div>
               </div>
               <div class="crm-card crm-card--inner">
-                <div class="crm-card__header"><h3>Preferencias</h3></div>
-                <p class="crm-long-text">La foto y el nombre visibles del asesor se editan desde el menÃº superior. Esta secciÃ³n resume cÃ³mo se presenta tu cuenta dentro del CRM.</p>
+                <div class="crm-card__header"><h3>Agenda</h3></div>
+                <p class="crm-long-text" id="profile-page-calendar-copy">Todav?a no hay un calendario personal conectado a este asesor.</p>
+                <div class="crm-actions__buttons crm-mt-10">
+                  <button type="button" id="profile-connect-google" class="button button--secondary button--compact">Conectar Google Calendar</button>
+                  <button type="button" id="profile-go-settings" class="button button--ghost button--compact">Abrir settings</button>
+                </div>
               </div>
             </div>
           </div>
@@ -467,16 +514,77 @@
           </div>
           <div class="crm-settings-grid">
             <div class="crm-card crm-card--inner">
+              <div class="crm-card__header"><h3>Google Calendar</h3></div>
+              <div class="crm-kv-grid crm-kv-grid--single">
+                <div class="crm-kv"><span>Estado</span><strong id="settings-google-status">Sin conectar</strong></div>
+                <div class="crm-kv"><span>Cuenta</span><strong id="settings-google-email">-</strong></div>
+                <div class="crm-kv"><span>?ltima conexi?n</span><strong id="settings-google-updated">-</strong></div>
+              </div>
+              <div class="crm-actions__buttons crm-mt-10">
+                <button type="button" id="settings-connect-google" class="button button--secondary button--compact">Conectar Google Calendar</button>
+              </div>
+            </div>
+            <div class="crm-card crm-card--inner">
+              <div class="crm-card__header"><h3>Perfil operativo</h3></div>
+              <div class="crm-form-grid crm-form-grid--two">
+                <label class="crm-field"><span>Nombre del asesor</span><input id="settings-display-name" type="text" placeholder="Nombre visible" /></label>
+                <label class="crm-field"><span>Zona horaria</span><input id="settings-timezone" type="text" value="America/Santiago" /></label>
+                <label class="crm-field"><span>Inicio jornada</span><input id="settings-workday-start" type="time" value="08:00" /></label>
+                <label class="crm-field"><span>Fin jornada</span><input id="settings-workday-end" type="time" value="19:00" /></label>
+                <label class="crm-field"><span>Duraci?n cita</span><input id="settings-slot-duration" type="number" min="15" max="180" step="15" value="45" /></label>
+                <label class="crm-field"><span>Buffer</span><input id="settings-slot-buffer" type="number" min="0" max="60" step="5" value="15" /></label>
+              </div>
+              <label class="crm-toggle-card crm-mt-10">
+                <input id="settings-allow-busy" type="checkbox" />
+                <span>
+                  <strong>Permitir solicitudes sobre horas ocupadas</strong>
+                  <small>Por ahora mantenlo apagado. Si se activa, luego el lead podr? pedir revisi?n manual de un horario ocupado.</small>
+                </span>
+              </label>
+              <div class="crm-actions__buttons crm-mt-10">
+                <button type="button" id="settings-save-profile" class="button button--primary button--compact">Guardar perfil</button>
+              </div>
+            </div>
+            <div class="crm-card crm-card--inner crm-card--span-2">
+              <div class="crm-card__header"><h3>Disponibilidad semanal</h3></div>
+              <div id="settings-availability-grid" class="crm-availability-grid"></div>
+              <div class="crm-actions__buttons crm-mt-10">
+                <button type="button" id="settings-save-availability" class="button button--primary button--compact">Guardar disponibilidad</button>
+              </div>
+            </div>
+            <div class="crm-card crm-card--inner crm-card--span-2">
+              <div class="crm-card__header">
+                <div>
+                  <h3>Bloqueos manuales</h3>
+                  <p class="crm-card__hint">Ocupaciones especiales, reuniones externas o aperturas extraordinarias.</p>
+                </div>
+              </div>
+              <div class="crm-form-grid crm-form-grid--blocks">
+                <label class="crm-field"><span>Fecha</span><input id="settings-block-date" type="date" /></label>
+                <label class="crm-field"><span>Desde</span><input id="settings-block-start" type="time" value="08:00" /></label>
+                <label class="crm-field"><span>Hasta</span><input id="settings-block-end" type="time" value="08:45" /></label>
+                <label class="crm-field crm-field--wide"><span>Nota</span><input id="settings-block-note" type="text" placeholder="Motivo del bloqueo" /></label>
+              </div>
+              <div class="crm-actions__buttons crm-mt-10">
+                <button type="button" id="settings-add-block" class="button button--secondary button--compact">Agregar bloqueo</button>
+                <button type="button" id="settings-add-full-day-block" class="button button--ghost button--compact">Bloquear día completo</button>
+              </div>
+              <div id="settings-block-list" class="crm-block-list crm-mt-10"></div>
+              <div class="crm-actions__buttons crm-mt-10">
+                <button type="button" id="settings-save-blocks" class="button button--primary button--compact">Guardar bloqueos</button>
+              </div>
+            </div>
+            <div class="crm-card crm-card--inner">
               <div class="crm-card__header"><h3>Acceso</h3></div>
               <div class="crm-kv-grid crm-kv-grid--single">
-                <div class="crm-kv"><span>Modo producciÃ³n</span><strong>Cloudflare Access</strong></div>
+                <div class="crm-kv"><span>Modo producci?n</span><strong>Cloudflare Access</strong></div>
                 <div class="crm-kv"><span>Modo local</span><strong>Clave manual</strong></div>
                 <div class="crm-kv"><span>Backend</span><strong>form.planespro.cl</strong></div>
               </div>
             </div>
             <div class="crm-card crm-card--inner">
               <div class="crm-card__header"><h3>Notas</h3></div>
-              <p class="crm-long-text">Esta etapa sigue orientada al asesor dueno de sus leads. El foco actual es mantener una operacion clara, estable y trazable.</p>
+              <p class="crm-long-text">Cada cita ocupa 45 minutos y deja 15 minutos de margen. Los bloques disponibles salen de tu horario base menos lo ya ocupado en Google Calendar cuando la cuenta est? conectada.</p>
             </div>
           </div>
         </section>
@@ -560,5 +668,3 @@
   <script type="module" src="./app.js"></script>
 </body>
 </html>
-
-

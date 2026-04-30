@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --crm-bg: #eef3f9;
   --crm-bg-alt: #f8fbff;
   --crm-surface: #ffffff;
@@ -1456,6 +1456,35 @@ body:has([data-view-panel="agenda"].is-active) #view-title-container { display: 
 .crm-profile-page__photo, .crm-profile-page__hero .crm-avatar { width:72px; height:72px; border-radius:6px; object-fit:cover; }
 .crm-profile-page__grid, .crm-settings-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; }
 .crm-card--inner { padding:10px; border-radius:4px; }
+.crm-card--span-2 { grid-column: 1 / -1; }
+.crm-form-grid { display:grid; gap:10px; }
+.crm-form-grid--blocks { grid-template-columns: 1fr 140px 140px 1.4fr; align-items:end; }
+.crm-toggle-card { display:flex; gap:10px; align-items:flex-start; padding:12px; border:1px solid var(--crm-border); border-radius:10px; background:var(--crm-surface-soft); }
+.crm-toggle-card input { width:auto; min-height:auto; margin-top:2px; }
+.crm-toggle-card strong { display:block; font-size:13px; color:var(--crm-text); margin-bottom:3px; }
+.crm-toggle-card small { display:block; font-size:12px; color:var(--crm-muted); line-height:1.45; }
+.crm-form-grid--two { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.crm-field { display:grid; gap:6px; font-size:12px; color:var(--crm-muted); }
+.crm-block-list { display:grid; gap:8px; }
+.crm-block-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 12px; border:1px solid var(--crm-border); border-radius:10px; background:#fff; }
+.crm-block-row__main { display:grid; gap:3px; }
+.crm-block-row__main strong { font-size:13px; color:var(--crm-primary-dark); }
+.crm-block-row__main span, .crm-block-row__main small { font-size:12px; color:var(--crm-muted); }
+.crm-field input { width:100%; }
+.crm-availability-grid { display:grid; gap:8px; }
+.crm-slot-card small { font-size:11px; color:var(--crm-muted); }
+.crm-slot-card--busy { border-color: rgba(15,23,42,.10); background:#f8fafc; }
+.crm-availability-row { display:grid; grid-template-columns:1.2fr 120px 120px; gap:10px; align-items:center; padding:8px 0; border-bottom:1px solid #eef3f8; }
+.crm-availability-row:last-child { border-bottom:0; }
+.crm-availability-row__toggle { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--crm-text); }
+.crm-slot-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; }
+.crm-slot-card { padding:10px 12px; border:1px solid var(--crm-border); border-radius:8px; background:#fff; display:grid; gap:4px; }
+.crm-slot-card strong { font-size:12px; color:var(--crm-primary-dark); }
+.crm-slot-card span { font-size:11px; color:var(--crm-muted); }
+.crm-slot-card__actions { display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+.crm-availability-panel { margin-top:12px; }
+.crm-calendar-blocks { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:12px; }
+.crm-card__header-actions { display:flex; align-items:center; gap:8px; }
 .crm-detail-layout-grid { display:grid; grid-template-columns:1fr 340px; gap:12px; align-items:start; }
 .crm-detail-main-col, .crm-detail-side-col { display:grid; gap:12px; }
 .crm-card--comment-compact { padding:10px; }
@@ -1466,8 +1495,13 @@ body:has([data-view-panel="agenda"].is-active) #view-title-container { display: 
 .crm-kv--compact { min-height:42px; padding:4px 8px; }
 .crm-kv--compact span { font-size:10px; margin-bottom:0; }
 .crm-kv--compact strong { font-size:12px; }
+.crm-actions--appointment { margin-top: 12px; padding-top: 12px; border-top: 1px solid #eef3f8; }
+.crm-actions__intro { display: grid; gap: 3px; }
+.crm-actions__intro strong { font-size: 13px; color: var(--crm-primary-dark); }
+.crm-actions__intro small, .crm-appointment-help { font-size: 12px; color: var(--crm-muted); line-height: 1.45; }
+
 @media (max-width: 1380px) { .crm-page-toolbar, .crm-topbar { flex-wrap:wrap; } .crm-page-toolbar__right { width:100%; justify-content:space-between; } }
-@media (max-width: 960px) { .crm-appshell { grid-template-columns: 1fr; } .crm-sidebar, .crm-sidebar.is-collapsed { width:auto; height:auto; position:static; } .crm-sidebar__top, .crm-sidebar__profile, .crm-sidebar__meta { display:none; } .crm-sidebar__nav { display:flex; gap:8px; padding:10px 12px; overflow:auto; } .crm-nav-item, .crm-sidebar.is-collapsed .crm-nav-item { min-width:50px; padding:0 10px; } .crm-nav-item::after, .crm-nav-item__label { display:none; } .crm-topbar { padding-inline:12px; } .crm-page-toolbar, .crm-view { padding-inline:12px; } .crm-dashboard-wrapper, .crm-leads-layout, .crm-dashboard-grid, .crm-filters__grid, .crm-profile-page__grid, .crm-settings-grid, .crm-detail-grid, .crm-kv-grid, .crm-metric-grid { grid-template-columns:1fr; } .crm-dashboard-sidebar { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); } .crm-profile-menu { width:260px; } }
+@media (max-width: 960px) { .crm-appshell { grid-template-columns: 1fr; } .crm-sidebar, .crm-sidebar.is-collapsed { width:auto; height:auto; position:static; } .crm-sidebar__top, .crm-sidebar__profile, .crm-sidebar__meta { display:none; } .crm-sidebar__nav { display:flex; gap:8px; padding:10px 12px; overflow:auto; } .crm-nav-item, .crm-sidebar.is-collapsed .crm-nav-item { min-width:50px; padding:0 10px; } .crm-nav-item::after, .crm-nav-item__label { display:none; } .crm-topbar { padding-inline:12px; } .crm-page-toolbar, .crm-view { padding-inline:12px; } .crm-dashboard-wrapper, .crm-leads-layout, .crm-dashboard-grid, .crm-filters__grid, .crm-profile-page__grid, .crm-settings-grid, .crm-detail-grid, .crm-kv-grid, .crm-metric-grid, .crm-form-grid--two, .crm-form-grid--blocks, .crm-calendar-blocks { grid-template-columns:1fr; } .crm-dashboard-sidebar { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); } .crm-profile-menu { width:260px; } .crm-availability-row { grid-template-columns:1fr; } }
 
 .crm-mt-10 { margin-top: 10px; }
 .crm-alert {
@@ -1530,3 +1564,5 @@ body:has([data-view-panel="agenda"].is-active) #view-title-container { display: 
 .crm-status-row__bar--pending { background: #64748b; }
 .crm-status-icon--neutral { color: #cbd5e1; }
 .crm-status-row__bar--neutral { background: #cbd5e1; }
+
+

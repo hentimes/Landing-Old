@@ -1,7 +1,7 @@
-import { API_BASE_URL, ADMIN_KEY_STORAGE, isLocalDev } from './config.js';
+import { API_BASE_URL, ADMIN_KEY_STORAGE, LOCAL_DEV_ADMIN_KEY, isLocalDev } from './config.js';
 
 function getAdminKey() {
-  return window.localStorage.getItem(ADMIN_KEY_STORAGE) || '';
+  return window.localStorage.getItem(ADMIN_KEY_STORAGE) || (isLocalDev ? LOCAL_DEV_ADMIN_KEY : '');
 }
 
 function getHeaders(extra = {}) {
@@ -57,6 +57,34 @@ export async function getSession() {
   return fetchJson('/api/admin/session');
 }
 
+export async function getAdvisorProfile() {
+  return fetchJson('/api/admin/advisor/profile');
+}
+
+export async function updateAdvisorProfile(payload) {
+  return fetchJson('/api/admin/advisor/profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload || {}),
+  });
+}
+
+export async function getAvailability(params = {}) {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) query.set(key, value);
+  });
+  return fetchJson(`/api/admin/availability?${query.toString()}`);
+}
+
+export async function updateAvailability(payload) {
+  return fetchJson('/api/admin/availability', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload || {}),
+  });
+}
+
 export async function listLeads(filters) {
   const params = new URLSearchParams();
   Object.entries(filters || {}).forEach(([key, value]) => {
@@ -67,11 +95,27 @@ export async function listLeads(filters) {
   return fetchJson(`/api/admin/leads?${params.toString()}`);
 }
 
-export async function updateAppointment(leadId, payload) {
-  return fetchJson('/api/form/appointments', {
+export async function createLead(payload) {
+  return fetchJson('/api/admin/leads', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ leadId, ...(payload || {}) }),
+    body: JSON.stringify(payload || {}),
+  });
+}
+
+export async function deleteLead(leadId) {
+  return fetchJson(`/api/admin/leads/${leadId}/delete`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  });
+}
+
+export async function updateAppointment(leadId, payload) {
+  return fetchJson(`/api/admin/leads/${leadId}/appointment`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload || {}),
   });
 }
 

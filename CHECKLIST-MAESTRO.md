@@ -37,7 +37,7 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
 - [x] Worker preparado para consultar noticias, clasificar y normalizar campos.
 - [x] Migracion SQL D1 creada.
 - [x] Frontend preparado para `limit`, `offset`, `dias`, `categoria` y `q`.
-- [x] Rediseño móvil del feed (buscador + dropdown, 6 titulares + 6 carrusel, CTA azul final).
+- [x] RediseÃ±o mÃ³vil del feed (buscador + dropdown, 6 titulares + 6 carrusel, CTA azul final).
 - [ ] Crear la base D1 real en Cloudflare.
 - [ ] Aplicar migracion D1 en Cloudflare.
 - [ ] Confirmar URL final del Worker y reemplazar endpoints antiguos si corresponde.
@@ -108,10 +108,18 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
 - [ ] Normalizar nombres de campos entre frontend y Apps Script para evitar mapeos duplicados.
 - [x] Agregar `Comentario` al contrato del formulario, Apps Script y Google Sheets.
 - [x] Preparar desde ya el contrato de `Agendamiento` o `Cita` aunque el flujo aun no exista en frontend.
-- [ ] Definir si la cita se guardara como estado, fecha/hora, link de agenda o combinacion de esos campos.
-- [ ] Diseñar el flujo futuro de agendamiento conectado a Google Calendar sin mezclarlo aun con el submit principal.
+- [x] Definir si la cita se guardara como estado, fecha/hora, link de agenda o combinacion de esos campos.
+- [ ] DiseÃ±ar el flujo futuro de agendamiento conectado a Google Calendar sin mezclarlo aun con el submit principal.
 - [x] Mantener Apps Script como backend transitorio del sidebar hasta cerrar la migracion a Cloudflare.
 - [x] Definir un adaptador de backend para que el frontend nuevo no dependa de Apps Script ni de Cloudflare directamente.
+- [x] Reemplazar el selector libre de fecha/hora por slots reales disponibles.
+- [x] Aplicar una regla unica de agenda: 45 min de reunion + 15 min de buffer.
+- [x] Mostrar al lead solo horas disponibles y bloquear visualmente las ocupadas o no disponibles.
+- [x] Exponer desde backend una grilla completa de slots con estado para que las horas ocupadas no desaparezcan.
+- [x] Permitir crear lead manual desde el CRM.
+- [x] Permitir eliminar lead desde el CRM.
+- [x] Permitir bloquear día completo desde el CRM.
+- [ ] Unificar el formateo de fecha/hora entre formulario, CRM, D1 y Google Calendar.
 - [ ] Probar el sidebar completo en mobile real, incluyendo CTA del header, menu hamburguesa, scroll, abandono y envio.
 - [ ] Probar el sidebar en desktop real despues de la simplificacion para evitar regresiones.
 
@@ -131,14 +139,14 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
 - [x] Imagenes principales usan WebP en varias secciones.
 - [x] Preload/fetchpriority revisado en heroes principales.
 - [x] Agregar dimensiones explicitas a las imagenes usadas en `ebook.html`.
-- [ ] Implementar cambios prioritarios de PageSpeed (Ver Sección 11).
-- [ ] Optimizar cadena de carga crítica: `main.js` -> `_module-loader.js` -> templates (Latencia ~2.5s).
-- [ ] Reducir "Forced Reflow" en JS (34ms detectados por consultas geométricas).
+- [ ] Implementar cambios prioritarios de PageSpeed (Ver SecciÃ³n 11).
+- [ ] Optimizar cadena de carga crÃ­tica: `main.js` -> `_module-loader.js` -> templates (Latencia ~2.5s).
+- [ ] Reducir "Forced Reflow" en JS (34ms detectados por consultas geomÃ©tricas).
 - [ ] Medir LCP real por pagina.
 - [ ] Revisar imagenes pesadas restantes (`news.webp`, `news1.webp`, assets del ebook).
 - [ ] Evitar sobre-preload y mantener solo recursos criticos.
 - [ ] Evaluar bundle/build para reducir `@import` en produccion.
-- [ ] Configurar políticas de caché (TTL > 30 días para estáticos; actualmente es de 7 días).
+- [ ] Configurar polÃ­ticas de cachÃ© (TTL > 30 dÃ­as para estÃ¡ticos; actualmente es de 7 dÃ­as).
 
 ## 9. Analytics y medicion
 
@@ -157,25 +165,25 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
 - [ ] Crear commits por bloque: fixes, docs, modularizacion, SEO/performance.
 - [ ] Mantener este archivo como unica fuente de estado.
 
-## 11. Optimización PageSpeed (Audit Detallado)
+## 11. OptimizaciÃ³n PageSpeed (Audit Detallado)
 
-### P1: Crítico (Impacto Directo en Core Web Vitals)
-- [ ] **Eliminar recursos que bloquean el renderizado:** Diferir scripts de terceros y optimizar carga de CSS crítico (~3.4s de ahorro).
-- [ ] **Redimensionar Assets Críticos:**
+### P1: CrÃ­tico (Impacto Directo en Core Web Vitals)
+- [ ] **Eliminar recursos que bloquean el renderizado:** Diferir scripts de terceros y optimizar carga de CSS crÃ­tico (~3.4s de ahorro).
+- [ ] **Redimensionar Assets CrÃ­ticos:**
     - [ ] **Logo PlanesPro:** De 800x800 a 140x140 (Ahorro ~276 KiB).
     - [ ] **Avatar 4:** De 1511x1500 a ~160x160.
     - [ ] **Avatar 1:** De 953x931 a ~120x120.
-    - [ ] **Conversión total a WebP/AVIF:** Resto de imágenes en landing y noticias.
-- [ ] **Dimensiones explícitas (CLS):** 
+    - [ ] **ConversiÃ³n total a WebP/AVIF:** Resto de imÃ¡genes en landing y noticias.
+- [ ] **Dimensiones explÃ­citas (CLS):** 
     - [ ] Agregar `width` y `height` a los logos de Isapres (Nueva Masvida, Esencial, Consalud, etc.).
     - [ ] Asegurar dimensiones en todos los tags `<img>` del sitio.
-- [ ] **Optimizar fuentes tipográficas:** Aplicar `font-display: swap` en `@font-face`.
+- [ ] **Optimizar fuentes tipogrÃ¡ficas:** Aplicar `font-display: swap` en `@font-face`.
 
 ### P2: Estructura y Eficiencia (JS/DOM)
 - [ ] **Optimizar Cadena de Peticiones:** Reducir la profundidad de carga (`index` -> `main.js` -> `loader` -> `templates`).
-- [ ] **Controlar Tamaño del DOM:** Actualmente 916 elementos. Evitar superar los 1400 y reducir profundidad (máx 15 niveles en `i.fas.fa-users`).
-- [ ] **Reducir trabajo de hilo principal:** Optimizar ejecución de `fbevents.js` y scripts propios (398ms CPU).
-- [ ] **Políticas de caché:** Aumentar TTL a 1 año para assets estáticos en el servidor/Cloudflare.
+- [ ] **Controlar TamaÃ±o del DOM:** Actualmente 916 elementos. Evitar superar los 1400 y reducir profundidad (mÃ¡x 15 niveles en `i.fas.fa-users`).
+- [ ] **Reducir trabajo de hilo principal:** Optimizar ejecuciÃ³n de `fbevents.js` y scripts propios (398ms CPU).
+- [ ] **PolÃ­ticas de cachÃ©:** Aumentar TTL a 1 aÃ±o para assets estÃ¡ticos en el servidor/Cloudflare.
 
 ### P3: Accesibilidad, SEO y Seguridad
 - [ ] **Corregir Contraste de Color:**
@@ -183,6 +191,7 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
     - [ ] `p.testimonial-card__date`
     - [ ] `button#cta_inferior`
     - [ ] `a.footer__subtle-link`
-- [ ] **Jerarquía de encabezados:** Corregir `h4.footer__title` (salto desde H1/H2).
-- [ ] **Tamaño de objetivos táctiles:** Espaciado en filtros y botones móviles.
+- [ ] **JerarquÃ­a de encabezados:** Corregir `h4.footer__title` (salto desde H1/H2).
+- [ ] **TamaÃ±o de objetivos tÃ¡ctiles:** Espaciado en filtros y botones mÃ³viles.
 - [ ] **Headers de Seguridad:** Implementar **CSP**, **HSTS** y **X-Frame-Options**.
+

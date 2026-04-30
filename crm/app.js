@@ -1,7 +1,8 @@
-import {
+﻿import {
   isLocalDev,
   LEAD_STATUSES,
   ADMIN_KEY_STORAGE,
+  LOCAL_DEV_ADMIN_KEY,
   PROFILE_STORAGE,
   RANGE_OPTIONS,
   ISAPRE_BUCKETS,
@@ -9,6 +10,10 @@ import {
 import {
   addLeadNote,
   archiveLead,
+  createLead,
+  deleteLead,
+  getAdvisorProfile,
+  getAvailability,
   getFileUrl,
   getLeadDetail,
   getSession,
@@ -16,6 +21,8 @@ import {
   readAdminKey,
   saveAdminKey,
   updateAppointment,
+  updateAdvisorProfile,
+  updateAvailability,
   updateLeadRut,
   updateLeadStatus,
 } from './api.js';
@@ -23,11 +30,11 @@ import {
 const SIDEBAR_STORAGE = 'crm-sidebar-collapsed';
 
 const VIEW_META = {
-  dashboard: { title: 'Dashboard', crumb: 'Dashboard', copy: 'Métricas, pipeline comercial y agenda del asesor.' },
+  dashboard: { title: 'Dashboard', crumb: 'Dashboard', copy: 'MÃƒÂ©tricas, pipeline comercial y agenda del asesor.' },
   leads: { title: 'Leads', crumb: 'Leads', copy: 'Bandeja compacta, seguimiento y acciones comerciales.' },
-  agenda: { title: 'Agenda', crumb: 'Agenda', copy: 'Próximas citas, pendientes y agenda inmediata.' },
+  agenda: { title: 'Agenda', crumb: 'Agenda', copy: 'PrÃƒÂ³ximas citas, pendientes y agenda inmediata.' },
   profile: { title: 'Profile', crumb: 'Profile', copy: 'Datos visibles del asesor dentro del CRM.' },
-  settings: { title: 'Settings', crumb: 'Settings', copy: 'Configuración actual del acceso y del panel privado.' },
+  settings: { title: 'Settings', crumb: 'Settings', copy: 'ConfiguraciÃƒÂ³n actual del acceso y del panel privado.' },
 };
 
 const state = {
@@ -44,6 +51,11 @@ const state = {
   sortBy: 'created',
   sortOrder: 'desc',
   calendarDate: new Date(),
+  advisorProfile: null,
+  advisorAvailability: [],
+  advisorSlots: [],
+  advisorBlocks: [],
+  advisorBusyIntervals: [],
 };
 
 const elements = {
@@ -60,6 +72,11 @@ const elements = {
   profilePageNameValue: document.getElementById('profile-page-name-value'),
   profilePageAccess: document.getElementById('profile-page-access'),
   profilePageEmail: document.getElementById('profile-page-email'),
+  profilePageGoogle: document.getElementById('profile-page-google'),
+  profilePageHours: document.getElementById('profile-page-hours'),
+  profilePageCalendarCopy: document.getElementById('profile-page-calendar-copy'),
+  profileConnectGoogle: document.getElementById('profile-connect-google'),
+  profileGoSettings: document.getElementById('profile-go-settings'),
   viewTitle: document.getElementById('view-title'),
   viewCopy: document.querySelector('.crm-page-toolbar__copy'),
   topbarActiveView: document.getElementById('topbar-active-view'),
@@ -76,6 +93,7 @@ const elements = {
   filterTo: document.getElementById('filter-to'),
   applyFilters: document.getElementById('apply-filters'),
   clearFilters: document.getElementById('clear-filters'),
+  createLeadButton: document.getElementById('create-lead-button'),
   leadList: document.getElementById('lead-list'),
   leadCount: document.getElementById('lead-count'),
   leadDetail: document.getElementById('lead-detail'),
@@ -102,6 +120,10 @@ const elements = {
   agendaListCaption: document.getElementById('agenda-list-caption'),
   agendaList: document.getElementById('agenda-list'),
   agendaSectionList: document.getElementById('agenda-section-list'),
+  availabilitySlots: document.getElementById('availability-slots'),
+  busyIntervals: document.getElementById('busy-intervals'),
+  availabilityRangeLabel: document.getElementById('availability-range-label'),
+  calendarSyncHint: document.getElementById('calendar-sync-hint'),
   leadsMetricNew: document.getElementById('leads-metric-new'),
   leadsMetricContacted: document.getElementById('leads-metric-contacted'),
   leadsMetricAnalysis: document.getElementById('leads-metric-analysis'),
@@ -132,6 +154,28 @@ const elements = {
   profileReset: document.getElementById('profile-reset'),
   profileSave: document.getElementById('profile-save'),
   openProfileEditor: document.getElementById('open-profile-editor'),
+  settingsGoogleStatus: document.getElementById('settings-google-status'),
+  settingsGoogleEmail: document.getElementById('settings-google-email'),
+  settingsGoogleUpdated: document.getElementById('settings-google-updated'),
+  settingsConnectGoogle: document.getElementById('settings-connect-google'),
+  settingsDisplayName: document.getElementById('settings-display-name'),
+  settingsTimezone: document.getElementById('settings-timezone'),
+  settingsWorkdayStart: document.getElementById('settings-workday-start'),
+  settingsWorkdayEnd: document.getElementById('settings-workday-end'),
+  settingsSlotDuration: document.getElementById('settings-slot-duration'),
+  settingsSlotBuffer: document.getElementById('settings-slot-buffer'),
+  settingsAllowBusy: document.getElementById('settings-allow-busy'),
+  settingsSaveProfile: document.getElementById('settings-save-profile'),
+  settingsAvailabilityGrid: document.getElementById('settings-availability-grid'),
+  settingsSaveAvailability: document.getElementById('settings-save-availability'),
+  settingsBlockDate: document.getElementById('settings-block-date'),
+  settingsBlockStart: document.getElementById('settings-block-start'),
+  settingsBlockEnd: document.getElementById('settings-block-end'),
+  settingsBlockNote: document.getElementById('settings-block-note'),
+  settingsAddBlock: document.getElementById('settings-add-block'),
+  settingsAddFullDayBlock: document.getElementById('settings-add-full-day-block'),
+  settingsBlockList: document.getElementById('settings-block-list'),
+  settingsSaveBlocks: document.getElementById('settings-save-blocks'),
   fileModal: document.getElementById('file-modal'),
   fileModalTitle: document.getElementById('file-modal-title'),
   fileModalClose: document.getElementById('file-modal-close'),
@@ -144,6 +188,8 @@ const elements = {
   calendarDayDetails: document.getElementById('calendar-day-details'),
   selectedDayLabel: document.getElementById('selected-day-label'),
   dayAppointmentsList: document.getElementById('day-appointments-list'),
+  dayFreeSlots: document.getElementById('day-free-slots'),
+  dayBusySlots: document.getElementById('day-busy-slots'),
   closeDayDetails: document.getElementById('close-details'),
 };
 
@@ -183,11 +229,13 @@ function bindEvents() {
       refreshDashboard();
       renderLeadsMetrics(filterItemsByRange(state.items, state.selectedRange));
       renderLeadsView();
-      renderAgenda(filterItemsByRange(state.items, state.selectedRange));
+      renderAgenda();
+      refreshAvailabilitySlots();
     });
   });
 
   elements.applyFilters?.addEventListener('click', renderLeadsView);
+  elements.createLeadButton?.addEventListener('click', createLeadFromPrompt);
   elements.clearFilters?.addEventListener('click', () => {
     if (elements.filterQ) elements.filterQ.value = '';
     if (elements.filterStatus) elements.filterStatus.value = '';
@@ -258,6 +306,14 @@ function bindEvents() {
   });
 
   elements.openProfileEditor?.addEventListener('click', openProfileModal);
+  elements.profileConnectGoogle?.addEventListener('click', connectGoogleCalendar);
+  elements.profileGoSettings?.addEventListener('click', () => setView('settings'));
+  elements.settingsConnectGoogle?.addEventListener('click', connectGoogleCalendar);
+  elements.settingsSaveProfile?.addEventListener('click', saveAdvisorSettings);
+  elements.settingsSaveAvailability?.addEventListener('click', saveAdvisorAvailability);
+  elements.settingsAddBlock?.addEventListener('click', appendManualBlockFromForm);
+  elements.settingsAddFullDayBlock?.addEventListener('click', appendFullDayBlockFromForm);
+  elements.settingsSaveBlocks?.addEventListener('click', saveAdvisorBlocks);
 
   elements.fileModalClose?.addEventListener('click', closeFileModal);
   elements.fileModal?.addEventListener('click', (event) => {
@@ -291,7 +347,9 @@ function bindEvents() {
 
 function configureAccessMode() {
   if (isLocalDev) {
-    elements.adminKey.value = readAdminKey();
+    const currentKey = readAdminKey() || LOCAL_DEV_ADMIN_KEY;
+    saveAdminKey(currentKey);
+    elements.adminKey.value = currentKey;
     elements.adminKeyBox.hidden = false;
   } else {
     elements.adminKeyBox.hidden = true;
@@ -318,6 +376,7 @@ async function bootstrap() {
     applyProfileToUI();
     hydrateProfileSections();
     await loadLeads();
+    await loadAdvisorWorkspace();
   } catch (error) {
     elements.sessionStatus.textContent = error.message;
     renderDashboard([]);
@@ -337,7 +396,7 @@ async function loadLeads(skipFetch = false) {
     refreshDashboard();
     renderLeadsMetrics(filterItemsByRange(state.items, state.selectedRange));
     renderLeadsView();
-    renderAgenda(filterItemsByRange(state.items, state.selectedRange));
+    renderAgenda();
 
     if (state.selectedLeadId) {
       const exists = state.items.some((item) => item.id === state.selectedLeadId);
@@ -354,6 +413,37 @@ async function loadLeads(skipFetch = false) {
     renderAgenda([]);
     renderList([]);
     renderDetail(null, error.message);
+  }
+}
+
+async function loadAdvisorWorkspace() {
+  try {
+    const profilePayload = await getAdvisorProfile();
+    state.advisorProfile = profilePayload;
+    hydrateAdvisorUI();
+    await refreshAvailabilitySlots();
+  } catch (error) {
+    if (elements.calendarSyncHint) elements.calendarSyncHint.textContent = error.message;
+  }
+}
+
+async function refreshAvailabilitySlots() {
+  try {
+    const { from, to } = getSelectedRangeWindow();
+    const payload = await getAvailability({ from, to });
+    state.advisorAvailability = payload.rules || [];
+    state.advisorSlots = payload.slots || [];
+    state.advisorBlocks = payload.blocks || [];
+    state.advisorBusyIntervals = payload.busy_intervals || [];
+    if (state.advisorProfile) state.advisorProfile.blocks = payload.blocks || [];
+    hydrateAdvisorUI();
+  } catch (error) {
+    state.advisorSlots = [];
+    state.advisorBlocks = [];
+    state.advisorBusyIntervals = [];
+    if (elements.availabilitySlots) {
+      elements.availabilitySlots.innerHTML = `<p class="crm-muted">${escapeHtml(error.message)}</p>`;
+    }
   }
 }
 
@@ -493,8 +583,8 @@ function renderStatusRow(label, count, total) {
   `;
 }
 
-function renderAgenda(items = []) {
-  const appointments = buildAppointments(items);
+function renderAgenda(items = state.items) {
+  const appointments = buildAppointments(filterAppointmentItemsByRange(items, state.selectedRange));
   const now = new Date();
   const todayIso = now.toISOString().slice(0, 10);
   const nextWeek = new Date(now);
@@ -507,6 +597,55 @@ function renderAgenda(items = []) {
 
   renderCalendar();
   renderAgendaTable(appointments);
+  renderAvailabilitySlots();
+}
+
+function renderAvailabilitySlots() {
+  if (!elements.availabilitySlots) return;
+  const slots = state.advisorSlots || [];
+  const rangeLabel = RANGE_OPTIONS[state.selectedRange]?.label || 'Periodo';
+  if (elements.availabilityRangeLabel) {
+    elements.availabilityRangeLabel.textContent = `Bloques Â· ${rangeLabel}`;
+  }
+
+  if (!slots.length) {
+    elements.availabilitySlots.innerHTML = '<p class="crm-muted">No hay bloques libres para el rango seleccionado.</p>';
+  } else {
+    elements.availabilitySlots.innerHTML = slots.slice(0, 18).map((slot) => `
+      <div class="crm-slot-card">
+        <strong>${escapeHtml(slot.label || '')}</strong>
+        <span>${escapeHtml(slot.starts_at?.slice(11, 16) || '')} - ${escapeHtml(slot.ends_at?.slice(11, 16) || '')}</span>
+      </div>
+    `).join('');
+  }
+
+  renderBusyIntervals();
+}
+
+function renderBusyIntervals() {
+  if (!elements.busyIntervals) return;
+  const intervals = (state.advisorBusyIntervals || [])
+    .slice()
+    .sort((a, b) => Number(a.startMs || 0) - Number(b.startMs || 0));
+
+  if (!intervals.length) {
+    elements.busyIntervals.innerHTML = '<p class="crm-muted">No hay horas ocupadas registradas para el rango.</p>';
+    return;
+  }
+
+  elements.busyIntervals.innerHTML = intervals.slice(0, 18).map((item) => `
+    <div class="crm-slot-card crm-slot-card--busy">
+      <strong>${escapeHtml(formatDateTime(item.starts_at || ''))}</strong>
+      <span>${escapeHtml((item.starts_at || '').slice(11, 16))} - ${escapeHtml((item.ends_at || '').slice(11, 16))}</span>
+      <small>${escapeHtml(resolveBusySourceLabel(item))}</small>
+    </div>
+  `).join('');
+}
+
+function resolveBusySourceLabel(item = {}) {
+  if (item.source === 'manual') return item.note || 'Bloqueo manual';
+  if (item.source === 'google') return item.note || 'Google Calendar';
+  return item.note || 'Cita del CRM';
 }
 
 function renderCalendar() {
@@ -521,7 +660,7 @@ function renderCalendar() {
   const today = new Date();
   const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
 
-  const appointments = buildAppointments(filterItemsByRange(state.items, state.selectedRange));
+  const appointments = buildAppointments(filterAppointmentItemsByRange(state.items, state.selectedRange));
   
   let html = '';
   // Padding days
@@ -561,7 +700,7 @@ function calendarEventLabel(appointment) {
   const time = appointment.date && !Number.isNaN(appointment.date.getTime())
     ? new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit' }).format(appointment.date)
     : '';
-  return time ? `${time} · ${name}` : name;
+  return time ? `${time} Ã‚Â· ${name}` : name;
 }
 
 function calendarStatusClass(status) {
@@ -573,8 +712,151 @@ function calendarStatusClass(status) {
   return 'pending';
 }
 
+function renderCalendarDaySlots(dayIso) {
+  if (elements.dayFreeSlots) {
+    const selectedLead = state.items.find((item) => item.id === state.selectedLeadId) || null;
+    const freeSlots = (state.advisorSlots || []).filter((slot) => String(slot.starts_at || '').slice(0, 10) === dayIso);
+    const selectedLeadCopy = selectedLead
+      ? `<p class="crm-muted crm-slot-context">Lead seleccionado: <strong>${escapeHtml(selectedLead.nombre || selectedLead.email || selectedLead.telefono || 'Sin nombre')}</strong></p>`
+      : '<p class="crm-muted crm-slot-context">Abre un lead desde la bandeja para usar estos bloques y agendar desde la agenda.</p>';
+    elements.dayFreeSlots.innerHTML = freeSlots.length
+      ? `${selectedLeadCopy}${freeSlots.map((slot) => `
+        <div class="crm-slot-card">
+          <strong>${escapeHtml((slot.starts_at || '').slice(11, 16))}</strong>
+          <span>${escapeHtml((slot.starts_at || '').slice(11, 16))} - ${escapeHtml((slot.ends_at || '').slice(11, 16))}</span>
+          <div class="crm-slot-card__actions">
+            <button
+              type="button"
+              class="button button--secondary button--compact crm-slot-action"
+              data-slot-start="${escapeHtml(slot.starts_at || '')}"
+              ${selectedLead ? '' : 'disabled'}
+            >
+              ${selectedLead?.cita_fecha_hora ? 'Reprogramar lead abierto' : 'Agendar lead abierto'}
+            </button>
+            <button
+              type="button"
+              class="button button--ghost button--compact crm-slot-block"
+              data-slot-start="${escapeHtml(slot.starts_at || '')}"
+              data-slot-end="${escapeHtml(slot.ends_at || '')}"
+            >
+              Bloquear
+            </button>
+          </div>
+        </div>
+      `).join('')}`
+      : '<p class="crm-muted">Sin bloques libres para este día.</p>';
+  }
+
+  if (elements.dayBusySlots) {
+    const busySlots = (state.advisorBusyIntervals || [])
+      .filter((item) => String(item.starts_at || '').slice(0, 10) === dayIso)
+      .sort((a, b) => Number(a.startMs || 0) - Number(b.startMs || 0));
+    elements.dayBusySlots.innerHTML = busySlots.length
+      ? busySlots.map((item) => `
+        <div class="crm-slot-card crm-slot-card--busy">
+          <strong>${escapeHtml((item.starts_at || '').slice(11, 16))}</strong>
+          <span>${escapeHtml((item.starts_at || '').slice(11, 16))} - ${escapeHtml((item.ends_at || '').slice(11, 16))}</span>
+          <small>${escapeHtml(resolveBusySourceLabel(item))}</small>
+          <div class="crm-slot-card__actions">
+            ${item.lead_id
+              ? `<button type="button" class="button button--ghost button--compact crm-busy-open" data-lead-id="${escapeHtml(item.lead_id)}">Abrir lead</button>`
+              : ''}
+            ${item.source === 'manual'
+              ? `<button type="button" class="button button--ghost button--compact crm-busy-release" data-block-id="${escapeHtml(item.id || '')}">Liberar</button>`
+              : ''}
+          </div>
+        </div>
+      `).join('')
+      : '<p class="crm-muted">Sin horas ocupadas registradas.</p>';
+  }
+
+  bindCalendarSlotActions(dayIso);
+}
+
+function bindCalendarSlotActions(dayIso) {
+  elements.dayFreeSlots?.querySelectorAll('.crm-slot-action').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const lead = state.items.find((item) => item.id === state.selectedLeadId);
+      if (!lead) {
+        window.alert('Primero abre un lead desde la bandeja.');
+        return;
+      }
+
+      const slotStart = button.dataset.slotStart || '';
+      if (!slotStart) return;
+
+      button.disabled = true;
+      try {
+        await updateAppointment(lead.id, {
+          action: lead.cita_fecha_hora ? 'reschedule' : 'create',
+          cita_fecha_hora: slotStart,
+          cita_estado: 'Agendada',
+        });
+        await loadLeads();
+        await loadLeadDetail(lead.id);
+        window.handleCalendarDayClick(dayIso);
+      } catch (error) {
+        window.alert(error.message || 'No se pudo agendar la cita');
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+
+  elements.dayFreeSlots?.querySelectorAll('.crm-slot-block').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const startsAt = button.dataset.slotStart || '';
+      const endsAt = button.dataset.slotEnd || '';
+      if (!startsAt || !endsAt) return;
+
+      button.disabled = true;
+      try {
+        await persistAdvisorBlocks([
+          ...(state.advisorBlocks || []),
+          {
+            id: window.crypto?.randomUUID?.() || `block-${Date.now()}`,
+            starts_at: startsAt,
+            ends_at: endsAt,
+            block_type: 'manual',
+            note: 'Bloqueado desde agenda',
+          },
+        ]);
+        window.handleCalendarDayClick(dayIso);
+      } catch (error) {
+        window.alert(error.message || 'No se pudo bloquear el horario');
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+
+  elements.dayBusySlots?.querySelectorAll('.crm-busy-open').forEach((button) => {
+    button.addEventListener('click', async () => {
+      setView('leads');
+      await loadLeadDetail(button.dataset.leadId);
+    });
+  });
+
+  elements.dayBusySlots?.querySelectorAll('.crm-busy-release').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const blockId = button.dataset.blockId || '';
+      if (!blockId) return;
+
+      button.disabled = true;
+      try {
+        await persistAdvisorBlocks((state.advisorBlocks || []).filter((block) => block.id !== blockId));
+        window.handleCalendarDayClick(dayIso);
+      } catch (error) {
+        window.alert(error.message || 'No se pudo liberar el bloqueo');
+      } finally {
+        button.disabled = false;
+      }
+    });
+  });
+}
+
 window.handleCalendarDayClick = (dayIso) => {
-  const appointments = buildAppointments(filterItemsByRange(state.items, state.selectedRange));
+  const appointments = buildAppointments(filterAppointmentItemsByRange(state.items, state.selectedRange));
   const dayAppointments = appointments.filter(a => a.rawDate.slice(0, 10) === dayIso);
   const dateObj = new Date(`${dayIso}T12:00:00`);
   const dateLabel = new Intl.DateTimeFormat('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }).format(dateObj);
@@ -588,6 +870,8 @@ window.handleCalendarDayClick = (dayIso) => {
     elements.dayAppointmentsList.innerHTML = dayAppointments.map(renderAppointmentItem).join('');
     bindAgendaClicks();
   }
+
+  renderCalendarDaySlots(dayIso);
 };
 
 function renderList(items) {
@@ -611,7 +895,7 @@ function renderList(items) {
     const rutIcon = item.rut ? ' <i class="fas fa-address-card crm-rut-icon" title="RUT registrado"></i>' : '';
     nameNode.innerHTML = `${escapeHtml(item.nombre || 'Sin nombre')}${rutIcon}`;
     
-    node.querySelector('[data-field="contacto"]').textContent = [item.telefono, item.email].filter(Boolean).join(' · ') || 'Sin contacto';
+    node.querySelector('[data-field="contacto"]').textContent = [item.telefono, item.email].filter(Boolean).join(' Ã‚Â· ') || 'Sin contacto';
     // Sistema / Isapre flip (Nombre Isapre arriba, Tipo abajo)
     const systemName = item.isapre_especifica || item.sistema_actual || 'Sin dato';
     const systemType = item.isapre_especifica ? (item.sistema_actual || 'Isapre') : (item.sistema_actual || '');
@@ -622,7 +906,7 @@ function renderList(items) {
     statusNode.textContent = (item.status || 'Sin estado').slice(0, 12);
     statusNode.className = `crm-badge ${statusBadgeClass(item.status)}`;
     node.querySelector('[data-field="created"]').textContent = formatDate(item.created_at);
-    node.querySelector('[data-field="region"]').textContent = item.region || 'Sin región';
+    node.querySelector('[data-field="region"]').textContent = item.region || 'Sin regiÃƒÂ³n';
 
     const attachButton = node.querySelector('[data-field="attach"]');
     const hasAttachment = Boolean(item.has_file && item.pdf_object_key);
@@ -680,13 +964,13 @@ function renderDetail(payload, errorMessage = '') {
         <p>${escapeHtml(note.note_text)}</p>
       </article>
     `).join('')
-    : '<p class="crm-muted">Sin notas internas todavía.</p>';
+    : '<p class="crm-muted">Sin notas internas todavÃƒÂ­a.</p>';
 
   const eventsHtml = (events || []).length
     ? events.map((event) => `
       <article class="crm-event">
         <strong>${escapeHtml(event.event_type)}</strong>
-        <span>${formatDateTime(event.created_at)} · ${escapeHtml(event.actor_email)}</span>
+        <span>${formatDateTime(event.created_at)} Ã‚Â· ${escapeHtml(event.actor_email)}</span>
       </article>
     `).join('')
     : '<p class="crm-muted">Sin eventos registrados.</p>';
@@ -740,11 +1024,67 @@ function bindDetailActions(lead) {
   const statusSelect = document.getElementById('lead-status');
   const saveStatusButton = document.getElementById('save-status');
   const archiveButton = document.getElementById('archive-lead');
+  const deleteButton = document.getElementById('delete-lead');
   const noteForm = document.getElementById('note-form');
   const noteText = document.getElementById('note-text');
   const rutInput = document.getElementById('lead-rut');
   const saveRutButton = document.getElementById('save-rut');
   const rutFeedback = document.getElementById('rut-feedback');
+  const appointmentDay = document.getElementById('lead-appointment-day');
+  const appointmentTime = document.getElementById('lead-appointment-time');
+  const saveAppointmentButton = document.getElementById('save-appointment');
+  const cancelAppointmentButton = document.getElementById('cancel-appointment');
+  const appointmentGroups = buildLeadAppointmentSlotGroups(lead);
+
+  if (appointmentDay) {
+    const currentStart = String(lead.cita_fecha_hora || '').trim();
+    const initialDay = currentStart ? normalizeLocalDateTime(currentStart).slice(0, 10) : appointmentGroups[0]?.day;
+    populateLeadAppointmentTimes(appointmentGroups, initialDay, currentStart ? normalizeLocalDateTime(currentStart) : '');
+    appointmentDay.value = appointmentGroups.some((group) => group.day === initialDay) ? initialDay : (appointmentGroups[0]?.day || '');
+    appointmentDay.addEventListener('change', () => {
+      populateLeadAppointmentTimes(appointmentGroups, appointmentDay.value);
+    });
+  }
+
+  saveAppointmentButton?.addEventListener('click', async () => {
+    const selectedSlot = appointmentTime?.value || '';
+    if (!selectedSlot) {
+      window.alert('Selecciona un bloque vÃ¡lido para la cita.');
+      return;
+    }
+
+    saveAppointmentButton.disabled = true;
+    if (cancelAppointmentButton) cancelAppointmentButton.disabled = true;
+    try {
+      await updateAppointment(lead.id, {
+        action: lead.cita_fecha_hora ? 'reschedule' : 'create',
+        cita_fecha_hora: selectedSlot,
+        cita_estado: 'Agendada',
+      });
+      await loadLeads();
+      await loadLeadDetail(lead.id);
+    } catch (error) {
+      window.alert(error.message || 'No se pudo guardar la cita');
+    } finally {
+      saveAppointmentButton.disabled = false;
+      if (cancelAppointmentButton) cancelAppointmentButton.disabled = false;
+    }
+  });
+
+  cancelAppointmentButton?.addEventListener('click', async () => {
+    cancelAppointmentButton.disabled = true;
+    if (saveAppointmentButton) saveAppointmentButton.disabled = true;
+    try {
+      await updateAppointment(lead.id, { action: 'cancel', cita_estado: 'Cancelada' });
+      await loadLeads();
+      await loadLeadDetail(lead.id);
+    } catch (error) {
+      window.alert(error.message || 'No se pudo cancelar la cita');
+    } finally {
+      cancelAppointmentButton.disabled = false;
+      if (saveAppointmentButton) saveAppointmentButton.disabled = false;
+    }
+  });
 
   rutInput?.addEventListener('input', () => {
     rutInput.value = sanitizeRutTyping(rutInput.value);
@@ -756,7 +1096,7 @@ function bindDetailActions(lead) {
     rutInput.value = formatRut(rutInput.value);
     if (rutInput.value.trim() && !isValidRut(rutInput.value)) {
       rutInput.classList.add('is-invalid');
-      rutFeedback.textContent = 'RUT inválido.';
+      rutFeedback.textContent = 'RUT invÃ¡lido.';
     }
   });
 
@@ -765,7 +1105,7 @@ function bindDetailActions(lead) {
     rutInput.value = formatted;
     if (formatted && !isValidRut(formatted)) {
       rutInput.classList.add('is-invalid');
-      rutFeedback.textContent = 'El RUT ingresado no es válido.';
+      rutFeedback.textContent = 'El RUT ingresado no es vÃ¡lido.';
       return;
     }
 
@@ -812,6 +1152,21 @@ function bindDetailActions(lead) {
     }
   });
 
+  deleteButton?.addEventListener('click', async () => {
+    const confirmed = window.confirm('Esto eliminará el lead, sus notas, su adjunto y su cita. ¿Continuar?');
+    if (!confirmed) return;
+    deleteButton.disabled = true;
+    try {
+      await deleteLead(lead.id);
+      state.selectedLeadId = '';
+      await loadLeads();
+      renderDetail(null);
+    } catch (error) {
+      window.alert(error.message || 'No se pudo eliminar el lead');
+      deleteButton.disabled = false;
+    }
+  });
+
   noteForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const note = noteText.value.trim();
@@ -825,8 +1180,7 @@ function bindDetailActions(lead) {
     }
   });
 
-  // Collapsible logic
-  document.querySelectorAll('.crm-card--collapsible .crm-card__header').forEach(header => {
+  document.querySelectorAll('.crm-card--collapsible .crm-card__header').forEach((header) => {
     header.addEventListener('click', () => {
       header.parentElement.classList.toggle('is-collapsed');
     });
@@ -836,11 +1190,11 @@ function bindDetailActions(lead) {
 function renderInfoCard(lead) {
   const data = [
     ['Correo', lead.email || 'Sin correo'],
-    ['Teléfono', lead.telefono || 'Sin teléfono'],
+    ['TelÃƒÂ©fono', lead.telefono || 'Sin telÃƒÂ©fono'],
     ['RUT', lead.rut ? formatRut(lead.rut) : 'Sin RUT'],
     ['Edad', lead.rango_edad || 'Sin dato'],
     ['Comuna', lead.comuna || 'Sin dato'],
-    ['Región', lead.region || 'Sin dato'],
+    ['RegiÃƒÂ³n', lead.region || 'Sin dato'],
     ['Sistema', lead.sistema_actual || 'Sin dato'],
     ['Isapre', lead.isapre_especifica || 'Sin dato'],
     ['Cargas', lead.num_cargas || 'Sin dato'],
@@ -891,7 +1245,7 @@ function renderNotesCard(notes = []) {
         <p>${escapeHtml(note.note_text)}</p>
       </article>
     `).join('')
-    : '<p class="crm-muted">Sin notas internas todavía.</p>';
+    : '<p class="crm-muted">Sin notas internas todavÃƒÂ­a.</p>';
 
   return `
     <div class="crm-card crm-card--detail-wide crm-card--collapsible">
@@ -912,7 +1266,7 @@ function renderEventsCard(events = []) {
     ? events.map((event) => `
       <article class="crm-event">
         <strong>${escapeHtml(event.event_type)}</strong>
-        <span>${formatDateTime(event.created_at)} · ${escapeHtml(event.actor_email)}</span>
+        <span>${formatDateTime(event.created_at)} Ã‚Â· ${escapeHtml(event.actor_email)}</span>
       </article>
     `).join('')
     : '<p class="crm-muted">Sin eventos registrados.</p>';
@@ -936,7 +1290,7 @@ function renderRutCard(lead) {
         <h3>Completar RUT</h3>
       </div>
       <div class="crm-actions">
-        <p class="crm-rut-help">Este lead no tiene RUT registrado. Ingrésalo para completar el perfil.</p>
+        <p class="crm-rut-help">Este lead no tiene RUT registrado. IngrÃƒÂ©salo para completar el perfil.</p>
         <label>
           <input id="lead-rut" type="text" inputmode="text" autocomplete="off" placeholder="12.345.678-5" value="${escapeHtml(rut)}" />
         </label>
@@ -964,6 +1318,7 @@ function renderActionsCard(lead) {
         <div class="crm-actions__buttons">
           <button type="button" id="save-status" class="button button--primary">Guardar estado</button>
           <button type="button" id="archive-lead" class="button button--ghost">Archivar</button>
+          <button type="button" id="delete-lead" class="button button--ghost">Eliminar</button>
         </div>
       </div>
     </div>
@@ -974,9 +1329,11 @@ function renderAppointmentCard(lead) {
   const appointmentDate = lead.cita_fecha_hora ? formatDateTime(lead.cita_fecha_hora) : 'Sin fecha agendada';
   const appointmentStatus = lead.cita_estado || 'Pendiente';
   const isCanceled = normalizeText(appointmentStatus).includes('cancel');
+  const preference = normalizeContactPreference(lead.contacto_preferencia || '');
+  const groups = buildLeadAppointmentSlotGroups(lead);
   const appointmentLink = lead.cita_calendar_url
     ? `<a href="${escapeHtml(lead.cita_calendar_url)}" target="_blank" rel="noopener noreferrer">Abrir en Google Calendar</a>`
-    : '<span class="crm-muted">Sin enlace de calendario todavía.</span>';
+    : '<span class="crm-muted">Sin enlace de calendario todavÃ­a.</span>';
 
   return `
     <div class="crm-card">
@@ -984,6 +1341,10 @@ function renderAppointmentCard(lead) {
         <h3>Agenda / cita</h3>
       </div>
       <div class="crm-kv-grid crm-kv-grid--single">
+        <div class="crm-kv">
+          <span>Preferencia</span>
+          <strong>${escapeHtml(preference === 'agendar_reunion' ? 'Agendar reuniÃ³n' : 'Lo antes posible')}</strong>
+        </div>
         <div class="crm-kv">
           <span>Estado cita</span>
           <strong>${escapeHtml(appointmentStatus)}</strong>
@@ -994,8 +1355,106 @@ function renderAppointmentCard(lead) {
         </div>
       </div>
       <div class="crm-inline-link">${appointmentLink}</div>
+      <div class="crm-actions crm-actions--appointment">
+        <div class="crm-actions__intro">
+          <strong>${lead.cita_fecha_hora && !isCanceled ? 'Reprogramar o mover cita' : 'Crear cita desde el CRM'}</strong>
+          <small>Slots reales del rango actual (${escapeHtml(RANGE_OPTIONS[state.selectedRange]?.label || '7d')}) con regla 45 min + 15 min.</small>
+        </div>
+        <div class="crm-form-grid crm-form-grid--two">
+          <label class="crm-field">
+            <span>DÃ­a</span>
+            <select id="lead-appointment-day" ${groups.length ? '' : 'disabled'}>
+              ${groups.length
+                ? groups.map((group, index) => `<option value="${escapeHtml(group.day)}" ${index === 0 ? 'selected' : ''}>${escapeHtml(group.label)}</option>`).join('')
+                : '<option value="">Sin dÃ­as disponibles</option>'}
+            </select>
+          </label>
+          <label class="crm-field">
+            <span>Hora</span>
+            <select id="lead-appointment-time" ${groups.length ? '' : 'disabled'}></select>
+          </label>
+        </div>
+        <p id="lead-appointment-help" class="crm-muted crm-appointment-help">
+          ${groups.length
+            ? 'Solo se muestran horas libres. Cambia el rango superior si necesitas ver mÃ¡s dÃ­as.'
+            : 'No hay slots libres en este rango. Ajusta la disponibilidad o cambia el rango de agenda.'}
+        </p>
+        <div class="crm-actions__buttons">
+          <button type="button" id="save-appointment" class="button button--primary" ${groups.length ? '' : 'disabled'}>
+            ${lead.cita_fecha_hora && !isCanceled ? 'Reprogramar cita' : 'Agendar cita'}
+          </button>
+          ${lead.cita_fecha_hora && !isCanceled
+            ? '<button type="button" id="cancel-appointment" class="button button--ghost">Cancelar cita</button>'
+            : ''}
+        </div>
+      </div>
     </div>
   `;
+}
+
+function buildLeadAppointmentSlotGroups(lead) {
+  const grouped = new Map();
+  const slots = Array.isArray(state.advisorSlots) ? state.advisorSlots.slice() : [];
+
+  slots.forEach((slot) => {
+    const day = String(slot.starts_at || '').slice(0, 10);
+    if (!day) return;
+    if (!grouped.has(day)) {
+      grouped.set(day, {
+        day,
+        label: formatDayLabel(day),
+        slots: [],
+      });
+    }
+    grouped.get(day).slots.push(slot);
+  });
+
+  const currentStart = String(lead.cita_fecha_hora || '').trim();
+  if (currentStart) {
+    const normalized = normalizeLocalDateTime(currentStart);
+    const day = normalized.slice(0, 10);
+    const alreadyIncluded = slots.some((slot) => String(slot.starts_at || '') === normalized);
+    if (day && !alreadyIncluded) {
+      if (!grouped.has(day)) {
+        grouped.set(day, {
+          day,
+          label: `${formatDayLabel(day)} Â· cita actual`,
+          slots: [],
+        });
+      }
+      grouped.get(day).slots.unshift({
+        starts_at: normalized,
+        ends_at: addMinutesToLocalDateTime(normalized, Number(state.advisorProfile?.advisor?.slot_duration_minutes || 45)),
+        label: `${formatSlotLabel(normalized)} Â· actual`,
+        isCurrent: true,
+      });
+    }
+  }
+
+  return Array.from(grouped.values())
+    .map((group) => ({
+      ...group,
+      slots: group.slots.sort((a, b) => String(a.starts_at || '').localeCompare(String(b.starts_at || ''))),
+    }))
+    .sort((a, b) => a.day.localeCompare(b.day));
+}
+
+function populateLeadAppointmentTimes(groups, selectedDay, selectedStart = '') {
+  const timeSelect = document.getElementById('lead-appointment-time');
+  if (!timeSelect) return;
+
+  const activeGroup = groups.find((group) => group.day === selectedDay) || groups[0];
+  const options = activeGroup?.slots || [];
+  timeSelect.innerHTML = options.length
+    ? options.map((slot, index) => {
+      const value = String(slot.starts_at || '');
+      const isSelected = selectedStart
+        ? value === selectedStart
+        : index === 0;
+      return `<option value="${escapeHtml(value)}" ${isSelected ? 'selected' : ''}>${escapeHtml(slot.label || formatSlotLabel(value))}</option>`;
+    }).join('')
+    : '<option value="">Sin horas libres</option>';
+  timeSelect.disabled = !options.length;
 }
 
 function hydrateStatusOptions() {
@@ -1045,6 +1504,22 @@ function filterItemsByRange(items, rangeKey) {
   return items.filter((item) => new Date(item.created_at) >= start && new Date(item.created_at) <= now);
 }
 
+function filterAppointmentItemsByRange(items, rangeKey) {
+  const days = RANGE_OPTIONS[rangeKey]?.days || 7;
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(start);
+  end.setDate(end.getDate() + Math.max(days - 1, 0));
+  end.setHours(23, 59, 59, 999);
+
+  return (items || []).filter((item) => {
+    if (!item.cita_fecha_hora) return false;
+    const date = new Date(item.cita_fecha_hora);
+    if (Number.isNaN(date.getTime())) return false;
+    return date >= start && date <= end;
+  });
+}
+
 function filterItemsByPreviousRange(items, rangeKey) {
   const days = RANGE_OPTIONS[rangeKey]?.days || 7;
   const end = new Date();
@@ -1059,6 +1534,18 @@ function filterItemsByPreviousRange(items, rangeKey) {
     const created = new Date(item.created_at);
     return created >= previousStart && created <= previousEnd;
   });
+}
+
+function getSelectedRangeWindow() {
+  const days = RANGE_OPTIONS[state.selectedRange]?.days || 7;
+  const fromDate = new Date();
+  fromDate.setHours(0, 0, 0, 0);
+  const toDate = new Date(fromDate);
+  toDate.setDate(toDate.getDate() + Math.max(days - 1, 0));
+  return {
+    from: fromDate.toISOString().slice(0, 10),
+    to: toDate.toISOString().slice(0, 10),
+  };
 }
 
 function buildSeries(items, rangeKey) {
@@ -1183,7 +1670,7 @@ function renderDonut(buckets) {
   if (!total) {
     elements.isapreDonut.innerHTML = '<span>0</span><small>Sin leads</small>';
     elements.isapreDonut.style.background = 'linear-gradient(180deg, #eaf1f8 0%, #dfe9f6 100%)';
-    elements.isapreLegend.innerHTML = '<p class="crm-muted">No hay distribución disponible todavía.</p>';
+    elements.isapreLegend.innerHTML = '<p class="crm-muted">No hay distribuciÃƒÂ³n disponible todavÃƒÂ­a.</p>';
     return;
   }
 
@@ -1302,6 +1789,7 @@ function renderAgendaTable(appointments) {
       btn.disabled = true;
       try {
         await updateAppointment(leadId, {
+          action: 'cancel',
           cita_estado: 'Cancelada',
           cita_calendar_event_id: '',
           cita_calendar_url: '',
@@ -1315,6 +1803,222 @@ function renderAgendaTable(appointments) {
   });
 }
 
+function renderAvailabilityRuleEditor(rules = [], advisor = {}) {
+  if (!elements.settingsAvailabilityGrid) return;
+  const dayLabels = ['Domingo', 'Lunes', 'Martes', 'MiÃƒÂ©rcoles', 'Jueves', 'Viernes', 'SÃƒÂ¡bado'];
+  const byDay = new Map((rules || []).map((rule) => [Number(rule.day_of_week), rule]));
+  elements.settingsAvailabilityGrid.innerHTML = dayLabels.map((label, dayOfWeek) => {
+    const rule = byDay.get(dayOfWeek) || {};
+    const enabled = Number(rule.is_enabled ?? (dayOfWeek >= 1 && dayOfWeek <= 5 ? 1 : 0)) === 1;
+    const start = rule.start_time || advisor.workday_start || '08:00';
+    const end = rule.end_time || advisor.workday_end || '19:00';
+    return `
+      <div class="crm-availability-row" data-day="${dayOfWeek}">
+        <label class="crm-availability-row__toggle">
+          <input type="checkbox" data-role="enabled" ${enabled ? 'checked' : ''} />
+          <span>${label}</span>
+        </label>
+        <input type="time" data-role="start" value="${escapeHtml(start)}" />
+        <input type="time" data-role="end" value="${escapeHtml(end)}" />
+      </div>
+    `;
+  }).join('');
+}
+
+function renderAvailabilityBlocks(blocks = []) {
+  if (!elements.settingsBlockList) return;
+  if (!blocks.length) {
+    elements.settingsBlockList.innerHTML = '<p class="crm-muted">No hay bloqueos manuales guardados.</p>';
+    return;
+  }
+
+  elements.settingsBlockList.innerHTML = blocks
+    .slice()
+    .sort((a, b) => String(a.starts_at || '').localeCompare(String(b.starts_at || '')))
+    .map((block) => `
+      <div class="crm-block-row" data-block-id="${escapeHtml(block.id || '')}">
+        <div class="crm-block-row__main">
+          <strong>${escapeHtml(formatDateTime(block.starts_at || ''))}</strong>
+          <span>${block.block_type === 'full_day'
+            ? 'Día completo'
+            : `${escapeHtml((block.starts_at || '').slice(11, 16))} - ${escapeHtml((block.ends_at || '').slice(11, 16))}`}</span>
+          <small>${escapeHtml(block.note || (block.block_type === 'full_day' ? 'Día bloqueado' : 'Bloqueo manual'))}</small>
+        </div>
+        <button type="button" class="button button--ghost button--compact crm-block-remove" data-block-id="${escapeHtml(block.id || '')}">Quitar</button>
+      </div>
+    `).join('');
+
+  elements.settingsBlockList.querySelectorAll('.crm-block-remove').forEach((button) => {
+    button.addEventListener('click', () => {
+      state.advisorBlocks = state.advisorBlocks.filter((block) => block.id !== button.dataset.blockId);
+      renderAvailabilityBlocks(state.advisorBlocks);
+    });
+  });
+}
+
+function appendManualBlockFromForm() {
+  const date = elements.settingsBlockDate?.value || '';
+  const start = elements.settingsBlockStart?.value || '';
+  const end = elements.settingsBlockEnd?.value || '';
+  const note = elements.settingsBlockNote?.value?.trim() || '';
+
+  if (!date || !start || !end) {
+    window.alert('Completa fecha, hora de inicio y hora de termino');
+    return;
+  }
+
+  if (end <= start) {
+    window.alert('La hora de termino debe ser mayor que la de inicio');
+    return;
+  }
+
+  state.advisorBlocks = [
+    ...state.advisorBlocks,
+    {
+      id: window.crypto?.randomUUID?.() || `block-${Date.now()}`,
+      starts_at: `${date}T${start}:00`,
+      ends_at: `${date}T${end}:00`,
+      block_type: 'manual',
+      note,
+    },
+  ];
+  renderAvailabilityBlocks(state.advisorBlocks);
+  if (elements.settingsBlockNote) elements.settingsBlockNote.value = '';
+}
+
+function appendFullDayBlockFromForm() {
+  const date = elements.settingsBlockDate?.value || '';
+  const note = elements.settingsBlockNote?.value?.trim() || 'Día bloqueado';
+
+  if (!date) {
+    window.alert('Selecciona una fecha para bloquear el día completo');
+    return;
+  }
+
+  state.advisorBlocks = [
+    ...state.advisorBlocks,
+    {
+      id: window.crypto?.randomUUID?.() || `block-${Date.now()}`,
+      starts_at: `${date}T${elements.settingsWorkdayStart?.value || '08:00'}:00`,
+      ends_at: `${date}T${elements.settingsWorkdayEnd?.value || '19:00'}:00`,
+      block_type: 'full_day',
+      note,
+    },
+  ];
+  renderAvailabilityBlocks(state.advisorBlocks);
+}
+
+async function saveAdvisorBlocks() {
+  elements.settingsSaveBlocks.disabled = true;
+  try {
+    await persistAdvisorBlocks(state.advisorBlocks || []);
+  } catch (error) {
+    window.alert(error.message || 'No se pudieron guardar los bloqueos');
+  } finally {
+    elements.settingsSaveBlocks.disabled = false;
+  }
+}
+
+async function persistAdvisorBlocks(blocks) {
+  const originalBlocks = state.advisorProfile?.blocks || [];
+  const currentBlocks = (blocks || []).map((block) => ({
+    id: block.id,
+    starts_at: block.starts_at,
+    ends_at: block.ends_at,
+    block_type: block.block_type || 'manual',
+    note: block.note || '',
+  }));
+  const currentIds = new Set(currentBlocks.map((block) => block.id).filter(Boolean));
+  const removeIds = originalBlocks
+    .map((block) => block.id)
+    .filter((id) => id && !currentIds.has(id));
+
+  await updateAvailability({
+    blocks: currentBlocks,
+    replace_blocks: removeIds,
+  });
+  await loadAdvisorWorkspace();
+}
+
+async function createLeadFromPrompt() {
+  const nombre = window.prompt('Nombre del lead:', '')?.trim();
+  if (nombre === undefined || nombre === null) return;
+  const telefono = window.prompt('Teléfono del lead:', '')?.trim() || '';
+  const email = window.prompt('Correo del lead:', '')?.trim() || '';
+  const sistema = window.prompt('Sistema actual (Fonasa / Isapre):', 'Fonasa')?.trim() || 'Fonasa';
+  const isapre = /^isapre$/i.test(sistema)
+    ? (window.prompt('¿Cuál isapre?:', '')?.trim() || '')
+    : '';
+
+  try {
+    const response = await createLead({
+      nombre,
+      telefono,
+      email,
+      sistema_actual: sistema,
+      isapre_especifica: isapre,
+      fuente_cta: 'CRM',
+      campana: 'CRM manual',
+      contacto_preferencia: 'lo_antes_posible',
+      status: 'Nuevo',
+    });
+    await loadLeads();
+    if (response?.leadId) {
+      setView('leads');
+      await loadLeadDetail(response.leadId);
+    }
+  } catch (error) {
+    window.alert(error.message || 'No se pudo crear el lead');
+  }
+}
+
+async function saveAdvisorSettings() {
+  const payload = {
+    display_name: elements.settingsDisplayName?.value?.trim() || '',
+    timezone: elements.settingsTimezone?.value?.trim() || 'America/Santiago',
+    workday_start: elements.settingsWorkdayStart?.value || '08:00',
+    workday_end: elements.settingsWorkdayEnd?.value || '19:00',
+    slot_duration_minutes: Number(elements.settingsSlotDuration?.value || 45),
+    slot_buffer_minutes: Number(elements.settingsSlotBuffer?.value || 15),
+    allow_busy_requests: Boolean(elements.settingsAllowBusy?.checked),
+  };
+
+  elements.settingsSaveProfile.disabled = true;
+  try {
+    await updateAdvisorProfile(payload);
+    await loadAdvisorWorkspace();
+  } catch (error) {
+    window.alert(error.message || 'No se pudo guardar el perfil operativo');
+  } finally {
+    elements.settingsSaveProfile.disabled = false;
+  }
+}
+
+async function saveAdvisorAvailability() {
+  const rows = Array.from(elements.settingsAvailabilityGrid?.querySelectorAll('.crm-availability-row') || []);
+  const rules = rows.map((row) => ({
+    day_of_week: Number(row.dataset.day),
+    is_enabled: row.querySelector('[data-role="enabled"]')?.checked || false,
+    start_time: row.querySelector('[data-role="start"]')?.value || '08:00',
+    end_time: row.querySelector('[data-role="end"]')?.value || '19:00',
+  }));
+
+  elements.settingsSaveAvailability.disabled = true;
+  try {
+    await updateAvailability({ rules });
+    await loadAdvisorWorkspace();
+  } catch (error) {
+    window.alert(error.message || 'No se pudo guardar la disponibilidad');
+  } finally {
+    elements.settingsSaveAvailability.disabled = false;
+  }
+}
+
+function connectGoogleCalendar() {
+  const returnTo = `${window.location.origin}${window.location.pathname}`;
+  window.location.href = `https://form.planespro.cl/api/auth/google/start?adminKey=${encodeURIComponent(readAdminKey())}&return_to=${encodeURIComponent(returnTo)}`;
+}
+
 function hydratePopovers(items) {
   const notifications = items.filter((item) => ['Nuevo', 'Por contactar'].includes(item.status)).slice(0, 5);
   const updates = items.slice().sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at)).slice(0, 5);
@@ -1323,8 +2027,8 @@ function hydratePopovers(items) {
   elements.updatesCount.textContent = String(updates.length);
   elements.messagesCount.textContent = String(messages.length);
   elements.notificationPopover.innerHTML = buildPopoverList('Leads por contactar', notifications.map((item) => ({ title: item.nombre || 'Sin nombre', meta: item.telefono || item.email || 'Sin contacto', leadId: item.id })));
-  elements.updatesPopover.innerHTML = buildPopoverList('Updates recientes', updates.map((item) => ({ title: item.nombre || 'Sin nombre', meta: `${formatDateTime(item.updated_at || item.created_at)} · ${item.status || 'Sin estado'}`, leadId: item.id })));
-  elements.messagesPopover.innerHTML = buildPopoverList('Citas pendientes', messages.map((item) => ({ title: item.nombre || 'Sin nombre', meta: `${formatDateTime(item.cita_fecha_hora)} · ${item.cita_estado || 'Pendiente'}`, leadId: item.id })));
+  elements.updatesPopover.innerHTML = buildPopoverList('Updates recientes', updates.map((item) => ({ title: item.nombre || 'Sin nombre', meta: `${formatDateTime(item.updated_at || item.created_at)} Ã‚Â· ${item.status || 'Sin estado'}`, leadId: item.id })));
+  elements.messagesPopover.innerHTML = buildPopoverList('Citas pendientes', messages.map((item) => ({ title: item.nombre || 'Sin nombre', meta: `${formatDateTime(item.cita_fecha_hora)} Ã‚Â· ${item.cita_estado || 'Pendiente'}`, leadId: item.id })));
   document.querySelectorAll('.crm-popover [data-lead-id]').forEach((button) => {
     button.addEventListener('click', async () => {
       hidePopovers();
@@ -1415,6 +2119,47 @@ function hydrateProfileSections() {
   toggleAvatarPhoto(elements.profilePagePhoto, elements.profilePageAvatar, state.profile.photoDataUrl, fallbackName);
 }
 
+function hydrateAdvisorUI() {
+  const profilePayload = state.advisorProfile;
+  const advisor = profilePayload?.advisor;
+  const google = profilePayload?.google;
+  const availability = state.advisorAvailability.length ? state.advisorAvailability : (profilePayload?.availability || []);
+  const blocks = state.advisorBlocks.length ? state.advisorBlocks : (profilePayload?.blocks || []);
+
+  if (advisor) {
+    if (elements.settingsDisplayName) elements.settingsDisplayName.value = advisor.display_name || '';
+    if (elements.settingsTimezone) elements.settingsTimezone.value = advisor.timezone || 'America/Santiago';
+    if (elements.settingsWorkdayStart) elements.settingsWorkdayStart.value = advisor.workday_start || '08:00';
+    if (elements.settingsWorkdayEnd) elements.settingsWorkdayEnd.value = advisor.workday_end || '19:00';
+    if (elements.settingsSlotDuration) elements.settingsSlotDuration.value = String(advisor.slot_duration_minutes || 45);
+    if (elements.settingsSlotBuffer) elements.settingsSlotBuffer.value = String(advisor.slot_buffer_minutes || 15);
+    if (elements.settingsAllowBusy) elements.settingsAllowBusy.checked = Number(advisor.allow_busy_requests || 0) === 1;
+    if (elements.profilePageHours) {
+      elements.profilePageHours.textContent = `${advisor.workday_start || '08:00'} - ${advisor.workday_end || '19:00'}`;
+    }
+  }
+
+  const connected = Boolean(google?.connected);
+  if (elements.settingsGoogleStatus) elements.settingsGoogleStatus.textContent = connected ? 'Conectado' : 'Sin conectar';
+  if (elements.settingsGoogleEmail) elements.settingsGoogleEmail.textContent = google?.google_email || '-';
+  if (elements.settingsGoogleUpdated) elements.settingsGoogleUpdated.textContent = google?.updated_at ? formatDateTime(google.updated_at) : '-';
+  if (elements.profilePageGoogle) elements.profilePageGoogle.textContent = connected ? (google?.google_email || 'Conectado') : 'Sin conectar';
+  if (elements.profilePageCalendarCopy) {
+    elements.profilePageCalendarCopy.textContent = connected
+      ? `Google Calendar activo para ${google?.google_email || 'esta cuenta'}.`
+      : 'TodavÃƒÂ­a no hay un calendario personal conectado a este asesor.';
+  }
+  if (elements.calendarSyncHint) {
+    elements.calendarSyncHint.textContent = connected
+      ? 'Disponibilidad sincronizada con Google Calendar.'
+      : 'Disponibilidad basada en reglas locales. Conecta Google Calendar para bloquear horas ocupadas.';
+  }
+
+  renderAvailabilityRuleEditor(availability, advisor);
+  renderAvailabilityBlocks(blocks);
+  renderAvailabilitySlots();
+}
+
 function renderProfilePreview(photoDataUrl, name) {
   toggleAvatarPhoto(elements.profilePreviewPhoto, elements.profilePreviewAvatar, photoDataUrl, name);
   paintAvatar(elements.profilePreviewAvatar, name);
@@ -1441,7 +2186,7 @@ function paintAvatar(element, seed) {
 }
 
 function openFileModal(leadId, leadName, fileName) {
-  elements.fileModalTitle.textContent = `${leadName} · ${fileName}`;
+  elements.fileModalTitle.textContent = `${leadName} Ã‚Â· ${fileName}`;
   elements.fileModalFrame.src = getFileUrl(leadId);
   elements.fileModal.showModal();
 }
@@ -1480,6 +2225,38 @@ function applySidebarState() {
   elements.sidebar?.classList.toggle('is-collapsed', state.sidebarCollapsed);
 }
 
+function normalizeContactPreference(value = '') {
+  const normalized = normalizeText(value || '');
+  return normalized.includes('agendar') ? 'agendar_reunion' : 'lo_antes_posible';
+}
+
+function normalizeLocalDateTime(value = '') {
+  const match = String(value || '').trim().match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/);
+  if (!match) return '';
+  return `${match[1]}T${match[2]}:${match[3]}:${match[4] || '00'}`;
+}
+
+function addMinutesToLocalDateTime(start, minutes) {
+  const normalized = normalizeLocalDateTime(start);
+  if (!normalized) return '';
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) return normalized;
+  date.setMinutes(date.getMinutes() + Number(minutes || 0));
+  const pad = (value) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+function formatDayLabel(dayIso) {
+  const date = new Date(`${dayIso}T12:00:00`);
+  if (Number.isNaN(date.getTime())) return dayIso;
+  return new Intl.DateTimeFormat('es-CL', { weekday: 'short', day: '2-digit', month: 'short' }).format(date).replace('.', '');
+}
+
+function formatSlotLabel(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat('es-CL', { weekday: 'short', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }).format(date).replace('.', '');
+}
 function formatDate(value) {
   if (!value) return 'Sin fecha';
   const date = new Date(value);
@@ -1550,7 +2327,7 @@ function resolveSystemBucket(item) {
   if ((item.sistema_actual || '').toLowerCase() === 'fonasa') return 'Fonasa';
   const normalized = normalizeText(item.isapre_especifica || '');
   if (!normalized) return 'Otros';
-  if (normalized.includes('banmedica')) return 'Banmédica';
+  if (normalized.includes('banmedica')) return 'BanmÃƒÂ©dica';
   if (normalized.includes('colmena')) return 'Colmena';
   if (normalized.includes('consalud')) return 'Consalud';
   if (normalized.includes('cruz blanca')) return 'Cruz Blanca';
@@ -1575,3 +2352,10 @@ function statusBadgeClass(status = '') {
   if (normalized.includes('archivado') || normalized.includes('descartado')) return 'crm-badge--muted';
   return 'crm-badge--neutral';
 }
+
+
+
+
+
+
+

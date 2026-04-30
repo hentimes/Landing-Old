@@ -222,32 +222,6 @@ export function initPhoneField() {
     });
 }
 
-// ─── Toggle agenda/cita ─────────────────────────────────────────
-export function initAppointmentToggle() {
-    const checkbox = document.getElementById('sb-agendar-cita');
-    const wrap = document.getElementById('sb-cita-wrap');
-    const dt = document.getElementById('sb-cita-fecha-hora');
-    const estado = document.getElementById('sb-cita-estado');
-    if (!checkbox || !wrap || !dt) return;
-
-    const update = () => {
-        const active = checkbox.checked;
-        wrap.classList.toggle('sb-field-hidden', !active);
-        if (active) {
-            if (estado) estado.value = 'Pendiente';
-            dt.focus?.();
-        } else {
-            dt.value = '';
-            if (estado) estado.value = '';
-            wrap.classList.remove('sb-has-error');
-        }
-    };
-
-    checkbox.addEventListener('change', update);
-    update();
-}
-
-
 // ─── Validación del formulario ────────────────────────────────
 export function validateSidebar(form) {
     let valid = true;
@@ -272,11 +246,11 @@ export function validateSidebar(form) {
     }
 
 
-    // Cita opcional: si se activa, requiere fecha/hora
-    const agendar = form.querySelector('#sb-agendar-cita');
+    // Cita opcional: solo si elige agendar reunion
+    const contactoPreferencia = form.querySelector('input[name="contacto_preferencia"]:checked')?.value || 'lo_antes_posible';
     const citaWrap = form.querySelector('#sb-cita-wrap');
     const citaDt = form.querySelector('#sb-cita-fecha-hora');
-    if (agendar?.checked) {
+    if (contactoPreferencia === 'agendar_reunion') {
         const empty = !String(citaDt?.value || '').trim();
         citaWrap?.classList.toggle('sb-has-error', empty);
         if (empty) valid = false;

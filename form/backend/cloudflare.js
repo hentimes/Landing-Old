@@ -23,5 +23,18 @@ export async function sendLeadToCloudflare(_form, formData) {
 export function sendAbandonedToCloudflare(data) {
     const payload = JSON.stringify(data);
     const blob = new Blob([payload], { type: 'application/json' });
-    navigator.sendBeacon(buildUrl('/api/form/leads/abandoned'), blob);
+  navigator.sendBeacon(buildUrl('/api/form/leads/abandoned'), blob);
+}
+
+export async function fetchPublicAvailability(params = {}) {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+        if (value) query.set(key, value);
+    });
+
+    const response = await fetch(buildUrl(`/api/public/availability?${query.toString()}`));
+    if (!response.ok) {
+        throw new Error('No se pudo consultar la disponibilidad.');
+    }
+    return response.json();
 }

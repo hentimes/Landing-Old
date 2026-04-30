@@ -113,6 +113,10 @@ export const saveProgress = debounce((form) => {
     if (isSubmitting || !form) return;
     const data = {};
     form.querySelectorAll('input:not([type=file]), select, textarea').forEach((field) => {
+        if (field.type === 'radio') {
+            if (field.checked) data[field.name] = field.value;
+            return;
+        }
         if (field.id) data[field.id] = field.value;
     });
     localStorage.setItem(SIDEBAR_STORAGE_KEY, JSON.stringify(data));
@@ -127,9 +131,15 @@ export function loadProgress(form) {
         const data = JSON.parse(raw);
         Object.entries(data).forEach(([id, value]) => {
             const field = form.querySelector(`#${id}`);
-            if (!field) return;
-            field.value = value;
-            field.dispatchEvent(new Event('change', { bubbles: true }));
+            if (field) {
+                field.value = value;
+                field.dispatchEvent(new Event('change', { bubbles: true }));
+                return;
+            }
+            const radio = form.querySelector(`input[type="radio"][name="${id}"][value="${value}"]`);
+            if (!radio) return;
+            radio.checked = true;
+            radio.dispatchEvent(new Event('change', { bubbles: true }));
         });
     } catch {
         localStorage.removeItem(SIDEBAR_STORAGE_KEY);

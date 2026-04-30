@@ -1,11 +1,11 @@
 {
   "document_type": "ai_handoff_master",
-  "document_version": "2026-04-27.crm-stage1.v4",
+  "document_version": "2026-04-29.crm-stage1.v5",
   "project": {
     "name": "PlanesPro Landing / CRM",
     "repository_root": "C:\\Users\\henti\\OneDrive\\Documentos\\ISAPRE\\PlanesPro\\Landing Old",
     "active_branch": "form",
-    "current_date": "2026-04-27",
+    "current_date": "2026-04-29",
     "timezone": "America/Santiago"
   },
   "governance": {
@@ -60,7 +60,7 @@
         "Chat",
         "Marketplace",
         "Compra/venta de leads",
-        "Asignación automática por advisor_id en producción"
+        "AsignaciÃ³n automÃ¡tica por advisor_id en producciÃ³n"
       ]
     }
   },
@@ -90,7 +90,8 @@
         ],
         "notes": [
           "Google Calendar no funciona con API key simple para crear eventos; requiere OAuth. Aqui se usa Service Account JWT.",
-          "No commitear credenciales. Usar secrets/env en Cloudflare."
+          "No commitear credenciales. Usar secrets/env en Cloudflare.",
+          "El agendamiento visible en el formulario ya usa slots reales y la regla operativa de 45 min + 15 min. El CRM ya permite ver slots libres, bloqueos, horas ocupadas y reprogramar/cancelar citas desde la ficha del lead. Sigue pendiente endurecer el flujo local/produccion de Google OAuth y ampliar la agenda operativa por bloques."
         ]
       }
     },
@@ -102,6 +103,8 @@
       "why_upstream_is_workers_dev": "ppcrm proxear contra form.planespro.cl produjo 525 SSL handshake entre Cloudflare y el host custom domain. Para destrabar la etapa 1 el proxy usa el endpoint tecnico workers.dev del worker ppforms.",
       "production_access_model": "Cloudflare Access obligatorio",
       "local_access_model": "UI local + clave manual contra form.planespro.cl"
+      ,
+      "important_oauth_note": "El CRM local no hace OAuth en local. El boton Conectar Google redirige al worker publico de ppforms en form.planespro.cl y luego vuelve a local via return_to. Si produccion falla, la conexion Google falla tambien aunque la UI del CRM se abra en 127.0.0.1."
     },
     "separation_of_concerns": {
       "ppforms": [
@@ -320,7 +323,7 @@
     ],
     "design_direction": {
       "reference": "https://demo.templatemonster.com/es/demo/79783.html",
-      "target": "Dashboard premium de asesor, mas compacto y mas denso que el corte previo. No es panel de administrador global. Es panel del asesor dueño de sus leads.",
+      "target": "Dashboard premium de asesor, mas compacto y mas denso que el corte previo. No es panel de administrador global. Es panel del asesor dueÃ±o de sus leads.",
       "do_not_do": [
         "No volver a emoticones para iconos",
         "No volver a una ficha de lead con hero grande sin valor operativo",
@@ -330,7 +333,7 @@
         "Font Awesome como sistema de iconos",
         "Sidebar compacto con solo las secciones necesarias",
         "Topbar con perfil, notificaciones, updates y mensajes",
-        "Selector temporal: Hoy, 7d, 2 semanas, 1 mes, 3 meses, 6 meses, 1 año"
+        "Selector temporal: Hoy, 7d, 2 semanas, 1 mes, 3 meses, 6 meses, 1 aÃ±o"
       ]
     },
     "features_currently_present": [
@@ -361,10 +364,10 @@
       "Iniciales del lead como avatar principal en la bandeja"
     ],
     "known_ui_behavior": [
-      "El clip del lead abre modal de adjunto sin cambiar la selección",
+      "El clip del lead abre modal de adjunto sin cambiar la selecciÃ³n",
       "El click sobre la fila sigue cargando detalle",
-      "El RUT se puede ingresar con o sin puntos/guion; se normaliza a formato chileno estándar",
-      "Si el RUT no es válido, no se guarda"
+      "El RUT se puede ingresar con o sin puntos/guion; se normaliza a formato chileno estÃ¡ndar",
+      "Si el RUT no es vÃ¡lido, no se guarda"
     ]
   },
   "code_conventions": {
@@ -374,7 +377,7 @@
       "Font Awesome 6.4.0 via CDN",
       "No usar emoticones para iconos",
       "Mantener nombres de clases con prefijo crm-",
-      "Mantener textos de UI en español"
+      "Mantener textos de UI en espaÃ±ol"
     ],
     "backend": [
       "Worker Cloudflare en cloudflare/form-worker.js",
@@ -434,17 +437,25 @@
       "Confirmar que el clip solo aparece en leads con adjunto"
     ],
     "known_gap_after_deploy": [
-      "La validacion visual completa de asesores.planespro.cl sigue siendo manual porque el acceso esta detras de Cloudflare Access"
+      "La validacion visual completa de asesores.planespro.cl sigue siendo manual porque el acceso esta detras de Cloudflare Access",
+      "La UX visual final del formulario y de la agenda todavia no aprovecha por completo la nueva grilla de slots con estado que ya existe en backend",
+      "La agenda del CRM ya expone edicion de disponibilidad semanal, bloqueos manuales, bloqueo de dia completo y reprogramacion/cancelacion. Sigue pendiente pulir la vista operativa por bloques y la experiencia final de agenda.",
+      "Los filtros temporales del dashboard/agenda no estan confirmados como fuente unica de verdad para todas las metricas y vistas"
     ]
   },
   "known_open_work_after_this_scope": {
     "next_priority": [
       "Pulir visualmente el dashboard para acercarlo aun mas al template de referencia sin agregar modulos irrelevantes",
       "Implementar la capa operativa real en backend y frontend: prioridad, ultimo_contacto, proxima_accion, motivo_archivado",
-      "Profundizar agenda/citas antes de Google Calendar real"
+      "Profundizar agenda/citas antes de Google Calendar real",
+      "Construir un motor de disponibilidad unico para formulario y CRM",
+      "Reemplazar el datepicker libre del formulario por seleccion de slots reales (hecho)",
+      "Hacer editable desde el CRM la disponibilidad semanal, los bloqueos manuales, el bloqueo de dia completo y la reprogramacion/cancelacion de citas (backend hecho; falta pulir agenda por bloques y diseño)",
+      "Aprovechar la nueva API admin/public de disponibilidad con slot_grid para mostrar horas ocupadas en gris en vez de esconderlas",
+      "Conectar completamente crear/eliminar lead manual desde la UI del CRM con una experiencia mejor que prompts temporales"
     ],
     "not_ready_yet": [
-      "Google Calendar real",
+      "Google Calendar real estable de punta a punta",
       "Asignacion automatica por asesor",
       "Roles granulares",
       "Chat interno",
@@ -465,6 +476,9 @@
     "Si se toca el flujo de adjuntos, mantener el almacenamiento en R2 y la exposicion controlada por el worker.",
     "Si se toca el RUT, validar en cliente y servidor. No confiar solo en la mascara visual.",
     "Si se cambia la UI del dashboard, conservar la orientacion a panel de asesor, no a panel de administrador global.",
-    "No reintroducir persistencia local falsa para campos operativos que no existan en el backend real."
+    "No reintroducir persistencia local falsa para campos operativos que no existan en el backend real.",
+    "No asumir que la agenda ya esta resuelta porque exista integracion parcial con Google Calendar. Actualmente el problema principal no es crear eventos sino modelar y exponer correctamente la disponibilidad real con la regla 45 + 15.",
+    "Si el usuario pide probar OAuth o Google Calendar desde local, recordar que el flujo actual sigue pasando por form.planespro.cl aunque el CRM se abra en 127.0.0.1."
   ]
 }
+

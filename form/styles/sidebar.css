@@ -207,6 +207,7 @@ body.sb-no-scroll { overflow: hidden; }
     position: relative;
 }
 .sb-field-group:last-child { margin-bottom: 0; }
+.sb-field-hidden { display: none; }
 
 .sb-label {
     font-size: .78rem;
@@ -271,6 +272,45 @@ select.sb-input {
     min-height: 70px;
     line-height: 1.5;
     font-size: .88rem;
+}
+
+.sb-choice-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.sb-choice-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 10px;
+    border: 1.5px solid rgba(37,99,235,.14);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--sb-txt);
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color .18s, background .18s, box-shadow .18s;
+}
+
+.sb-choice-card input {
+    margin: 0;
+    accent-color: var(--sb-blue);
+}
+
+.sb-choice-card:has(input:checked) {
+    border-color: rgba(37,99,235,.4);
+    background: rgba(37,99,235,.06);
+    box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+}
+
+.sb-select-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, .9fr);
+    gap: 8px;
 }
 
 /* ─── Errores ─────────────────────────────────────────────────── */

@@ -34,8 +34,8 @@ async function handleRequest(request) {
   const url = new URL(request.url);
   const pathname = normalizePath(url.pathname);
 
-  if (pathname.startsWith('/api/admin/')) {
-    return proxyAdminRequest(request, pathname, url.search);
+  if (pathname.startsWith('/api/admin/') || pathname.startsWith('/api/auth/') || pathname.startsWith('/api/public/')) {
+    return proxyApiRequest(request, pathname, url.search);
   }
 
   if (pathname === '/' || pathname === '/index.html') {
@@ -66,13 +66,15 @@ function serveStatic(pathname) {
   });
 }
 
-async function proxyAdminRequest(request, pathname, search) {
+async function proxyApiRequest(request, pathname, search) {
   const accessEmail =
     request.headers.get('Cf-Access-Authenticated-User-Email') ||
     request.headers.get('cf-access-authenticated-user-email') ||
     '';
 
-  if (!accessEmail) {
+  const isProtectedAdminRoute = pathname.startsWith('/api/admin/');
+
+  if (isProtectedAdminRoute && !accessEmail) {
     return new Response(JSON.stringify({
       error: 'Unauthorized',
       message: 'Cloudflare Access requerido.',
@@ -89,7 +91,9 @@ async function proxyAdminRequest(request, pathname, search) {
     : 'https://form.planespro.cl';
   const upstreamUrl = upstreamBase + pathname + (search || '');
   const headers = new Headers(request.headers);
-  headers.set('X-Admin-Key', typeof ADMIN_PROXY_KEY === 'string' ? ADMIN_PROXY_KEY : '');
+  if (isProtectedAdminRoute) {
+    headers.set('X-Admin-Key', typeof ADMIN_PROXY_KEY === 'string' ? ADMIN_PROXY_KEY : '');
+  }
   headers.delete('host');
 
   const init = {

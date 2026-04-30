@@ -10,9 +10,9 @@ import {
     initSistemaToggle,
     initCargasModal,
     initPhoneField,
-    initAppointmentToggle,
     validateSidebar,
 } from './fields.js';
+import { initContactPreferenceFlow } from './appointment.js';
 import {
     submitSidebarForm,
     saveProgress,
@@ -34,7 +34,7 @@ export function initSidebar() {
         initSistemaToggle();
         initCargasModal();
         initPhoneField();
-        initAppointmentToggle();
+        initContactPreferenceFlow();
         bindFormSubmit();
         bindFileUpload();
         bindProgressSave();
@@ -261,24 +261,37 @@ function injectHTML() {
 
           <!-- Agenda (opcional) -->
           <div class="sb-field-group">
-            <label class="sb-label" for="sb-agendar-cita">
-              Agendar cita
-              <span class="sb-badge-opt">Opcional</span>
+            <label class="sb-label">
+              ¿Cuándo quieres que te contacten? <span class="sb-req">*</span>
             </label>
-            <label class="sb-checkbox">
-              <input type="checkbox" id="sb-agendar-cita" name="agendar_cita" value="1" />
-              <span>Quiero agendar una llamada</span>
-            </label>
+            <div class="sb-choice-group" role="radiogroup" aria-label="Preferencia de contacto">
+              <label class="sb-choice-card">
+                <input type="radio" name="contacto_preferencia" value="lo_antes_posible" checked />
+                <span>Lo antes posible</span>
+              </label>
+              <label class="sb-choice-card">
+                <input type="radio" name="contacto_preferencia" value="agendar_reunion" />
+                <span>Agendar reunión</span>
+              </label>
+            </div>
           </div>
 
           <div class="sb-field-group sb-field-hidden" id="sb-cita-wrap">
-            <label class="sb-label" for="sb-cita-fecha-hora">
+            <label class="sb-label" for="sb-cita-dia">
               Fecha y hora
               <span class="sb-req">*</span>
             </label>
-            <input type="datetime-local" id="sb-cita-fecha-hora" name="cita_fecha_hora" class="sb-input" />
-            <span class="sb-field-error">Selecciona fecha y hora</span>
-            <p class="sb-hint">Duración estimada: 30 minutos.</p>
+            <div class="sb-select-grid">
+              <select id="sb-cita-dia" class="sb-input" aria-label="Dia disponible">
+                <option value="">Dia</option>
+              </select>
+              <select id="sb-cita-slot" class="sb-input" aria-label="Hora disponible">
+                <option value="">Hora</option>
+              </select>
+            </div>
+            <input type="hidden" id="sb-cita-fecha-hora" name="cita_fecha_hora" value="" />
+            <span class="sb-field-error">Selecciona un bloque disponible</span>
+            <p class="sb-hint" id="sb-cita-hint">Citas de 45 min con 15 min de separacion.</p>
           </div>
 
           <!-- Archivo -->

@@ -6,6 +6,7 @@ export const API_BASE_URL = isLocalDev
 
 export const ADMIN_KEY_STORAGE = 'planespro.crm.adminKey';
 export const PROFILE_STORAGE = 'planespro.crm.profile';
+export const LOCAL_DEV_ADMIN_KEY = 'ppcrm_dev_20260425_9f6c2c8e1a4b';
 
 export const LEAD_STATUSES = [
   'Nuevo',
@@ -22,13 +23,9 @@ export const LEAD_STATUSES = [
 ];
 
 export const RANGE_OPTIONS = {
-  today: { label: 'Hoy', days: 1 },
   '7d': { label: '7d', days: 7 },
-  '14d': { label: '2 semanas', days: 14 },
+  '2s': { label: '2 semanas', days: 14 },
   '1m': { label: '1 mes', days: 30 },
-  '3m': { label: '3 meses', days: 90 },
-  '6m': { label: '6 meses', days: 180 },
-  '1y': { label: '1 ano', days: 365 },
 };
 
 export const ISAPRE_BUCKETS = [

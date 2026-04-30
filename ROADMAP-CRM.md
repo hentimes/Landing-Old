@@ -73,6 +73,8 @@
 - [x] Crear endpoint para cambiar estado
 - [x] Crear endpoint para agregar nota
 - [x] Crear endpoint para archivar
+- [x] Crear endpoint para crear lead manual desde el CRM
+- [x] Crear endpoint para eliminar lead desde el CRM
 - [x] Agregar auditoria basica de acciones
 
 ### Trazabilidad
@@ -91,9 +93,23 @@
 - [x] Crear indicadores de citas de hoy, pendientes y proximas
 - [x] Definir estados de cita
 - [ ] Integrar agendamiento real con Google Calendar (backend listo via Service Account; falta configurar secrets y UI de reprogramacion)
-- [ ] Guardar `cita_calendar_event_id`
-- [ ] Permitir reprogramacion de cita
+- [x] Guardar `cita_calendar_event_id`
+- [x] Permitir reprogramacion de cita
 - [ ] Permitir marcar cita como realizada o cancelada
+- [x] Reemplazar el selector nativo `datetime-local` del formulario por un selector de slots reales
+- [x] Mostrar solo bloques disponibles segun la regla operativa final
+- [x] Aplicar regla de agenda: cita de 45 min + buffer de 15 min
+- [x] Bloquear visualmente horas ocupadas y no seleccionables en el formulario publico
+- [ ] Evitar fechas y horas incoherentes entre formulario, CRM y Google Calendar
+- [x] Permitir al asesor editar disponibilidad semanal desde el CRM
+- [x] Permitir al asesor bloquear horas manualmente desde el CRM
+- [x] Permitir bloquear día completo desde el CRM
+- [x] Permitir al asesor reprogramar una cita desde el CRM y propagarlo a Google Calendar
+- [x] Permitir al asesor cancelar una cita desde el CRM y propagarlo a Google Calendar
+- [ ] Mostrar una agenda operativa real por bloques en el CRM, no solo KPIs y listados
+- [ ] Unificar timezone y formateo horario entre formulario, CRM, D1 y Google Calendar
+- [ ] Definir y documentar la fuente de verdad de disponibilidad: Google Calendar + reglas internas de slots
+- [x] Exponer una grilla de slots con estado (`free`, `busy_crm`, `busy_google`, `manual_block`) para formulario y CRM
 
 ## Fase 2 - Atribucion por asesor
 - [ ] Crear tabla `advisors`
@@ -119,7 +135,7 @@
 ## Fase 3 - Operacion comercial
 - [ ] Crear recordatorios o tareas simples
 - [ ] Agregar `fecha_ultimo_contacto`
-- [x] Agregar `proxima_acción`
+- [x] Agregar `proxima_acciÃ³n`
 - [ ] Agregar `prioridad`
 - [ ] Agregar etiquetas internas
 - [ ] Agregar comentarios privados por asesor
@@ -133,6 +149,8 @@
 - [ ] Medir tiempo promedio de respuesta
 - [ ] Crear panel global de metricas
 - [ ] Medir campanas y origen de leads
+- [ ] Hacer que los rangos `Hoy`, `7d`, `2 semanas`, `1 mes`, `3 meses`, `6 meses`, `1 aÃ±o` filtren datos reales en dashboard, leads y agenda
+- [ ] Alinear los KPIs del dashboard con la misma ventana temporal activa
 
 ## Fase 4 - Colaboracion interna
 - [ ] Crear sistema de reasignacion manual
@@ -162,10 +180,10 @@
 ## Fase 6 - Marketplace de leads
 - [ ] Definir cuando un lead puede publicarse
 - [ ] Definir motivo de publicacion
-- [ ] Incluir “no compatible con isapre”
-- [ ] Incluir “fuera de zona”
-- [ ] Incluir “sin capacidad”
-- [ ] Incluir “baja probabilidad de cierre”
+- [ ] Incluir â€œno compatible con isapreâ€
+- [ ] Incluir â€œfuera de zonaâ€
+- [ ] Incluir â€œsin capacidadâ€
+- [ ] Incluir â€œbaja probabilidad de cierreâ€
 - [ ] Definir si el lead se publica anonimizado
 - [ ] Definir si el lead se publica parcial
 - [ ] Definir si el lead se publica completo tras aceptacion
@@ -214,6 +232,8 @@
 - [ ] Registrar acciones admin
 - [ ] Configurar alertas basicas de error
 - [ ] Medir uso del CRM
+- [ ] Registrar fallos de OAuth Google por entorno y callback
+- [ ] Registrar fallos de creacion, reprogramacion y cancelacion de citas
 
 ## Prioridad inmediata
 - [x] Crear `asesores.planespro.cl`
@@ -225,6 +245,9 @@
 - [x] Agregar notas
 - [x] Agregar estados
 - [ ] Agregar archivado
+- [ ] Corregir la agenda para que formulario y CRM usen el mismo motor de disponibilidad
+- [ ] Eliminar del formulario cualquier selector de fecha/hora que no respete la regla 45 + 15
+- [ ] Hacer editable la disponibilidad y las citas desde el CRM
 
 ## Decisiones pendientes
 - [ ] Cerrar estados finales del lead
@@ -233,3 +256,4 @@
 - [ ] Definir campos visibles en la ficha
 - [ ] Definir si habr? comentarios sobre leads antes del chat
 - [ ] Definir si el marketplace mostrara datos completos o anonimizado
+
