@@ -126,8 +126,8 @@
       </header>
 
       <div class="crm-page-toolbar">
-        <div class="crm-toolbar-metrics-container" id="dashboard-toolbar-metrics">
-          <div class="crm-metric-box">
+        <div class="crm-toolbar-metrics-container" id="dashboard-toolbar-metrics" hidden>
+          <button type="button" class="crm-metric-box crm-metric-box--clickable" id="dashboard-metric-box-leads">
             <div class="crm-metric-box__val">
               <strong id="tb-metric-leads">0</strong>
               <span class="crm-metric-box__trend" id="tb-trend-leads">+0%</span>
@@ -136,8 +136,18 @@
               <i class="fas fa-users" aria-hidden="true"></i>
               <span>Leads</span>
             </div>
-          </div>
-          <div class="crm-metric-box">
+          </button>
+          <button type="button" class="crm-metric-box crm-metric-box--clickable" id="dashboard-metric-box-appointments">
+            <div class="crm-metric-box__val">
+              <strong id="tb-metric-appointments">0</strong>
+              <span class="crm-metric-box__trend" id="tb-trend-appointments">+0%</span>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-calendar-check" aria-hidden="true"></i>
+              <span>Citas registradas</span>
+            </div>
+          </button>
+          <button type="button" class="crm-metric-box crm-metric-box--clickable" id="dashboard-metric-box-proposals">
             <div class="crm-metric-box__val">
               <strong id="tb-metric-proposals">0</strong>
               <span class="crm-metric-box__trend" id="tb-trend-proposals">+0%</span>
@@ -146,30 +156,20 @@
               <i class="fas fa-file-invoice" aria-hidden="true"></i>
               <span>Propuestas</span>
             </div>
-          </div>
-          <div class="crm-metric-box">
+          </button>
+          <button type="button" class="crm-metric-box crm-metric-box--clickable" id="dashboard-metric-box-analysis">
             <div class="crm-metric-box__val">
-              <strong id="tb-metric-closed">0</strong>
-              <span class="crm-metric-box__trend" id="tb-trend-closed">+0%</span>
+              <strong id="tb-metric-analysis">0</strong>
+              <span class="crm-metric-box__trend" id="tb-trend-analysis">+0%</span>
             </div>
             <div class="crm-metric-box__label">
-              <i class="fas fa-check-circle" aria-hidden="true"></i>
-              <span>Cerrados</span>
+              <i class="fas fa-microscope" aria-hidden="true"></i>
+              <span>En análisis</span>
             </div>
-          </div>
-          <div class="crm-metric-box">
-            <div class="crm-metric-box__val">
-              <strong id="tb-metric-pending">0</strong>
-              <span class="crm-metric-box__trend" id="tb-trend-pending">+0%</span>
-            </div>
-            <div class="crm-metric-box__label">
-              <i class="fas fa-clock" aria-hidden="true"></i>
-              <span>Nuevos</span>
-            </div>
-          </div>
+          </button>
         </div>
 
-        <div class="crm-toolbar-metrics-container" id="leads-toolbar-metrics">
+        <div class="crm-toolbar-metrics-container" id="leads-toolbar-metrics" hidden>
           <div class="crm-metric-box crm-metric-box--clickable" id="leads-metric-box-new">
             <div class="crm-metric-box__val">
               <strong id="leads-metric-new">0</strong>
@@ -208,8 +208,8 @@
           </div>
         </div>
 
-        <div class="crm-toolbar-metrics-container" id="agenda-toolbar-metrics">
-          <div class="crm-metric-box">
+        <div class="crm-toolbar-metrics-container" id="agenda-toolbar-metrics" hidden>
+          <button type="button" class="crm-metric-box crm-metric-box--clickable" id="agenda-metric-box-total">
             <div class="crm-metric-box__val">
               <strong id="agenda-count-total">0</strong>
             </div>
@@ -217,8 +217,8 @@
               <i class="fas fa-list-check" aria-hidden="true"></i>
               <span>Citas registradas</span>
             </div>
-          </div>
-          <div class="crm-metric-box">
+          </button>
+          <button type="button" class="crm-metric-box crm-metric-box--clickable" id="agenda-metric-box-today">
             <div class="crm-metric-box__val">
               <strong id="agenda-count-today">0</strong>
             </div>
@@ -226,25 +226,25 @@
               <i class="fas fa-calendar-day" aria-hidden="true"></i>
               <span>Hoy</span>
             </div>
-          </div>
-          <div class="crm-metric-box">
-            <div class="crm-metric-box__val">
-              <strong id="agenda-count-pending">0</strong>
-            </div>
-            <div class="crm-metric-box__label">
-              <i class="fas fa-hourglass-half" aria-hidden="true"></i>
-              <span>Pendientes</span>
-            </div>
-          </div>
-          <div class="crm-metric-box">
+          </button>
+          <button type="button" class="crm-metric-box crm-metric-box--clickable" id="agenda-metric-box-upcoming">
             <div class="crm-metric-box__val">
               <strong id="agenda-count-upcoming">0</strong>
             </div>
             <div class="crm-metric-box__label">
               <i class="fas fa-calendar-week" aria-hidden="true"></i>
-              <span>Próximos 7 días</span>
+              <span>Pr?ximos 7 d?as</span>
             </div>
-          </div>
+          </button>
+          <button type="button" class="crm-metric-box crm-metric-box--clickable" id="agenda-metric-box-month">
+            <div class="crm-metric-box__val">
+              <strong id="agenda-count-month">0</strong>
+            </div>
+            <div class="crm-metric-box__label">
+              <i class="fas fa-calendar-days" aria-hidden="true"></i>
+              <span>Pr?ximo mes</span>
+            </div>
+          </button>
         </div>
         <div id="view-title-container">
           <h1 id="view-title">Dashboard</h1>
@@ -255,11 +255,7 @@
             <p class="crm-eyebrow">Panel operativo</p>
             <strong>Leads y seguimiento</strong>
           </div>
-                    <div class="crm-chip-range" id="range-selector">
-            <button type="button" class="crm-range-chip is-active" data-range="7d">7d</button>
-            <button type="button" class="crm-range-chip" data-range="2s">2 semanas</button>
-            <button type="button" class="crm-range-chip" data-range="1m">1 mes</button>
-          </div>
+                    <div class="crm-chip-range" id="range-selector" hidden></div>
         </div>
       </div>
 
@@ -272,12 +268,18 @@
                   <p class="crm-eyebrow">Overview</p>
                   <h2>Ingresos y cierres</h2>
                 </div>
-                <span class="crm-card__hint" id="overview-caption">Serie del periodo seleccionado</span>
+                <div class="crm-card__header-actions">
+                  <span class="crm-card__hint" id="overview-caption">Serie del periodo seleccionado</span>
+                  <select id="overview-compare-mode" class="crm-select crm-select--compact">
+                    <option value="previous">Periodo anterior</option>
+                    <option value="record">Mejor r?cord</option>
+                  </select>
+                </div>
               </div>
               <div class="crm-line-chart" id="overview-line-chart"></div>
               <div class="crm-chart-legend">
-                <div class="crm-legend-item"><span class="crm-dot" style="background:#2f80ed"></span> Leads</div>
-                <div class="crm-legend-item"><span class="crm-dot" style="background:#12284a"></span> Cerrados</div>
+                <div class="crm-legend-item"><span class="crm-dot" style="background:#2f80ed"></span> Periodo actual</div>
+                <div class="crm-legend-item"><span class="crm-dot" style="background:#12284a"></span> Comparaci?n</div>
               </div>
             </article>
 
@@ -436,28 +438,6 @@
             </section>
           </div>
         </div>
-
-        <section class="crm-card crm-card--inner crm-availability-panel">
-          <div class="crm-card__header">
-            <div>
-              <p class="crm-eyebrow">Disponibilidad</p>
-              <h3>Próximos bloques libres</h3>
-            </div>
-            <span class="crm-card__hint" id="availability-range-label">Próximos 7 días</span>
-          </div>
-          <div id="availability-slots" class="crm-slot-list"></div>
-        </section>
-
-        <section class="crm-card crm-card--inner crm-availability-panel">
-          <div class="crm-card__header">
-            <div>
-              <p class="crm-eyebrow">Ocupación</p>
-              <h3>Horas ya bloqueadas</h3>
-            </div>
-            <span class="crm-card__hint">Google, citas y bloqueos manuales</span>
-          </div>
-          <div id="busy-intervals" class="crm-slot-list"></div>
-        </section>
 
         <div id="agenda-section-list" class="crm-agenda-table"></div>
       </section>
@@ -714,3 +694,4 @@
   <script type="module" src="./app.js"></script>
 </body>
 </html>
+

@@ -23,9 +23,13 @@ export const LEAD_STATUSES = [
 ];
 
 export const RANGE_OPTIONS = {
+  today: { label: 'Hoy', days: 1 },
   '7d': { label: '7d', days: 7 },
   '2s': { label: '2 semanas', days: 14 },
   '1m': { label: '1 mes', days: 30 },
+  '3m': { label: '3 meses', days: 90 },
+  '6m': { label: '6 meses', days: 180 },
+  '1a': { label: '1 año', days: 365 },
 };
 
 export const ISAPRE_BUCKETS = [

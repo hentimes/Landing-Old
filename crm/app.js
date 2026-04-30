@@ -30,12 +30,20 @@ import {
 const SIDEBAR_STORAGE = 'crm-sidebar-collapsed';
 
 const VIEW_META = {
-  dashboard: { title: 'Dashboard', crumb: 'Dashboard', copy: 'Métricas, pipeline comercial y agenda del asesor.' },
+  dashboard: { title: 'Dashboard', crumb: 'Dashboard', copy: 'M?tricas, pipeline comercial y agenda del asesor.' },
   leads: { title: 'Leads', crumb: 'Leads', copy: 'Bandeja compacta, seguimiento y acciones comerciales.' },
-  agenda: { title: 'Agenda', crumb: 'Agenda', copy: 'Próximas citas, pendientes y agenda inmediata.' },
-  profile: { title: 'Profile', crumb: 'Profile', copy: 'Datos visibles del asesor dentro del CRM.' },
-  settings: { title: 'Configuración', crumb: 'Configuración', copy: 'Configuración actual del acceso y del panel privado.' },
+  agenda: { title: 'Agenda', crumb: 'Agenda', copy: 'Pr?ximas citas, pendientes y agenda inmediata.' },
+  profile: { title: 'Perfil', crumb: 'Perfil', copy: 'Datos visibles del asesor dentro del CRM.' },
+  settings: { title: 'Configuraci?n', crumb: 'Configuraci?n', copy: 'Configuraci?n actual del acceso y del panel privado.' },
 };
+
+const VIEW_RANGE_MAP = {
+  dashboard: ['today', '7d', '2s', '1m', '3m', '6m', '1a'],
+  leads: ['today', '7d', '2s', '1m', '3m', '6m', '1a'],
+  agenda: ['7d', '2s', '1m'],
+};
+
+const DASHBOARD_METRICS = ['leads', 'appointments', 'proposals', 'analysis'];
 
 const state = {
   items: [],
@@ -43,7 +51,16 @@ const state = {
   selectedLeadId: '',
   currentView: 'dashboard',
   session: null,
+  // Alias used by older helpers; always keep in sync with `selectedRanges[currentView]`.
   selectedRange: '7d',
+  selectedRanges: {
+    dashboard: '7d',
+    leads: '7d',
+    agenda: '7d',
+  },
+  dashboardMetric: 'leads',
+  dashboardCompareMode: 'previous',
+  agendaFocus: 'all',
   profile: loadProfile(),
   openPopover: '',
   profileMenuOpen: false,
@@ -54,6 +71,7 @@ const state = {
   advisorProfile: null,
   advisorAvailability: [],
   advisorSlots: [],
+  advisorSlotGrid: [],
   advisorBlocks: [],
   advisorBusyIntervals: [],
 };
@@ -99,24 +117,36 @@ const elements = {
   leadDetail: document.getElementById('lead-detail'),
   leadDetailEmpty: document.getElementById('lead-detail-empty'),
   leadRowTemplate: document.getElementById('lead-row-template'),
-  rangeChips: Array.from(document.querySelectorAll('.crm-range-chip')),
+  rangeSelector: document.getElementById('range-selector'),
+  dashboardToolbarMetrics: document.getElementById('dashboard-toolbar-metrics'),
+  leadsToolbarMetrics: document.getElementById('leads-toolbar-metrics'),
+  agendaToolbarMetrics: document.getElementById('agenda-toolbar-metrics'),
   metricLeads: document.getElementById('tb-metric-leads'),
-  metricClosed: document.getElementById('tb-metric-closed'),
+  metricAppointments: document.getElementById('tb-metric-appointments'),
   metricProposals: document.getElementById('tb-metric-proposals'),
-  metricPending: document.getElementById('tb-metric-pending'),
+  metricAnalysis: document.getElementById('tb-metric-analysis'),
   trendLeads: document.getElementById('tb-trend-leads'),
-  trendClosed: document.getElementById('tb-trend-closed'),
+  trendAppointments: document.getElementById('tb-trend-appointments'),
   trendProposals: document.getElementById('tb-trend-proposals'),
-  trendPending: document.getElementById('tb-trend-pending'),
+  trendAnalysis: document.getElementById('tb-trend-analysis'),
+  dashboardBoxLeads: document.getElementById('dashboard-metric-box-leads'),
+  dashboardBoxAppointments: document.getElementById('dashboard-metric-box-appointments'),
+  dashboardBoxProposals: document.getElementById('dashboard-metric-box-proposals'),
+  dashboardBoxAnalysis: document.getElementById('dashboard-metric-box-analysis'),
   overviewLineChart: document.getElementById('overview-line-chart'),
   overviewCaption: document.getElementById('overview-caption'),
+  overviewCompareMode: document.getElementById('overview-compare-mode'),
   isapreDonut: document.getElementById('isapre-donut'),
   isapreLegend: document.getElementById('isapre-legend'),
   statusBreakdown: document.getElementById('status-breakdown'),
   agendaCountTotal: document.getElementById('agenda-count-total'),
   agendaCountToday: document.getElementById('agenda-count-today'),
-  agendaCountPending: document.getElementById('agenda-count-pending'),
   agendaCountUpcoming: document.getElementById('agenda-count-upcoming'),
+  agendaCountMonth: document.getElementById('agenda-count-month'),
+  agendaBoxTotal: document.getElementById('agenda-metric-box-total'),
+  agendaBoxToday: document.getElementById('agenda-metric-box-today'),
+  agendaBoxUpcoming: document.getElementById('agenda-metric-box-upcoming'),
+  agendaBoxMonth: document.getElementById('agenda-metric-box-month'),
   agendaListCaption: document.getElementById('agenda-list-caption'),
   agendaList: document.getElementById('agenda-list'),
   agendaSectionList: document.getElementById('agenda-section-list'),
@@ -235,17 +265,21 @@ function bindEvents() {
   });
 
   elements.navItems.forEach((button) => button.addEventListener('click', () => setView(button.dataset.view)));
-
-  elements.rangeChips.forEach((button) => {
-    button.addEventListener('click', () => {
-      state.selectedRange = button.dataset.range;
-      elements.rangeChips.forEach((chip) => chip.classList.toggle('is-active', chip === button));
+  elements.rangeSelector?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-range]');
+    if (!button) return;
+    const nextRange = button.dataset.range;
+    setRangeForView(state.currentView, nextRange);
+    if (state.currentView === 'dashboard') {
       refreshDashboard();
-      renderLeadsMetrics(filterItemsByRange(state.items, state.selectedRange));
+    } else if (state.currentView === 'leads') {
       renderLeadsView();
+    } else if (state.currentView === 'agenda') {
+      state.agendaFocus = 'all';
       renderAgenda();
       refreshAvailabilitySlots();
-    });
+    }
+    renderRangeSelector();
   });
 
   elements.applyFilters?.addEventListener('click', renderLeadsView);
@@ -308,19 +342,16 @@ function bindEvents() {
   elements.leadCreateModal?.addEventListener('click', (event) => {
     if (event.target === elements.leadCreateModal) closeLeadCreateModal();
   });
-
   // Calendar navigation
   elements.calendarPrev?.addEventListener('click', () => {
-    state.calendarDate.setMonth(state.calendarDate.getMonth() - 1);
-    renderCalendar();
+    shiftCalendarWindow(-1);
   });
   elements.calendarNext?.addEventListener('click', () => {
-    state.calendarDate.setMonth(state.calendarDate.getMonth() + 1);
-    renderCalendar();
+    shiftCalendarWindow(1);
   });
   elements.calendarToday?.addEventListener('click', () => {
     state.calendarDate = new Date();
-    renderCalendar();
+    renderAgenda();
   });
   elements.closeDayDetails?.addEventListener('click', () => {
     elements.calendarDayDetails.hidden = true;
@@ -359,11 +390,104 @@ function bindEvents() {
   elements.leadsBoxAnalysis?.addEventListener('click', () => quickFilterByStatus('En analisis'));
   elements.leadsBoxProposals?.addEventListener('click', () => quickFilterByStatus('Propuesta enviada'));
 
+  elements.overviewCompareMode?.addEventListener('change', () => {
+    state.dashboardCompareMode = elements.overviewCompareMode.value || 'previous';
+    refreshDashboard();
+  });
+
+  elements.dashboardBoxLeads?.addEventListener('click', () => setDashboardMetric('leads'));
+  elements.dashboardBoxAppointments?.addEventListener('click', () => setDashboardMetric('appointments'));
+  elements.dashboardBoxProposals?.addEventListener('click', () => setDashboardMetric('proposals'));
+  elements.dashboardBoxAnalysis?.addEventListener('click', () => setDashboardMetric('analysis'));
+
+  elements.agendaBoxTotal?.addEventListener('click', () => {
+    state.agendaFocus = 'all';
+    renderAgenda();
+  });
+  elements.agendaBoxToday?.addEventListener('click', () => {
+    state.agendaFocus = 'today';
+    state.calendarDate = new Date();
+    renderAgenda();
+    window.handleCalendarDayClick(toIsoDate(new Date()));
+  });
+  elements.agendaBoxUpcoming?.addEventListener('click', () => {
+    state.agendaFocus = 'all';
+    setRangeForView('agenda', '7d');
+    renderRangeSelector();
+    renderAgenda();
+  });
+  elements.agendaBoxMonth?.addEventListener('click', () => {
+    state.agendaFocus = 'all';
+    setRangeForView('agenda', '1m');
+    renderRangeSelector();
+    renderAgenda();
+  });
+
   if (isLocalDev) {
     window.addEventListener('storage', (event) => {
       if (event.key === ADMIN_KEY_STORAGE) elements.adminKey.value = readAdminKey();
     });
   }
+}
+
+function shiftCalendarWindow(direction) {
+  const step = Number(direction || 0);
+  if (!step) return;
+
+  const rangeKey = getRangeForView('agenda');
+  const days = RANGE_OPTIONS[rangeKey]?.days || 7;
+
+  // 7d/2s: mover por ventana; 1m o mayor: mover por mes.
+  if (days >= 28) {
+    const next = new Date(state.calendarDate);
+    next.setMonth(next.getMonth() + step);
+    state.calendarDate = next;
+  } else {
+    state.calendarDate = addDays(state.calendarDate, step * days);
+  }
+
+  renderAgenda();
+}
+
+function getRangeForView(view) {
+  return state.selectedRanges?.[view] || '7d';
+}
+
+function setRangeForView(view, rangeKey) {
+  const allowed = VIEW_RANGE_MAP?.[view] || [];
+  const next = allowed.includes(rangeKey) ? rangeKey : allowed[0] || '7d';
+  state.selectedRanges[view] = next;
+  if (state.currentView === view) {
+    state.selectedRange = next;
+  }
+}
+
+function syncToolbarVisibility() {
+  const view = state.currentView;
+  if (elements.dashboardToolbarMetrics) elements.dashboardToolbarMetrics.hidden = view !== 'dashboard';
+  if (elements.leadsToolbarMetrics) elements.leadsToolbarMetrics.hidden = view !== 'leads';
+  if (elements.agendaToolbarMetrics) elements.agendaToolbarMetrics.hidden = view !== 'agenda';
+  if (elements.rangeSelector) elements.rangeSelector.hidden = !VIEW_RANGE_MAP?.[view];
+}
+
+function renderRangeSelector() {
+  if (!elements.rangeSelector) return;
+  const view = state.currentView;
+  const ranges = VIEW_RANGE_MAP?.[view];
+  if (!ranges || !ranges.length) {
+    elements.rangeSelector.innerHTML = '';
+    elements.rangeSelector.hidden = true;
+    return;
+  }
+  const selected = getRangeForView(view);
+  elements.rangeSelector.hidden = false;
+  elements.rangeSelector.innerHTML = ranges
+    .map((key) => {
+      const label = RANGE_OPTIONS[key]?.label || key;
+      const active = key === selected ? ' is-active' : '';
+      return `<button type="button" class="crm-chip${active}" data-range="${escapeHtml(key)}">${escapeHtml(label)}</button>`;
+    })
+    .join('');
 }
 
 function configureAccessMode() {
@@ -379,12 +503,23 @@ function configureAccessMode() {
 
 function setView(view) {
   state.currentView = view;
+  state.selectedRange = getRangeForView(view);
   elements.navItems.forEach((item) => item.classList.toggle('is-active', item.dataset.view === view));
   elements.viewPanels.forEach((panel) => panel.classList.toggle('is-active', panel.dataset.viewPanel === view));
   const meta = VIEW_META[view] || { title: 'CRM', crumb: 'CRM', copy: '' };
   if (elements.viewTitle) elements.viewTitle.textContent = meta.title;
   if (elements.topbarActiveView) elements.topbarActiveView.textContent = meta.crumb;
   if (elements.viewCopy) elements.viewCopy.textContent = meta.copy;
+  syncToolbarVisibility();
+  renderRangeSelector();
+
+  if (view === 'dashboard') {
+    refreshDashboard();
+  } else if (view === 'leads') {
+    renderLeadsView();
+  } else if (view === 'agenda') {
+    renderAgenda();
+  }
 }
 
 async function bootstrap() {
@@ -398,6 +533,7 @@ async function bootstrap() {
     hydrateProfileSections();
     await loadLeads();
     await loadAdvisorWorkspace();
+    syncToolbarVisibility();
   } catch (error) {
     elements.sessionStatus.textContent = error.message;
     renderDashboard([]);
@@ -415,9 +551,10 @@ async function loadLeads(skipFetch = false) {
     }
     state.filteredItems = applyLeadFilters(state.items);
     refreshDashboard();
-    renderLeadsMetrics(filterItemsByRange(state.items, state.selectedRange));
+    renderLeadsMetrics(filterItemsByRange(state.items, getRangeForView('leads')));
     renderLeadsView();
     renderAgenda();
+    syncToolbarVisibility();
 
     if (state.selectedLeadId) {
       const exists = state.items.some((item) => item.id === state.selectedLeadId);
@@ -443,6 +580,7 @@ async function loadAdvisorWorkspace() {
     state.advisorProfile = profilePayload;
     hydrateAdvisorUI();
     await refreshAvailabilitySlots();
+    syncToolbarVisibility();
   } catch (error) {
     if (elements.calendarSyncHint) elements.calendarSyncHint.textContent = error.message;
   }
@@ -450,14 +588,16 @@ async function loadAdvisorWorkspace() {
 
 async function refreshAvailabilitySlots() {
   try {
-    const { from, to } = getSelectedRangeWindow();
+    const { from, to } = getSelectedRangeWindow(getRangeForView('agenda'));
     const payload = await getAvailability({ from, to });
     state.advisorAvailability = payload.rules || [];
     state.advisorSlots = payload.slots || [];
+    state.advisorSlotGrid = payload.slot_grid || [];
     state.advisorBlocks = payload.blocks || [];
     state.advisorBusyIntervals = payload.busy_intervals || [];
     if (state.advisorProfile) state.advisorProfile.blocks = payload.blocks || [];
     hydrateAdvisorUI();
+    syncToolbarVisibility();
   } catch (error) {
     state.advisorSlots = [];
     state.advisorBlocks = [];
@@ -469,7 +609,9 @@ async function refreshAvailabilitySlots() {
 }
 
 function renderLeadsView() {
-  state.filteredItems = applyLeadFilters(state.items);
+  const rangeKey = getRangeForView('leads');
+  const baseItems = filterItemsByRange(state.items, rangeKey);
+  state.filteredItems = applyLeadFilters(baseItems);
   
   // Sort
   state.filteredItems.sort((a, b) => {
@@ -498,8 +640,9 @@ function renderLeadsView() {
 
   // Header & Search merging
   elements.leadCount.textContent = `${state.filteredItems.length} leads captados`;
-  renderLeadsMetrics(state.items);
+  renderLeadsMetrics(baseItems);
   renderList(state.filteredItems);
+  syncToolbarVisibility();
 }
 
 function renderLeadsMetrics(items = []) {
@@ -523,50 +666,76 @@ function quickFilterByStatus(status) {
   }
 }
 
-function refreshDashboard() {
-  const rangeItems = filterItemsByRange(state.items, state.selectedRange);
-  const previousItems = filterItemsByPreviousRange(state.items, state.selectedRange);
-  renderDashboard(rangeItems, previousItems);
+function setDashboardMetric(metricKey) {
+  if (!DASHBOARD_METRICS.includes(metricKey)) return;
+  state.dashboardMetric = metricKey;
+  const mapping = {
+    leads: elements.dashboardBoxLeads,
+    appointments: elements.dashboardBoxAppointments,
+    proposals: elements.dashboardBoxProposals,
+    analysis: elements.dashboardBoxAnalysis,
+  };
+  Object.entries(mapping).forEach(([key, node]) => {
+    node?.classList.toggle('is-selected', key === metricKey);
+  });
+  refreshDashboard();
 }
 
-function renderDashboard(items = [], previousItems = []) {
-  const totalLeads = items.length;
-  const totalClosed = items.filter((item) => item.status === 'Cerrado').length;
-  const totalProposals = items.filter((item) => item.status === 'Propuesta enviada').length;
-  const totalPending = items.filter((item) => ['Nuevo', 'Por contactar', 'Completado'].includes(item.status)).length;
+function refreshDashboard() {
+  const rangeKey = getRangeForView('dashboard');
+  renderDashboard(state.items, rangeKey);
+}
+
+function renderDashboard(allItems = [], rangeKey = getRangeForView('dashboard')) {
+  const metricKey = state.dashboardMetric || 'leads';
+  const compareMode = state.dashboardCompareMode || 'previous';
+
+  const leadItems = filterItemsByRange(allItems, rangeKey);
+  const previousLeadItems = filterItemsByPreviousRange(allItems, rangeKey);
+
+  const totalLeads = countMetricInWindow(allItems, rangeKey, 'leads', 0);
+  const totalAppointments = countMetricInWindow(allItems, rangeKey, 'appointments', 0);
+  const totalProposals = countMetricInWindow(allItems, rangeKey, 'proposals', 0);
+  const totalAnalysis = countMetricInWindow(allItems, rangeKey, 'analysis', 0);
+
+  const prevLeads = countMetricInWindow(allItems, rangeKey, 'leads', -1);
+  const prevAppointments = countMetricInWindow(allItems, rangeKey, 'appointments', -1);
+  const prevProposals = countMetricInWindow(allItems, rangeKey, 'proposals', -1);
+  const prevAnalysis = countMetricInWindow(allItems, rangeKey, 'analysis', -1);
 
   elements.metricLeads.textContent = String(totalLeads);
-  elements.metricClosed.textContent = String(totalClosed);
+  elements.metricAppointments.textContent = String(totalAppointments);
   elements.metricProposals.textContent = String(totalProposals);
-  elements.metricPending.textContent = String(totalPending);
+  elements.metricAnalysis.textContent = String(totalAnalysis);
 
-  renderTrend(elements.trendLeads, totalLeads, previousItems.length);
-  renderTrend(elements.trendClosed, totalClosed, previousItems.filter((item) => item.status === 'Cerrado').length);
-  renderTrend(elements.trendProposals, totalProposals, previousItems.filter((item) => item.status === 'Propuesta enviada').length);
-  renderTrend(elements.trendPending, totalPending, previousItems.filter((item) => ['Nuevo', 'Por contactar', 'Completado'].includes(item.status)).length);
+  renderTrend(elements.trendLeads, totalLeads, prevLeads);
+  renderTrend(elements.trendAppointments, totalAppointments, prevAppointments);
+  renderTrend(elements.trendProposals, totalProposals, prevProposals);
+  renderTrend(elements.trendAnalysis, totalAnalysis, prevAnalysis);
 
-  const series = buildSeries(items, state.selectedRange);
-  elements.overviewCaption.textContent = `${RANGE_OPTIONS[state.selectedRange]?.label || 'Periodo'} vs periodo anterior`;
-  elements.overviewLineChart.innerHTML = buildLineChartSvg(series.labels, [
-    { values: series.leads, color: '#2f80ed', fill: 'rgba(47,128,237,0.10)' },
-    { values: series.closed, color: '#12284a', fill: 'rgba(18,40,74,0.08)' },
+  const metricSeries = buildMetricSeriesWindow(allItems, rangeKey, metricKey, compareMode);
+  elements.overviewCaption.textContent = buildOverviewCaption(rangeKey, compareMode);
+  elements.overviewLineChart.innerHTML = buildLineChartSvg(metricSeries.labels, [
+    { values: metricSeries.current, color: '#2f80ed', fill: 'rgba(47,128,237,0.10)' },
+    { values: metricSeries.compare, color: '#12284a', fill: 'rgba(18,40,74,0.08)' },
   ]);
 
   renderDonut(ISAPRE_BUCKETS.map((label) => ({
     label,
-    count: items.filter((item) => resolveSystemBucket(item) === label).length,
+    count: leadItems.filter((item) => resolveSystemBucket(item) === label).length,
   })));
 
   const statuses = LEAD_STATUSES
-    .map((label) => ({ label, count: items.filter((item) => item.status === label).length }))
+    .map((label) => ({ label, count: leadItems.filter((item) => item.status === label).length }))
     .filter((entry) => entry.count > 0)
     .sort((a, b) => b.count - a.count);
 
   elements.statusBreakdown.innerHTML = statuses.length
-    ? statuses.map((entry) => renderStatusRow(entry.label, entry.count, totalLeads || 1)).join('')
+    ? statuses.map((entry) => renderStatusRow(entry.label, entry.count, leadItems.length || 1)).join('')
     : '<p class="crm-muted">Sin movimientos para el periodo seleccionado.</p>';
 
-  hydratePopovers(items);
+  hydratePopovers(leadItems);
+  syncToolbarVisibility();
 }
 
 function renderStatusRow(label, count, total) {
@@ -605,26 +774,30 @@ function renderStatusRow(label, count, total) {
 }
 
 function renderAgenda(items = state.items) {
-  const appointments = buildAppointments(filterAppointmentItemsByRange(items, state.selectedRange));
+  const rangeKey = getRangeForView('agenda');
+  const appointments = buildAppointments(filterAppointmentItemsByRange(items, rangeKey));
   const now = new Date();
   const todayIso = now.toISOString().slice(0, 10);
   const nextWeek = new Date(now);
   nextWeek.setDate(nextWeek.getDate() + 7);
+  const nextMonth = new Date(now);
+  nextMonth.setDate(nextMonth.getDate() + 30);
 
   elements.agendaCountTotal.textContent = String(appointments.length);
   elements.agendaCountToday.textContent = String(appointments.filter((item) => item.rawDate.slice(0, 10) === todayIso).length);
-  elements.agendaCountPending.textContent = String(appointments.filter((item) => !item.status || ['Pendiente', 'Por coordinar'].includes(item.status)).length);
   elements.agendaCountUpcoming.textContent = String(appointments.filter((item) => item.date >= now && item.date <= nextWeek).length);
+  elements.agendaCountMonth.textContent = String(appointments.filter((item) => item.date >= now && item.date <= nextMonth).length);
 
-  renderCalendar();
+  renderCalendar(rangeKey);
   renderAgendaTable(appointments);
   renderAvailabilitySlots();
+  syncToolbarVisibility();
 }
 
 function renderAvailabilitySlots() {
   if (!elements.availabilitySlots) return;
   const slots = state.advisorSlots || [];
-  const rangeLabel = RANGE_OPTIONS[state.selectedRange]?.label || 'Periodo';
+  const rangeLabel = RANGE_OPTIONS[getRangeForView('agenda')]?.label || 'Periodo';
   if (elements.availabilityRangeLabel) {
     elements.availabilityRangeLabel.textContent = `Ventana · ${rangeLabel}`;
   }
@@ -669,32 +842,76 @@ function resolveBusySourceLabel(item = {}) {
   return item.note || 'Cita del CRM';
 }
 
-function renderCalendar() {
+function renderCalendar(rangeKey = getRangeForView('agenda')) {
+  const days = RANGE_OPTIONS[rangeKey]?.days || 7;
+  const today = new Date();
+  const todayIso = today.toISOString().slice(0, 10);
+
+  // Vista por ventana: 7d / 2s (2 semanas). Mantiene layout 7 columnas.
+  if (days < 28) {
+    const windowDays = days <= 7 ? 7 : 14;
+    const start = startOfWeekMonday(state.calendarDate);
+    const startIso = toIsoDate(start);
+    const endIso = toIsoDate(addDays(start, windowDays - 1));
+
+    const caption = windowDays === 7
+      ? `Semana del ${formatDate(startIso)}`
+      : `2 semanas · ${formatDate(startIso)} - ${formatDate(endIso)}`;
+    elements.calendarMonthYear.textContent = caption;
+
+    const appointments = buildAppointments(filterAppointmentItemsBetween(state.items, startIso, endIso));
+    let html = '';
+
+    for (let offset = 0; offset < windowDays; offset += 1) {
+      const date = addDays(start, offset);
+      const dayIso = toIsoDate(date);
+      const dayAppointments = appointments.filter((a) => a.rawDate.slice(0, 10) === dayIso);
+      const todayClass = dayIso === todayIso ? 'crm-calendar-day--today' : '';
+      const dayNumber = Number(dayIso.slice(8, 10));
+
+      const eventsHtml = dayAppointments.map((appt) => {
+        const statusClass = calendarStatusClass(appt.status || '');
+        const label = calendarEventLabel(appt);
+        return `
+          <div class="calendar-event calendar-event--${statusClass}" title="${escapeHtml(label)}">
+            ${escapeHtml(label)}
+          </div>
+        `;
+      }).join('');
+
+      html += `
+        <div class="crm-calendar-day ${todayClass}" onclick="handleCalendarDayClick('${dayIso}')">
+          <span class="day-number">${dayNumber}</span>
+          <div class="crm-calendar-events">${eventsHtml}</div>
+        </div>
+      `;
+    }
+
+    elements.calendarGrid.innerHTML = html;
+    return;
+  }
+
+  // Vista mensual (1m): la misma de siempre.
   const year = state.calendarDate.getFullYear();
   const month = state.calendarDate.getMonth();
-  
   const monthName = new Intl.DateTimeFormat('es-CL', { month: 'long', year: 'numeric' }).format(state.calendarDate);
   elements.calendarMonthYear.textContent = monthName;
 
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const today = new Date();
   const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+  const appointments = buildAppointments(filterAppointmentItemsBetween(state.items, `${year}-${String(month + 1).padStart(2, '0')}-01`, `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`));
 
-  const appointments = buildAppointments(filterAppointmentItemsByRange(state.items, state.selectedRange));
-  
   let html = '';
-  // Padding days
   for (let i = 0; i < firstDay; i++) {
     html += '<div class="crm-calendar-day crm-calendar-day--other"></div>';
   }
 
-  // Actual days
   for (let d = 1; d <= daysInMonth; d++) {
     const dayIso = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    const dayAppointments = appointments.filter(a => a.rawDate.slice(0, 10) === dayIso);
+    const dayAppointments = appointments.filter((a) => a.rawDate.slice(0, 10) === dayIso);
     const todayClass = (isCurrentMonth && today.getDate() === d) ? 'crm-calendar-day--today' : '';
-    
+
     const eventsHtml = dayAppointments.map((appt) => {
       const statusClass = calendarStatusClass(appt.status || '');
       const label = calendarEventLabel(appt);
@@ -877,7 +1094,7 @@ function bindCalendarSlotActions(dayIso) {
 }
 
 window.handleCalendarDayClick = (dayIso) => {
-  const appointments = buildAppointments(filterAppointmentItemsByRange(state.items, state.selectedRange));
+  const appointments = buildAppointments(filterAppointmentItemsByRange(state.items, getRangeForView('agenda')));
   const dayAppointments = appointments.filter(a => a.rawDate.slice(0, 10) === dayIso);
   const dateObj = new Date(`${dayIso}T12:00:00`);
   const dateLabel = new Intl.DateTimeFormat('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }).format(dateObj);
@@ -1387,7 +1604,7 @@ function renderAppointmentCard(lead) {
       <div class="crm-actions crm-actions--appointment">
         <div class="crm-actions__intro">
           <strong>${lead.cita_fecha_hora && !isCanceled ? 'Reprogramar o mover cita' : 'Crear cita desde el CRM'}</strong>
-          <small>Slots reales del rango actual (${escapeHtml(RANGE_OPTIONS[state.selectedRange]?.label || '7d')}) con regla 45 min + 15 min.</small>
+          <small>Slots reales del rango actual (${escapeHtml(RANGE_OPTIONS[getRangeForView('agenda')]?.label || '7d')}) con regla 45 min + 15 min.</small>
         </div>
         <div class="crm-form-grid crm-form-grid--two">
           <label class="crm-field">
@@ -1496,7 +1713,6 @@ function hydrateStatusOptions() {
 }
 
 function applyLeadFilters(items) {
-  const rangeItems = filterItemsByRange(items, state.selectedRange);
   const query = normalizeText(elements.filterQ?.value?.trim() || '');
   const status = elements.filterStatus?.value || '';
   const sistema = elements.filterSistema?.value || '';
@@ -1506,7 +1722,7 @@ function applyLeadFilters(items) {
   const from = fromValue ? new Date(`${fromValue}T00:00:00`) : null;
   const to = toValue ? new Date(`${toValue}T23:59:59`) : null;
 
-  return rangeItems.filter((item) => {
+  return (items || []).filter((item) => {
     if (status && item.status !== status) return false;
     if (sistema && item.sistema_actual !== sistema) return false;
     if (isapre && !normalizeText(item.isapre_especifica || '').includes(isapre)) return false;
@@ -1549,6 +1765,19 @@ function filterAppointmentItemsByRange(items, rangeKey) {
   });
 }
 
+function filterAppointmentItemsBetween(items, fromIso, toIso) {
+  const start = fromIso ? new Date(`${fromIso}T00:00:00`) : null;
+  const end = toIso ? new Date(`${toIso}T23:59:59.999`) : null;
+  return (items || []).filter((item) => {
+    if (!item.cita_fecha_hora) return false;
+    const date = new Date(item.cita_fecha_hora);
+    if (Number.isNaN(date.getTime())) return false;
+    if (start && date < start) return false;
+    if (end && date > end) return false;
+    return true;
+  });
+}
+
 function filterItemsByPreviousRange(items, rangeKey) {
   const days = RANGE_OPTIONS[rangeKey]?.days || 7;
   const end = new Date();
@@ -1565,8 +1794,173 @@ function filterItemsByPreviousRange(items, rangeKey) {
   });
 }
 
-function getSelectedRangeWindow() {
-  const days = RANGE_OPTIONS[state.selectedRange]?.days || 7;
+function countMetric(items, metricKey) {
+  if (!items || !items.length) return 0;
+  switch (metricKey) {
+    case 'appointments':
+      return items.filter((item) => Boolean(item.cita_fecha_hora) && !isAppointmentCancelled(item)).length;
+    case 'proposals':
+      return items.filter((item) => item.status === 'Propuesta enviada').length;
+    case 'analysis':
+      return items.filter((item) => item.status === 'En analisis').length;
+    case 'leads':
+    default:
+      return items.length;
+  }
+}
+
+function buildOverviewCaption(rangeKey, compareMode) {
+  const rangeLabel = RANGE_OPTIONS[rangeKey]?.label || rangeKey;
+  if (compareMode === 'record') {
+    return `${rangeLabel} vs mejor récord`;
+  }
+  return `${rangeLabel} vs periodo anterior`;
+}
+
+function isAppointmentCancelled(item) {
+  return normalizeText(item?.cita_estado || '').includes('cancel');
+}
+
+function resolveMetricDate(item, metricKey) {
+  if (!item) return null;
+  if (metricKey === 'appointments') {
+    if (!item.cita_fecha_hora || isAppointmentCancelled(item)) return null;
+    const date = new Date(item.cita_fecha_hora);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+  if (metricKey === 'proposals') {
+    if (item.status !== 'Propuesta enviada') return null;
+    const date = new Date(item.updated_at || item.created_at);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+  if (metricKey === 'analysis') {
+    if (item.status !== 'En analisis') return null;
+    const date = new Date(item.updated_at || item.created_at);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+  const date = new Date(item.created_at);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function computeBucketStep(days) {
+  if (days <= 14) return 1;
+  if (days <= 60) return 2;
+  if (days <= 120) return 7;
+  if (days <= 240) return 14;
+  if (days <= 365) return 30;
+  return Math.ceil(days / 12);
+}
+
+function toStartOfDay(date) {
+  const copy = new Date(date);
+  copy.setHours(0, 0, 0, 0);
+  return copy;
+}
+
+function toIsoDate(date) {
+  const copy = toStartOfDay(date);
+  return copy.toISOString().slice(0, 10);
+}
+
+function addDays(date, days) {
+  const copy = new Date(date);
+  copy.setDate(copy.getDate() + days);
+  return copy;
+}
+
+function startOfWeekMonday(date) {
+  const base = toStartOfDay(date);
+  const day = base.getDay(); // 0=domingo, 1=lunes
+  const diff = day === 0 ? -6 : 1 - day;
+  return addDays(base, diff);
+}
+
+function formatBucketLabel(date, stepDays) {
+  const options = stepDays >= 14
+    ? { day: '2-digit', month: 'short' }
+    : { weekday: 'short', day: '2-digit' };
+  return new Intl.DateTimeFormat('es-CL', options).format(date);
+}
+
+function buildBuckets(startDate, days, stepDays) {
+  const buckets = [];
+  for (let offset = 0; offset < days; offset += stepDays) {
+    const bucketStart = addDays(startDate, offset);
+    const bucketEnd = addDays(bucketStart, stepDays);
+    buckets.push({
+      start: bucketStart,
+      end: bucketEnd,
+      label: formatBucketLabel(bucketStart, stepDays),
+    });
+  }
+  return buckets;
+}
+
+function buildMetricSeriesForWindow(items, startDate, days, metricKey) {
+  const stepDays = computeBucketStep(days);
+  const buckets = buildBuckets(startDate, days, stepDays);
+  const values = buckets.map((bucket) => {
+    let count = 0;
+    for (const item of items || []) {
+      const date = resolveMetricDate(item, metricKey);
+      if (!date) continue;
+      if (date >= bucket.start && date < bucket.end) count += 1;
+    }
+    return count;
+  });
+  return { labels: buckets.map((b) => b.label), values, stepDays };
+}
+
+function pickRecordWindowStart(items, days, metricKey, maxLookbackDays = 365) {
+  const now = toStartOfDay(new Date());
+  const earliest = addDays(now, -Math.max(maxLookbackDays, days));
+
+  let bestStart = addDays(now, -(days - 1));
+  let bestTotal = -1;
+
+  for (let offset = 0; offset <= maxLookbackDays - days; offset += 1) {
+    const candidateStart = addDays(earliest, offset);
+    const candidateEnd = addDays(candidateStart, days);
+    let total = 0;
+    for (const item of items || []) {
+      const date = resolveMetricDate(item, metricKey);
+      if (!date) continue;
+      if (date >= candidateStart && date < candidateEnd) total += 1;
+    }
+    if (total > bestTotal) {
+      bestTotal = total;
+      bestStart = candidateStart;
+    }
+  }
+
+  return bestStart;
+}
+
+function buildMetricSeriesWindow(items, rangeKey, metricKey, compareMode) {
+  const days = RANGE_OPTIONS[rangeKey]?.days || 7;
+  const now = toStartOfDay(new Date());
+  const currentStart = days === 1 ? now : addDays(now, -(days - 1));
+
+  const current = buildMetricSeriesForWindow(items, currentStart, days, metricKey);
+  let compare = current;
+
+  if (compareMode === 'record') {
+    const recordStart = pickRecordWindowStart(items, days, metricKey, 365);
+    compare = buildMetricSeriesForWindow(items, recordStart, days, metricKey);
+  } else {
+    const previousStart = addDays(currentStart, -days);
+    compare = buildMetricSeriesForWindow(items, previousStart, days, metricKey);
+  }
+
+  return {
+    labels: current.labels,
+    current: current.values,
+    compare: compare.values,
+  };
+}
+
+function getSelectedRangeWindow(rangeKey) {
+  const days = RANGE_OPTIONS[rangeKey]?.days || 7;
   const fromDate = new Date();
   fromDate.setHours(0, 0, 0, 0);
   const toDate = new Date(fromDate);
