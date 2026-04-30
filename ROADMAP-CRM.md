@@ -1,5 +1,36 @@
 # Checklist Roadmap CRM PlanesPro
 
+## Estado real al 30-04-2026
+
+### Hecho
+- Backend base del CRM operativo sobre `ppforms`:
+  - listado, detalle, notas, cambio de estado, archivado y borrado manual;
+  - disponibilidad semanal;
+  - bloqueos manuales y bloqueos de día completo;
+  - creación, reprogramación y cancelación de citas;
+  - integración base con Google Calendar;
+  - selector público de slots reales con regla `45 min + 15 min`.
+- CRM local accesible por `http://127.0.0.1:<puerto>/crm/` usando `X-Admin-Key`.
+- Cloudflare Access ya protege el entorno productivo del CRM.
+- Existe una primera capa visual para `Dashboard`, `Leads`, `Agenda`, `Settings` y `Profile`.
+
+### Pendiente crítico
+- Corregir la operación real del front del CRM antes de seguir con diseño:
+  - visibilidad por sección de las tarjetas métricas;
+  - filtros/rangos temporales coherentes por vista;
+  - comparativas reales contra período anterior y/o mejor registro;
+  - agenda realmente operativa por rango (`7d`, `2s`, `1m`);
+  - bloquear / liberar horas desde CRM sin errores;
+  - reprogramar citas abiertas desde Agenda;
+  - ordenar `Settings` para que disponibilidad y bloqueos no ocupen media pantalla;
+  - eliminar botones de adorno o volverlos funcionales.
+- Resolver definitivamente la conexión Google OAuth en producción sin depender de pruebas locales.
+- Unificar timezone y formato de fecha/hora entre formulario, CRM, D1 y Google Calendar.
+
+### Regla de trabajo desde este punto
+- No seguir expandiendo UI hasta cerrar lo operativo anterior.
+- Todo cambio nuevo debe actualizar este roadmap y el handoff.
+
 ## Fase 0 - Base tecnica
 - [ ] Consolidar el formulario actual como unica entrada activa
 - [ ] Confirmar `ppforms_db` como base exclusiva del formulario

@@ -1,5 +1,15 @@
 # Plan de Modularizacion PlanesPro
 
+## Estado al 30-04-2026
+
+- Documento histórico.
+- Sigue vigente para el sitio público.
+- No gobierna el trabajo del CRM.
+- Para CRM usar:
+  - `ROADMAP-CRM.md`
+  - `CRM-DESIGN-ROADMAP.md`
+  - `HANDOFF-CRM-STAGE1.json`
+
 Fecha: 2026-04-22  
 Objetivo: reducir duplicacion, hacer mas seguro cambiar header/footer/secciones y preparar el proyecto para crecer sin romper paginas existentes.
 

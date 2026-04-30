@@ -25,7 +25,7 @@ import {
   updateAvailability,
   updateLeadRut,
   updateLeadStatus,
-} from './api.js';
+} from './api.js?v=20260430-localfix';
 
 const SIDEBAR_STORAGE = 'crm-sidebar-collapsed';
 
@@ -492,9 +492,8 @@ function renderRangeSelector() {
 
 function configureAccessMode() {
   if (isLocalDev) {
-    const currentKey = readAdminKey() || LOCAL_DEV_ADMIN_KEY;
-    saveAdminKey(currentKey);
-    elements.adminKey.value = currentKey;
+    saveAdminKey(LOCAL_DEV_ADMIN_KEY);
+    elements.adminKey.value = LOCAL_DEV_ADMIN_KEY;
     elements.adminKeyBox.hidden = false;
   } else {
     elements.adminKeyBox.hidden = true;
@@ -523,24 +522,51 @@ function setView(view) {
 }
 
 async function bootstrap() {
+  let session = null;
   try {
-    state.session = await getSession();
-
-    const displayName = state.profile.name || state.session.actorEmail || 'Asesor';
-    elements.sessionStatus.textContent = state.session.actorEmail || 'Acceso OK';
-    elements.sidebarUserName.textContent = displayName;
-    applyProfileToUI();
-    hydrateProfileSections();
-    await loadLeads();
-    await loadAdvisorWorkspace();
-    syncToolbarVisibility();
+    session = await getSession();
   } catch (error) {
-    elements.sessionStatus.textContent = error.message;
+    if (!isLocalDev) {
+      throw error;
+    }
+    session = {
+      ok: true,
+      actorEmail: 'local-admin',
+      authMode: 'admin-key-fallback',
+    };
+  }
+
+  state.session = session;
+  const displayName = state.profile.name || state.session.actorEmail || 'Asesor';
+  elements.sessionStatus.textContent = isLocalDev
+    ? `Acceso local · ${state.session.actorEmail || 'local-admin'}`
+    : (state.session.actorEmail || 'Acceso OK');
+  elements.sidebarUserName.textContent = displayName;
+  applyProfileToUI();
+  hydrateProfileSections();
+
+  try {
+    await loadLeads();
+  } catch (error) {
+    elements.sessionStatus.textContent = isLocalDev
+      ? `Acceso local · ${state.session.actorEmail || 'local-admin'}`
+      : (state.session.actorEmail || 'Acceso OK');
     renderDashboard([]);
     renderAgenda([]);
     renderList([]);
     renderDetail(null, error.message);
+    return;
   }
+
+  try {
+    await loadAdvisorWorkspace();
+  } catch (error) {
+    if (elements.calendarSyncHint) {
+      elements.calendarSyncHint.textContent = error.message || 'No se pudo cargar la agenda del asesor';
+    }
+  }
+
+  syncToolbarVisibility();
 }
 
 async function loadLeads(skipFetch = false) {
@@ -567,10 +593,13 @@ async function loadLeads(skipFetch = false) {
     }
   } catch (error) {
     elements.leadCount.textContent = error.message;
-    renderDashboard([]);
-    renderAgenda([]);
-    renderList([]);
-    renderDetail(null, error.message);
+    if (!state.items.length) {
+      renderDashboard([]);
+      renderAgenda([]);
+      renderList([]);
+      renderDetail(null, error.message);
+    }
+    throw error;
   }
 }
 
@@ -1807,6 +1836,24 @@ function countMetric(items, metricKey) {
     default:
       return items.length;
   }
+}
+
+function countMetricInWindow(items, rangeKey, metricKey, offset = 0) {
+  const days = RANGE_OPTIONS[rangeKey]?.days || 7;
+  const now = toStartOfDay(new Date());
+  const currentStart = days === 1 ? now : addDays(now, -(days - 1));
+  const windowStart = addDays(currentStart, offset * days);
+  const windowEnd = addDays(windowStart, days);
+
+  let count = 0;
+  for (const item of items || []) {
+    const date = resolveMetricDate(item, metricKey);
+    if (!date) continue;
+    if (date >= windowStart && date < windowEnd) {
+      count += 1;
+    }
+  }
+  return count;
 }
 
 function buildOverviewCaption(rangeKey, compareMode) {

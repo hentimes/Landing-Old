@@ -5,6 +5,19 @@ Rama revisada: `sections`
 
 Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como fuente unica para priorizar estabilizacion, SEO, noticias, conversion y mantenimiento.
 
+## Estado documental al 30-04-2026
+
+- Para CRM, la fuente principal de estado ya no es este archivo sino:
+  - `ROADMAP-CRM.md`
+  - `CRM-DESIGN-ROADMAP.md`
+  - `HANDOFF-CRM-STAGE1.json`
+- Este checklist se mantiene como mapa general del proyecto.
+- El CRM quedó en etapa operativa intermedia:
+  - backend base existente;
+  - agenda y disponibilidad existentes;
+  - diseño parcial existente;
+  - faltan correcciones funcionales antes de otra ronda visual.
+
 ## 1. Estabilizacion inmediata
 
 - [x] Restaurar carga del feed de noticias en `noticias.html`.
@@ -120,6 +133,8 @@ Este documento reemplaza los roadmaps y checklists anteriores. Debe usarse como 
 - [x] Permitir eliminar lead desde el CRM.
 - [x] Permitir bloquear día completo desde el CRM.
 - [ ] Unificar el formateo de fecha/hora entre formulario, CRM, D1 y Google Calendar.
+- [ ] Corregir la lógica local/productiva de login del CRM para que no dependa de estados ambiguos del frontend.
+- [ ] Alinear la agenda del formulario y la agenda del CRM con exactamente los mismos rangos, slots y bloqueos.
 - [ ] Probar el sidebar completo en mobile real, incluyendo CTA del header, menu hamburguesa, scroll, abandono y envio.
 - [ ] Probar el sidebar en desktop real despues de la simplificacion para evitar regresiones.
 

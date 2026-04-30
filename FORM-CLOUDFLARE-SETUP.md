@@ -1,5 +1,23 @@
 # Formulario en Cloudflare
 
+## Estado real al 30-04-2026
+
+- `ppforms` existe y sigue siendo el backend real del formulario + admin.
+- `ppforms_db` existe y guarda leads, notas, eventos, disponibilidad y citas.
+- `ppforms-uploads` existe y guarda adjuntos.
+- El formulario público ya usa slots reales y ya puede generar citas.
+- El CRM local sigue consumiendo `https://form.planespro.cl`.
+- El punto todavía inestable no es la base del worker, sino:
+  - OAuth/redirects de Google Calendar en producción;
+  - consistencia operativa de la Agenda del CRM;
+  - refinamiento del login local para pruebas sin fricción.
+
+## Estado del acceso local CRM
+
+- La clave local de desarrollo sigue siendo `ppcrm_dev_20260425_9f6c2c8e1a4b`.
+- `GET /api/admin/session` ya responde `200` con `X-Admin-Key`.
+- Si el frontend local falla, el problema está del lado de la UI/flujo del CRM, no del endpoint de validación.
+
 Este documento deja el setup exacto que falta para mover el formulario nuevo de `Apps Script` a `Cloudflare Worker + D1 + R2`.
 
 ## 1. Recursos que debes crear en Cloudflare

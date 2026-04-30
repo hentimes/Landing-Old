@@ -1,7 +1,10 @@
 import { API_BASE_URL, ADMIN_KEY_STORAGE, LOCAL_DEV_ADMIN_KEY, isLocalDev } from './config.js';
 
 function getAdminKey() {
-  return window.localStorage.getItem(ADMIN_KEY_STORAGE) || (isLocalDev ? LOCAL_DEV_ADMIN_KEY : '');
+  if (isLocalDev) {
+    return LOCAL_DEV_ADMIN_KEY;
+  }
+  return window.localStorage.getItem(ADMIN_KEY_STORAGE) || '';
 }
 
 function getHeaders(extra = {}) {
@@ -33,6 +36,10 @@ async function fetchJson(path, options = {}) {
 }
 
 export function saveAdminKey(value) {
+  if (isLocalDev) {
+    window.localStorage.setItem(ADMIN_KEY_STORAGE, LOCAL_DEV_ADMIN_KEY);
+    return;
+  }
   if (!value) {
     window.localStorage.removeItem(ADMIN_KEY_STORAGE);
     return;

@@ -1,11 +1,11 @@
 {
   "document_type": "ai_handoff_master",
-  "document_version": "2026-04-29.crm-stage1.v5",
+  "document_version": "2026-04-30.crm-stage1.v6",
   "project": {
     "name": "PlanesPro Landing / CRM",
     "repository_root": "C:\\Users\\henti\\OneDrive\\Documentos\\ISAPRE\\PlanesPro\\Landing Old",
     "active_branch": "form",
-    "current_date": "2026-04-29",
+    "current_date": "2026-04-30",
     "timezone": "America/Santiago"
   },
   "governance": {
@@ -442,6 +442,24 @@
       "La agenda del CRM ya expone edicion de disponibilidad semanal, bloqueos manuales, bloqueo de dia completo y reprogramacion/cancelacion. Sigue pendiente pulir la vista operativa por bloques y la experiencia final de agenda.",
       "Los filtros temporales del dashboard/agenda no estan confirmados como fuente unica de verdad para todas las metricas y vistas"
     ]
+  },
+  "progress_snapshot": {
+    "date": "2026-04-30",
+    "status": "partial_operational",
+    "completed_since_previous_version": [
+      "Session endpoint local validado con X-Admin-Key y respuesta 200",
+      "Fallback local reforzado en bootstrap del CRM para no bloquear toda la UI si la verificación remota falla en desarrollo",
+      "Se ocultaron por defecto los grupos de métricas de toolbar para evitar que aparezcan todas las tarjetas a la vez durante el arranque",
+      "La agenda empezó a respetar ventanas 7d/2s/1m en el render del calendario en lugar de usar siempre un mes fijo"
+    ],
+    "critical_open_issues": [
+      "Todavía hay vistas donde se muestran métricas que no corresponden o quedan mal sincronizadas con el rango activo",
+      "La comparación de métricas contra periodo anterior / récord todavía no está cerrada",
+      "Agenda sigue inconsistente en varios flujos operativos: bloqueo, reprogramación desde panel diario, estados visibles y densidad visual",
+      "Settings necesita compactación estructural y mejor alineación; hoy sigue sobredimensionado",
+      "Google OAuth/redirect en producción todavía no está resuelto de extremo a extremo"
+    ],
+    "execution_rule": "Antes de otra ronda visual grande, cerrar operación: métricas correctas por sección, rangos reales, agenda funcional y settings compactos."
   },
   "known_open_work_after_this_scope": {
     "next_priority": [

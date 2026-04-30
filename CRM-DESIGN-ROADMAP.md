@@ -1,5 +1,25 @@
 # CRM Design Roadmap
 
+## Estado actual al 30-04-2026
+
+- Este documento sigue vigente, pero **su ejecución está pausada parcialmente**.
+- Motivo: el CRM todavía tiene inconsistencias operativas y de layout base que deben corregirse antes de una pasada fuerte de diseño.
+- Conclusión práctica:
+  - `Dashboard`, `Leads`, `Agenda`, `Profile` y `Settings` ya tienen una primera capa visual;
+  - todavía **no** conviene entrar a refinar premium/Asana-like hasta estabilizar:
+    - métricas por vista,
+    - filtros temporales,
+    - agenda real,
+    - acciones de bloqueo/reprogramación,
+    - alineación y densidad básica de `Settings`.
+
+## Prioridad de diseño inmediata
+
+1. Limpiar estructura y jerarquía visual por vista.
+2. Quitar componentes que hoy sobran o están duplicados.
+3. Ajustar densidad, alineación y grid base.
+4. Solo después aplicar la capa `clean / stylized / executive`.
+
 ## Objetivo
 
 Definir una dirección de diseño limpia, compacta y escalable para el CRM de asesores de PlanesPro tomando como referencia ciertos patrones de Asana, sin copiar su estilo de forma literal ni mezclar lenguajes visuales incompatibles con el producto actual.
