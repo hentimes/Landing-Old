@@ -2419,4 +2419,496 @@ body:has([data-view-panel="agenda"].is-active) #view-title-container {
 .crm-status-icon--neutral { color: #cbd5e1; }
 .crm-status-row__bar--neutral { background: #cbd5e1; }
 
+/* === CRM design tranche 3: agenda + profile + settings === */
+.crm-icon-button.is-empty {
+  opacity: 0.72;
+}
 
+.crm-icon-button.is-empty strong {
+  background: #e2e8f0;
+  color: #64748b;
+}
+
+.crm-view[data-view-panel="agenda"] {
+  display: none;
+}
+
+.crm-view[data-view-panel="agenda"].is-active {
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.crm-view[data-view-panel="agenda"] > .crm-calendar-wrapper {
+  grid-column: 1;
+  max-width: none;
+  gap: 16px;
+}
+
+.crm-view[data-view-panel="agenda"] > .crm-availability-panel {
+  grid-column: 2;
+  margin-top: 0;
+  min-height: 0;
+  padding: 16px;
+}
+
+.crm-view[data-view-panel="agenda"] > #calendar-day-details,
+.crm-view[data-view-panel="agenda"] > #agenda-section-list {
+  grid-column: 1 / -1;
+  max-width: none;
+}
+
+.crm-calendar-header {
+  min-height: 62px;
+  padding: 0 2px;
+}
+
+.crm-calendar-current h2 {
+  font-size: 26px;
+  color: #10233f;
+}
+
+.crm-calendar-current p,
+.crm-calendar-panel-copy {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.crm-calendar {
+  border-radius: 16px;
+  border-color: rgba(226, 232, 240, 0.92);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.04);
+}
+
+.crm-calendar-weekdays {
+  padding: 12px 14px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}
+
+.crm-calendar-day {
+  min-height: 132px;
+  padding: 12px;
+  transition: background 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.crm-calendar-day:not(.crm-calendar-day--other):hover {
+  background: #f8fbff;
+  box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.12);
+}
+
+.crm-calendar-day--today {
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.02) 100%);
+}
+
+.crm-calendar-day .day-number {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.crm-calendar-events {
+  gap: 8px;
+}
+
+.calendar-event {
+  padding: 7px 9px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.crm-calendar-footer {
+  padding: 0 4px 2px;
+}
+
+.crm-calendar-details {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.04);
+}
+
+.crm-calendar-details-header {
+  margin-bottom: 0;
+}
+
+.crm-calendar-details-header h3 {
+  margin: 0;
+  font: 800 22px/1.15 'Outfit', sans-serif;
+  color: #10233f;
+}
+
+.crm-appointment-list {
+  gap: 10px;
+}
+
+.crm-calendar-blocks {
+  gap: 16px;
+}
+
+.crm-slot-context {
+  margin: 0 0 4px;
+  font-size: 12px;
+}
+
+.crm-slot-list {
+  grid-template-columns: repeat(auto-fit, minmax(188px, 1fr));
+  gap: 12px;
+}
+
+.crm-slot-card {
+  min-height: 92px;
+  padding: 14px;
+  border-radius: 12px;
+  border-color: rgba(226, 232, 240, 0.92);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  gap: 6px;
+}
+
+.crm-slot-card strong {
+  font-size: 13px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.crm-slot-card span,
+.crm-slot-card small {
+  font-size: 12px;
+}
+
+.crm-slot-card__actions {
+  margin-top: auto;
+  gap: 8px;
+}
+
+.crm-slot-card--busy {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-color: #dbe5f0;
+}
+
+.crm-slot-card--busy strong,
+.crm-slot-card--busy span,
+.crm-slot-card--busy small {
+  color: #516075;
+}
+
+.crm-availability-panel .crm-card__header {
+  align-items: start;
+}
+
+.crm-availability-panel .crm-card__header h3 {
+  font-size: 20px;
+}
+
+.crm-availability-panel .crm-card__hint {
+  white-space: nowrap;
+}
+
+.crm-agenda-table {
+  max-width: none;
+  gap: 16px;
+}
+
+.crm-agenda-day {
+  padding: 16px;
+  border-radius: 16px;
+}
+
+.crm-agenda-day__rows {
+  gap: 10px;
+}
+
+.crm-agenda-row {
+  grid-template-columns: 84px minmax(0, 1fr) 132px auto;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border-color: rgba(226, 232, 240, 0.92);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.crm-agenda-row__time {
+  font-size: 14px;
+}
+
+.crm-agenda-row__main strong {
+  font-size: 14px;
+}
+
+.crm-agenda-row__main span {
+  font-size: 12px;
+}
+
+.crm-agenda-row__actions {
+  justify-content: flex-end;
+}
+
+.crm-view[data-view-panel="profile"] .crm-card--page,
+.crm-view[data-view-panel="settings"] .crm-card--page {
+  padding: 18px;
+}
+
+.crm-profile-page,
+.crm-settings-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.crm-profile-page__hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 22px;
+  border: 1px solid rgba(226, 232, 240, 0.92);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 247, 255, 0.96) 100%);
+}
+
+.crm-profile-page__photo,
+.crm-profile-page__hero .crm-avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 18px;
+}
+
+.crm-profile-page__hero strong {
+  display: block;
+  margin-bottom: 4px;
+  font: 800 26px/1.1 'Outfit', sans-serif;
+  color: #10233f;
+}
+
+.crm-profile-page__hero span {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.crm-profile-page__cta {
+  justify-self: end;
+}
+
+.crm-profile-page__grid {
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  gap: 18px;
+}
+
+.crm-card--page .crm-card--inner {
+  padding: 16px;
+  border-radius: 16px;
+  border-color: rgba(226, 232, 240, 0.92);
+}
+
+.crm-card--page .crm-card__header h3 {
+  font-size: 20px;
+}
+
+.crm-kv-grid--single {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.crm-kv-grid--single .crm-kv:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.crm-kv {
+  min-height: 66px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #fbfcfe;
+  border: 1px solid rgba(226, 232, 240, 0.88);
+}
+
+.crm-kv span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.crm-kv strong {
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.crm-long-text {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.65;
+  color: #64748b;
+}
+
+.crm-settings-grid {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.crm-settings-grid > .crm-card:nth-child(1),
+.crm-settings-grid > .crm-card:nth-child(2),
+.crm-settings-grid > .crm-card:nth-child(5),
+.crm-settings-grid > .crm-card:nth-child(6) {
+  grid-column: span 6;
+}
+
+.crm-settings-grid > .crm-card.crm-card--span-2 {
+  grid-column: 1 / -1;
+}
+
+.crm-form-grid {
+  gap: 12px;
+}
+
+.crm-form-grid--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.crm-form-grid--blocks {
+  grid-template-columns: minmax(180px, 0.9fr) 140px 140px minmax(260px, 1.4fr);
+  gap: 12px;
+}
+
+.crm-field {
+  gap: 8px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.crm-field span {
+  font-weight: 700;
+  color: #334155;
+}
+
+.crm-field input,
+.crm-field select,
+.crm-field textarea,
+.crm-availability-row input {
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(203, 213, 225, 0.92);
+  background: #fbfcfe;
+}
+
+.crm-toggle-card {
+  padding: 14px;
+  border-radius: 14px;
+}
+
+.crm-availability-grid {
+  gap: 10px;
+}
+
+.crm-availability-row {
+  grid-template-columns: minmax(180px, 1fr) 132px 132px;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.82);
+}
+
+.crm-availability-row__toggle {
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.crm-availability-row__toggle input {
+  accent-color: #2563eb;
+}
+
+.crm-block-list {
+  gap: 10px;
+}
+
+.crm-block-row {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border-color: rgba(226, 232, 240, 0.92);
+}
+
+.crm-block-row__main strong {
+  font-size: 14px;
+}
+
+.crm-block-row__main span,
+.crm-block-row__main small {
+  font-size: 12px;
+}
+
+.crm-card--page .crm-actions__buttons {
+  gap: 10px;
+}
+
+.crm-card--page .button--primary,
+.crm-card--page .button--secondary,
+.crm-card--page .button--ghost {
+  min-height: 40px;
+  border-radius: 12px;
+  padding-inline: 14px;
+}
+
+.crm-card__header-actions strong {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 1380px) {
+  .crm-view[data-view-panel="agenda"] {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-view[data-view-panel="agenda"] > .crm-calendar-wrapper,
+  .crm-view[data-view-panel="agenda"] > .crm-availability-panel,
+  .crm-view[data-view-panel="agenda"] > #calendar-day-details,
+  .crm-view[data-view-panel="agenda"] > #agenda-section-list {
+    grid-column: 1;
+  }
+
+  .crm-profile-page__grid,
+  .crm-settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-settings-grid > .crm-card:nth-child(1),
+  .crm-settings-grid > .crm-card:nth-child(2),
+  .crm-settings-grid > .crm-card:nth-child(5),
+  .crm-settings-grid > .crm-card:nth-child(6),
+  .crm-settings-grid > .crm-card.crm-card--span-2 {
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 960px) {
+  .crm-profile-page__hero {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .crm-profile-page__cta {
+    justify-self: start;
+  }
+
+  .crm-kv-grid--single,
+  .crm-form-grid--two,
+  .crm-form-grid--blocks,
+  .crm-calendar-blocks {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-availability-row,
+  .crm-agenda-row {
+    grid-template-columns: 1fr;
+  }
+
+  .crm-agenda-row__actions {
+    justify-content: flex-start;
+  }
+}

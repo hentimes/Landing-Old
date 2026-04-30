@@ -1,4 +1,4 @@
-﻿import {
+import {
   isLocalDev,
   LEAD_STATUSES,
   ADMIN_KEY_STORAGE,
@@ -626,7 +626,7 @@ function renderAvailabilitySlots() {
   const slots = state.advisorSlots || [];
   const rangeLabel = RANGE_OPTIONS[state.selectedRange]?.label || 'Periodo';
   if (elements.availabilityRangeLabel) {
-    elements.availabilityRangeLabel.textContent = `Bloques · ${rangeLabel}`;
+    elements.availabilityRangeLabel.textContent = `Ventana · ${rangeLabel}`;
   }
 
   if (!slots.length) {
@@ -1892,12 +1892,12 @@ function appendManualBlockFromForm() {
   const note = elements.settingsBlockNote?.value?.trim() || '';
 
   if (!date || !start || !end) {
-    window.alert('Completa fecha, hora de inicio y hora de t?rmino');
+    window.alert('Completa fecha, hora de inicio y hora de término');
     return;
   }
 
   if (end <= start) {
-    window.alert('La hora de t?rmino debe ser mayor que la de inicio');
+    window.alert('La hora de término debe ser mayor que la de inicio');
     return;
   }
 
@@ -2090,6 +2090,9 @@ function hydratePopovers(items) {
   elements.notificationCount.textContent = String(notifications.length);
   elements.updatesCount.textContent = String(updates.length);
   elements.messagesCount.textContent = String(messages.length);
+  elements.notificationButton.classList.toggle('is-empty', notifications.length === 0);
+  elements.updatesButton.classList.toggle('is-empty', updates.length === 0);
+  elements.messagesButton.classList.toggle('is-empty', messages.length === 0);
   elements.notificationPopover.innerHTML = buildPopoverList('Leads por contactar', notifications.map((item) => ({ title: item.nombre || 'Sin nombre', meta: item.telefono || item.email || 'Sin contacto', leadId: item.id })));
   elements.updatesPopover.innerHTML = buildPopoverList('Updates recientes', updates.map((item) => ({ title: item.nombre || 'Sin nombre', meta: `${formatDateTime(item.updated_at || item.created_at)} · ${item.status || 'Sin estado'}`, leadId: item.id })));
   elements.messagesPopover.innerHTML = buildPopoverList('Citas pendientes', messages.map((item) => ({ title: item.nombre || 'Sin nombre', meta: `${formatDateTime(item.cita_fecha_hora)} · ${item.cita_estado || 'Pendiente'}`, leadId: item.id })));
@@ -2207,11 +2210,20 @@ function hydrateAdvisorUI() {
   if (elements.settingsGoogleStatus) elements.settingsGoogleStatus.textContent = connected ? 'Conectado' : 'Sin conectar';
   if (elements.settingsGoogleEmail) elements.settingsGoogleEmail.textContent = google?.google_email || '-';
   if (elements.settingsGoogleUpdated) elements.settingsGoogleUpdated.textContent = google?.updated_at ? formatDateTime(google.updated_at) : '-';
+  if (elements.settingsConnectGoogle) {
+    elements.settingsConnectGoogle.textContent = connected ? 'Actualizar conexión Google' : 'Conectar Google Calendar';
+  }
   if (elements.profilePageGoogle) elements.profilePageGoogle.textContent = connected ? (google?.google_email || 'Conectado') : 'Sin conectar';
   if (elements.profilePageCalendarCopy) {
     elements.profilePageCalendarCopy.textContent = connected
       ? `Google Calendar activo para ${google?.google_email || 'esta cuenta'}.`
       : 'Todavía no hay un calendario personal conectado a este asesor.';
+  }
+  if (elements.profileConnectGoogle) {
+    elements.profileConnectGoogle.textContent = connected ? 'Actualizar Google Calendar' : 'Conectar Google Calendar';
+  }
+  if (elements.profileGoSettings) {
+    elements.profileGoSettings.textContent = connected ? 'Editar disponibilidad' : 'Configurar agenda';
   }
   if (elements.calendarSyncHint) {
     elements.calendarSyncHint.textContent = connected
@@ -2416,10 +2428,3 @@ function statusBadgeClass(status = '') {
   if (normalized.includes('archivado') || normalized.includes('descartado')) return 'crm-badge--muted';
   return 'crm-badge--neutral';
 }
-
-
-
-
-
-
-
