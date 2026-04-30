@@ -154,6 +154,19 @@ const elements = {
   profileReset: document.getElementById('profile-reset'),
   profileSave: document.getElementById('profile-save'),
   openProfileEditor: document.getElementById('open-profile-editor'),
+  leadCreateModal: document.getElementById('lead-create-modal'),
+  leadCreateForm: document.getElementById('lead-create-form'),
+  leadCreateClose: document.getElementById('lead-create-close'),
+  leadCreateCancel: document.getElementById('lead-create-cancel'),
+  leadCreateSubmit: document.getElementById('lead-create-submit'),
+  leadCreateName: document.getElementById('lead-create-name'),
+  leadCreatePhone: document.getElementById('lead-create-phone'),
+  leadCreateEmail: document.getElementById('lead-create-email'),
+  leadCreateSystem: document.getElementById('lead-create-system'),
+  leadCreateIsapreField: document.getElementById('lead-create-isapre-field'),
+  leadCreateIsapre: document.getElementById('lead-create-isapre'),
+  leadCreateComuna: document.getElementById('lead-create-comuna'),
+  leadCreateFeedback: document.getElementById('lead-create-feedback'),
   settingsGoogleStatus: document.getElementById('settings-google-status'),
   settingsGoogleEmail: document.getElementById('settings-google-email'),
   settingsGoogleUpdated: document.getElementById('settings-google-updated'),
@@ -200,6 +213,7 @@ function init() {
   configureAccessMode();
   applySidebarState();
   bindEvents();
+  syncLeadCreateSystemField();
   applyProfileToUI();
   hydrateProfileSections();
   setView(state.currentView);
@@ -235,7 +249,7 @@ function bindEvents() {
   });
 
   elements.applyFilters?.addEventListener('click', renderLeadsView);
-  elements.createLeadButton?.addEventListener('click', createLeadFromPrompt);
+  elements.createLeadButton?.addEventListener('click', openLeadCreateModal);
   elements.clearFilters?.addEventListener('click', () => {
     if (elements.filterQ) elements.filterQ.value = '';
     if (elements.filterStatus) elements.filterStatus.value = '';
@@ -287,6 +301,13 @@ function bindEvents() {
   elements.profilePhotoInput?.addEventListener('change', handleProfilePhotoChange);
   elements.profileReset?.addEventListener('click', resetProfile);
   elements.profileSave?.addEventListener('click', saveProfileChanges);
+  elements.leadCreateClose?.addEventListener('click', closeLeadCreateModal);
+  elements.leadCreateCancel?.addEventListener('click', closeLeadCreateModal);
+  elements.leadCreateForm?.addEventListener('submit', createLeadFromModal);
+  elements.leadCreateSystem?.addEventListener('change', syncLeadCreateSystemField);
+  elements.leadCreateModal?.addEventListener('click', (event) => {
+    if (event.target === elements.leadCreateModal) closeLeadCreateModal();
+  });
 
   // Calendar navigation
   elements.calendarPrev?.addEventListener('click', () => {
@@ -946,7 +967,9 @@ function renderDetail(payload, errorMessage = '') {
   if (!payload?.lead) {
     elements.leadDetail.hidden = true;
     elements.leadDetailEmpty.hidden = false;
-    elements.leadDetailEmpty.innerHTML = errorMessage ? `<div class="crm-empty__message"><h3>Error</h3><p>${escapeHtml(errorMessage)}</p></div>` : '';
+    elements.leadDetailEmpty.innerHTML = errorMessage
+      ? `<div class="crm-empty__message"><h3>Error</h3><p>${escapeHtml(errorMessage)}</p></div>`
+      : '<div class="crm-empty__message"><h3>Selecciona un lead</h3><p>Aquí verás datos, notas, agenda y acciones operativas del contacto elegido.</p></div>';
     return;
   }
 
@@ -996,12 +1019,18 @@ function renderDetail(payload, errorMessage = '') {
 }
 
 function renderDetailHeader(lead) {
+  const meta = [
+    lead.comuna || '',
+    lead.region || '',
+    lead.created_at ? `Ingreso ${formatDateTime(lead.created_at)}` : '',
+  ].filter(Boolean).join(' · ');
   return `
     <div class="crm-detail-summary">
       <div class="crm-detail-summary__identity">
         <div class="crm-avatar crm-avatar--detail" id="detail-avatar"></div>
         <div>
           <h2>${escapeHtml(lead.nombre || 'Sin nombre')}</h2>
+          ${meta ? `<p class="crm-detail-summary__meta">${escapeHtml(meta)}</p>` : ''}
           <div class="crm-chip-row crm-chip-row--compact">
             ${lead.rut ? `<span class="crm-chip crm-chip--accent"><i class="fas fa-id-card"></i> ${escapeHtml(formatRut(lead.rut))}</span>` : ''}
             ${lead.telefono ? `<span class="crm-chip"><i class="fas fa-phone"></i> ${escapeHtml(lead.telefono)}</span>` : ''}
@@ -1940,21 +1969,53 @@ async function persistAdvisorBlocks(blocks) {
   await loadAdvisorWorkspace();
 }
 
-async function createLeadFromPrompt() {
-  const nombre = window.prompt('Nombre del lead:', '')?.trim();
-  if (nombre === undefined || nombre === null) return;
-  const telefono = window.prompt('Teléfono del lead:', '')?.trim() || '';
-  const email = window.prompt('Correo del lead:', '')?.trim() || '';
-  const sistema = window.prompt('Sistema actual (Fonasa / Isapre):', 'Fonasa')?.trim() || 'Fonasa';
-  const isapre = /^isapre$/i.test(sistema)
-    ? (window.prompt('¿Cuál isapre?:', '')?.trim() || '')
-    : '';
+function syncLeadCreateSystemField() {
+  if (!elements.leadCreateSystem || !elements.leadCreateIsapreField || !elements.leadCreateIsapre) return;
+  const needsIsapre = /^isapre$/i.test(elements.leadCreateSystem.value || '');
+  elements.leadCreateIsapreField.hidden = !needsIsapre;
+  elements.leadCreateIsapre.toggleAttribute('required', needsIsapre);
+  if (!needsIsapre) elements.leadCreateIsapre.value = '';
+}
 
+function resetLeadCreateForm() {
+  elements.leadCreateForm?.reset();
+  if (elements.leadCreateSystem) elements.leadCreateSystem.value = 'Fonasa';
+  if (elements.leadCreateFeedback) elements.leadCreateFeedback.textContent = '';
+  syncLeadCreateSystemField();
+}
+
+function openLeadCreateModal() {
+  resetLeadCreateForm();
+  elements.leadCreateModal?.showModal();
+  window.setTimeout(() => elements.leadCreateName?.focus(), 30);
+}
+
+function closeLeadCreateModal() {
+  elements.leadCreateModal?.close();
+}
+
+async function createLeadFromModal(event) {
+  event?.preventDefault();
+  const nombre = elements.leadCreateName?.value?.trim() || '';
+  const telefono = elements.leadCreatePhone?.value?.trim() || '';
+  const email = elements.leadCreateEmail?.value?.trim() || '';
+  const sistema = elements.leadCreateSystem?.value || 'Fonasa';
+  const isapre = /^isapre$/i.test(sistema) ? (elements.leadCreateIsapre?.value?.trim() || '') : '';
+  const comuna = elements.leadCreateComuna?.value?.trim() || '';
+
+  if (!nombre) {
+    if (elements.leadCreateFeedback) elements.leadCreateFeedback.textContent = 'El nombre es obligatorio.';
+    elements.leadCreateName?.focus();
+    return;
+  }
+
+  elements.leadCreateSubmit.disabled = true;
   try {
     const response = await createLead({
       nombre,
       telefono,
       email,
+      comuna,
       sistema_actual: sistema,
       isapre_especifica: isapre,
       fuente_cta: 'CRM',
@@ -1962,13 +2023,16 @@ async function createLeadFromPrompt() {
       contacto_preferencia: 'lo_antes_posible',
       status: 'Nuevo',
     });
+    closeLeadCreateModal();
     await loadLeads();
     if (response?.leadId) {
       setView('leads');
       await loadLeadDetail(response.leadId);
     }
   } catch (error) {
-    window.alert(error.message || 'No se pudo crear el lead');
+    if (elements.leadCreateFeedback) elements.leadCreateFeedback.textContent = error.message || 'No se pudo crear el lead';
+  } finally {
+    elements.leadCreateSubmit.disabled = false;
   }
 }
 

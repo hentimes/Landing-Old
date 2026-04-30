@@ -639,6 +639,52 @@
     </form>
   </dialog>
 
+  <dialog class="crm-modal" id="lead-create-modal">
+    <form method="dialog" class="crm-modal__card crm-modal__card--lead" id="lead-create-form">
+      <div class="crm-card__header">
+        <div>
+          <p class="crm-eyebrow">Leads</p>
+          <h2>Nuevo lead</h2>
+        </div>
+        <button type="button" id="lead-create-close" class="button button--ghost">Cerrar</button>
+      </div>
+      <div class="crm-form-grid crm-form-grid--two">
+        <label class="crm-field crm-field--wide">
+          <span>Nombre *</span>
+          <input id="lead-create-name" type="text" maxlength="120" required placeholder="Nombre del lead" />
+        </label>
+        <label class="crm-field">
+          <span>Teléfono</span>
+          <input id="lead-create-phone" type="text" maxlength="24" placeholder="+56 9 1234 5678" />
+        </label>
+        <label class="crm-field">
+          <span>Correo</span>
+          <input id="lead-create-email" type="email" maxlength="160" placeholder="correo@ejemplo.cl" />
+        </label>
+        <label class="crm-field">
+          <span>Sistema</span>
+          <select id="lead-create-system">
+            <option value="Fonasa">Fonasa</option>
+            <option value="Isapre">Isapre</option>
+          </select>
+        </label>
+        <label class="crm-field" id="lead-create-isapre-field" hidden>
+          <span>¿Cuál isapre?</span>
+          <input id="lead-create-isapre" type="text" maxlength="80" placeholder="Colmena, Cruz Blanca..." />
+        </label>
+        <label class="crm-field">
+          <span>Comuna</span>
+          <input id="lead-create-comuna" type="text" maxlength="80" placeholder="Providencia" />
+        </label>
+      </div>
+      <p class="crm-inline-feedback" id="lead-create-feedback"></p>
+      <div class="crm-actions__buttons crm-actions__buttons--end">
+        <button type="button" id="lead-create-cancel" class="button button--ghost">Cancelar</button>
+        <button type="submit" id="lead-create-submit" class="button button--primary">Guardar lead</button>
+      </div>
+    </form>
+  </dialog>
+
   <template id="lead-row-template">
     <article class="crm-lead-row" tabindex="0" role="button">
       <div class="crm-lead-row__avatar" data-field="avatar"></div>
