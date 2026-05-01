@@ -1215,17 +1215,15 @@ input.is-invalid {
 }
 
 .crm-toolbar-metrics-container {
-  display: none;
+  display: flex;
   gap: 12px;
   align-items: stretch;
   flex: 1;
   margin-right: 20px;
 }
 
-body:has([data-view-panel="dashboard"].is-active) #dashboard-toolbar-metrics,
-body:has([data-view-panel="leads"].is-active) #leads-toolbar-metrics,
-body:has([data-view-panel="agenda"].is-active) #agenda-toolbar-metrics {
-  display: flex;
+.crm-toolbar-metrics-container[hidden] {
+  display: none !important;
 }
 
 body:has([data-view-panel="dashboard"].is-active) #view-title-container,
@@ -2434,30 +2432,274 @@ body:has([data-view-panel="agenda"].is-active) #view-title-container {
 }
 
 .crm-view[data-view-panel="agenda"].is-active {
+  display: block;
+}
+
+.crm-agenda-5-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
-  gap: 18px;
-  align-items: start;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto 1fr;
+  gap: 20px;
+  align-items: stretch;
 }
 
-.crm-view[data-view-panel="agenda"] > .crm-calendar-wrapper {
-  grid-column: 1;
-  max-width: none;
-  gap: 16px;
+.crm-agenda-block {
+  display: flex;
+  flex-direction: column;
 }
 
-.crm-view[data-view-panel="agenda"] > .crm-availability-panel {
-  grid-column: 2;
-  margin-top: 0;
-  min-height: 0;
+.crm-agenda-block--1 { grid-column: 1; }
+.crm-agenda-block--2 { grid-column: 2; }
+.crm-agenda-block--3 { grid-column: 3; }
+.crm-agenda-block--4 { grid-column: 1 / span 2; }
+.crm-agenda-block--5 { grid-column: 3; }
+
+.crm-calendar-wrapper {
+  background: #ffffff;
+  border-radius: 4px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.crm-agenda-details-split {
+  display: flex;
+  gap: 0;
+  flex: 1;
+  padding-top: 12px;
+}
+
+.crm-card--sidebar {
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
   padding: 16px;
 }
 
-.crm-view[data-view-panel="agenda"] > #calendar-day-details,
-.crm-view[data-view-panel="agenda"] > #agenda-section-list {
-  grid-column: 1 / -1;
-  max-width: none;
+.crm-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: auto;
+  padding: 0 0 20px 0;
 }
+
+.crm-calendar-current {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.crm-calendar-title {
+  font-size: 16px;
+  color: #10233f;
+  margin: 0;
+  font-weight: 700;
+}
+
+.crm-calendar-nav {
+  display: flex;
+  gap: 4px;
+}
+
+.crm-calendar-dropdown {
+  padding: 6px 12px;
+  border: 1px solid var(--crm-border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #f8fafc;
+}
+
+.crm-calendar-view-toggles {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.crm-calendar-view-toggles .button {
+  background: transparent;
+  color: #64748b;
+  border: none;
+  box-shadow: none;
+}
+
+.crm-calendar-view-toggles .button.is-active {
+  background: #ffffff;
+  color: #10233f;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.crm-calendar-sync {
+  font-size: 12px;
+  color: #10b981;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.crm-day-metrics {
+  display: flex;
+  justify-content: space-between;
+  margin: 16px 0;
+  border-top: 1px solid var(--crm-border);
+  border-bottom: 1px solid var(--crm-border);
+  padding: 16px 0;
+}
+
+.crm-day-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.crm-day-metric strong {
+  font-size: 20px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.crm-day-metric span {
+  font-size: 11px;
+  color: #64748b;
+  text-align: center;
+}
+
+.crm-timeline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  padding-left: 12px;
+}
+
+.crm-timeline-list::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 8px;
+  bottom: 0;
+  width: 1px;
+  background: #e2e8f0;
+}
+
+.crm-timeline-item {
+  display: flex;
+  gap: 16px;
+  position: relative;
+}
+
+.crm-timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -13.5px;
+  top: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2563eb;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px #2563eb;
+}
+
+.crm-timeline-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.crm-timeline-content {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px;
+  padding: 4px 8px;
+  transition: background 0.2s;
+}
+
+.crm-timeline-content:hover {
+  background: #f1f5f9;
+}
+
+.crm-pill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.crm-pill {
+  padding: 6px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2563eb;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.crm-pill:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.crm-upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.crm-upcoming-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.crm-upcoming-date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #10b981;
+  color: #ffffff;
+  border-radius: 6px;
+  min-width: 44px;
+  padding: 4px;
+}
+
+.crm-upcoming-date small {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.crm-upcoming-date strong {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.color-primary { color: #2563eb !important; }
+.color-success { color: #10b981 !important; }
+.color-warning { color: #f59e0b !important; }
+.color-danger { color: #ef4444 !important; }
+
+@media (max-width: 1024px) {
+  .crm-agenda-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 .crm-calendar-header {
   min-height: 62px;
@@ -2477,9 +2719,12 @@ body:has([data-view-panel="agenda"].is-active) #view-title-container {
 }
 
 .crm-calendar {
-  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  height: 340px; /* Altura fija para igualar 7d y 1m */
+  border-radius: 0;
   border-color: rgba(226, 232, 240, 0.92);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.04);
+  box-shadow: none;
 }
 
 .crm-calendar-weekdays {
@@ -2488,15 +2733,37 @@ body:has([data-view-panel="agenda"].is-active) #view-title-container {
   letter-spacing: 0.08em;
 }
 
+.crm-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
+  flex: 1;
+}
+
 .crm-calendar-day {
-  min-height: 132px;
-  padding: 12px;
+  min-height: 0;
+  padding: 8px;
   transition: background 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .crm-calendar-day:not(.crm-calendar-day--other):hover {
   background: #f8fbff;
   box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.12);
+}
+
+.crm-calendar-day--other {
+  opacity: 0.4;
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.crm-calendar-day--other:hover {
+  opacity: 0.7;
+  background: #f1f5f9;
 }
 
 .crm-calendar-day--today {
@@ -2506,17 +2773,37 @@ body:has([data-view-panel="agenda"].is-active) #view-title-container {
 .crm-calendar-day .day-number {
   font-size: 12px;
   font-weight: 800;
+  align-self: flex-start;
 }
 
 .crm-calendar-events {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
   gap: 8px;
 }
 
+.crm-event-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  color: #2563eb;
+  font-weight: 800;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
 .calendar-event {
-  padding: 7px 9px;
-  border-radius: 10px;
+  padding: 4px 6px;
+  border-radius: 4px;
   font-size: 10px;
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .crm-calendar-footer {

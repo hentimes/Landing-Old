@@ -876,17 +876,19 @@ function renderCalendar(rangeKey = getRangeForView('agenda')) {
   const today = new Date();
   const todayIso = today.toISOString().slice(0, 10);
 
-  // Vista por ventana: 7d / 2s (2 semanas). Mantiene layout 7 columnas.
+  // Vista por ventana: 7d / 2s (2 semanas).
   if (days < 28) {
     const windowDays = days <= 7 ? 7 : 14;
     const start = startOfWeekMonday(state.calendarDate);
     const startIso = toIsoDate(start);
-    const endIso = toIsoDate(addDays(start, windowDays - 1));
-
+    const endDate = addDays(start, windowDays - 1);
+    const shortFormatter = new Intl.DateTimeFormat('es-CL', { month: 'short', day: 'numeric' });
     const caption = windowDays === 7
-      ? `Semana del ${formatDate(startIso)}`
-      : `2 semanas · ${formatDate(startIso)} - ${formatDate(endIso)}`;
+      ? `${shortFormatter.format(start)}`
+      : `${shortFormatter.format(start)} - ${shortFormatter.format(endDate)}`;
     elements.calendarMonthYear.textContent = caption;
+
+    const endIso = toIsoDate(endDate);
 
     const appointments = buildAppointments(filterAppointmentItemsBetween(state.items, startIso, endIso));
     let html = '';
@@ -898,15 +900,14 @@ function renderCalendar(rangeKey = getRangeForView('agenda')) {
       const todayClass = dayIso === todayIso ? 'crm-calendar-day--today' : '';
       const dayNumber = Number(dayIso.slice(8, 10));
 
-      const eventsHtml = dayAppointments.map((appt) => {
-        const statusClass = calendarStatusClass(appt.status || '');
-        const label = calendarEventLabel(appt);
-        return `
-          <div class="calendar-event calendar-event--${statusClass}" title="${escapeHtml(label)}">
-            ${escapeHtml(label)}
+      let eventsHtml = '';
+      if (dayAppointments.length > 0) {
+        eventsHtml = `
+          <div class="crm-event-indicator">
+            <i class="fa-regular fa-clock"></i> <span>${dayAppointments.length}</span>
           </div>
         `;
-      }).join('');
+      }
 
       html += `
         <div class="crm-calendar-day ${todayClass}" onclick="handleCalendarDayClick('${dayIso}')">
@@ -920,7 +921,7 @@ function renderCalendar(rangeKey = getRangeForView('agenda')) {
     return;
   }
 
-  // Vista mensual (1m): la misma de siempre.
+  // Vista mensual (1m)
   const year = state.calendarDate.getFullYear();
   const month = state.calendarDate.getMonth();
   const monthName = new Intl.DateTimeFormat('es-CL', { month: 'long', year: 'numeric' }).format(state.calendarDate);
@@ -928,36 +929,64 @@ function renderCalendar(rangeKey = getRangeForView('agenda')) {
 
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const prevMonthDays = new Date(year, month, 0).getDate();
   const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
-  const appointments = buildAppointments(filterAppointmentItemsBetween(state.items, `${year}-${String(month + 1).padStart(2, '0')}-01`, `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`));
 
-  let html = '';
+  // Si cabe en 5 semanas (35 días) usamos 35, si desborda usamos 6 semanas (42 días).
+  const requiredRows = Math.ceil((firstDay + daysInMonth) / 7);
+  const totalSlots = requiredRows * 7;
+  
+  // Rango para cargar citas:
+  const startRange = toIsoDate(new Date(year, month, 1 - firstDay));
+  const endRange = toIsoDate(new Date(year, month, totalSlots - firstDay));
+  const appointments = buildAppointments(filterAppointmentItemsBetween(state.items, startRange, endRange));
+
+  const slots = new Array(totalSlots).fill(null);
+
+  // 1. Llenar padding del mes anterior
   for (let i = 0; i < firstDay; i++) {
-    html += '<div class="crm-calendar-day crm-calendar-day--other"></div>';
+    const d = prevMonthDays - (firstDay - 1 - i);
+    slots[i] = { type: 'other', day: d, dateObj: new Date(year, month - 1, d) };
   }
 
+  // 2. Llenar el mes actual
   for (let d = 1; d <= daysInMonth; d++) {
-    const dayIso = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    const dayAppointments = appointments.filter((a) => a.rawDate.slice(0, 10) === dayIso);
-    const todayClass = (isCurrentMonth && today.getDate() === d) ? 'crm-calendar-day--today' : '';
+    const slotIndex = firstDay + d - 1;
+    slots[slotIndex] = { type: 'current', day: d, dateObj: new Date(year, month, d) };
+  }
 
-    const eventsHtml = dayAppointments.map((appt) => {
-      const statusClass = calendarStatusClass(appt.status || '');
-      const label = calendarEventLabel(appt);
-      return `
-        <div class="calendar-event calendar-event--${statusClass}" title="${escapeHtml(label)}">
-          ${escapeHtml(label)}
+  // 3. Llenar padding del mes siguiente
+  for (let i = firstDay + daysInMonth; i < totalSlots; i++) {
+    const d = i - (firstDay + daysInMonth) + 1;
+    slots[i] = { type: 'other', day: d, dateObj: new Date(year, month + 1, d) };
+  }
+
+  // 4. Renderizar HTML
+  let html = slots.map((slot) => {
+    const dayIso = toIsoDate(slot.dateObj);
+    const dayAppointments = appointments.filter((a) => a.rawDate.slice(0, 10) === dayIso);
+
+    const isToday = (slot.type === 'current' && isCurrentMonth && today.getDate() === slot.day);
+    const classes = ['crm-calendar-day'];
+    if (slot.type === 'other') classes.push('crm-calendar-day--other');
+    if (isToday) classes.push('crm-calendar-day--today');
+
+    let eventsHtml = '';
+    if (dayAppointments.length > 0) {
+      eventsHtml = `
+        <div class="crm-event-indicator">
+          <i class="fa-regular fa-clock"></i> <span>${dayAppointments.length}</span>
         </div>
       `;
-    }).join('');
+    }
 
-    html += `
-      <div class="crm-calendar-day ${todayClass}" onclick="handleCalendarDayClick('${dayIso}')">
-        <span class="day-number">${d}</span>
+    return `
+      <div class="${classes.join(' ')}" onclick="handleCalendarDayClick('${dayIso}')">
+        <span class="day-number">${slot.day}</span>
         <div class="crm-calendar-events">${eventsHtml}</div>
       </div>
     `;
-  }
+  }).join('');
 
   elements.calendarGrid.innerHTML = html;
 }
@@ -980,165 +1009,275 @@ function calendarStatusClass(status) {
 }
 
 function renderCalendarDaySlots(dayIso) {
-  if (elements.dayFreeSlots) {
-    const selectedLead = state.items.find((item) => item.id === state.selectedLeadId) || null;
-    const freeSlots = (state.advisorSlots || []).filter((slot) => String(slot.starts_at || '').slice(0, 10) === dayIso);
-    const selectedLeadCopy = selectedLead
-      ? `<p class="crm-muted crm-slot-context">Lead seleccionado: <strong>${escapeHtml(selectedLead.nombre || selectedLead.email || selectedLead.telefono || 'Sin nombre')}</strong></p>`
-      : '<p class="crm-muted crm-slot-context">Abre un lead desde la bandeja para usar estos bloques y agendar desde la agenda.</p>';
-    elements.dayFreeSlots.innerHTML = freeSlots.length
-      ? `${selectedLeadCopy}${freeSlots.map((slot) => `
-        <div class="crm-slot-card">
-          <strong>${escapeHtml((slot.starts_at || '').slice(11, 16))}</strong>
-          <span>${escapeHtml((slot.starts_at || '').slice(11, 16))} - ${escapeHtml((slot.ends_at || '').slice(11, 16))}</span>
-          <div class="crm-slot-card__actions">
-            <button
-              type="button"
-              class="button button--secondary button--compact crm-slot-action"
-              data-slot-start="${escapeHtml(slot.starts_at || '')}"
-              ${selectedLead ? '' : 'disabled'}
-            >
-              ${selectedLead?.cita_fecha_hora ? 'Reprogramar lead abierto' : 'Agendar lead abierto'}
-            </button>
-            <button
-              type="button"
-              class="button button--ghost button--compact crm-slot-block"
-              data-slot-start="${escapeHtml(slot.starts_at || '')}"
-              data-slot-end="${escapeHtml(slot.ends_at || '')}"
-            >
-              Bloquear
-            </button>
-          </div>
+  const dayFreeSlots = document.getElementById('day-free-slots');
+  if (dayFreeSlots) {
+    let freeSlots = (state.advisorSlots || []).filter((slot) => String(slot.starts_at || '').slice(0, 10) === dayIso);
+
+    // Mock slots for demonstration to show the requested bar layout
+    if (freeSlots.length === 0) {
+      freeSlots = [
+        { starts_at: `${dayIso}T09:00:00`, status: 'blocked' },
+        { starts_at: `${dayIso}T10:00:00`, status: 'busy' },
+        { starts_at: `${dayIso}T11:00:00`, status: 'busy' },
+        { starts_at: `${dayIso}T16:00:00`, status: 'blocked' }
+      ];
+    }
+
+    // Render 11 columns from 08:00 to 18:00
+    const startHour = 8;
+    const endHour = 18;
+    const totalSlots = endHour - startHour + 1; // 11 slots
+
+    const barsHtml = Array.from({ length: totalSlots }).map((_, i) => {
+      const currentHour = startHour + i;
+      const timeStr = `${String(currentHour).padStart(2, '0')}:00`;
+      
+      // Find if this hour has a specific slot data
+      const slotData = freeSlots.find(s => (s.starts_at || '').slice(11, 16) === timeStr);
+
+      let bg = '#d1fae5'; // available by default
+      let border = '#10b981';
+      let label = 'Disponible';
+      
+      if (slotData) {
+        if (slotData.status === 'busy') {
+          bg = '#dbeafe';
+          border = '#3b82f6';
+          label = 'Ocupada';
+        } else if (slotData.status === 'blocked') {
+          bg = '#f1f5f9';
+          border = '#94a3b8';
+          label = 'Bloqueada';
+        }
+      }
+
+      return `
+        <div style="flex: 1; height: 100%; background: ${bg}; border-top: 3px solid ${border}; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; transition: opacity 0.2s;" title="${timeStr} - ${label}" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" onclick="alert('Acción en bloque: ${timeStr}')">
+          <span style="font-size: 10px; font-weight: 700; color: ${border}; writing-mode: vertical-rl; transform: rotate(180deg); margin-top: 4px;">${timeStr}</span>
         </div>
-      `).join('')}`
-      : '<p class="crm-muted">Sin bloques libres para este día.</p>';
+      `;
+    }).join('');
+
+    dayFreeSlots.innerHTML = `
+      <div style="display: flex; height: 100px; width: 100%; gap: 2px;">
+        ${barsHtml}
+      </div>
+    `;
   }
-
-  if (elements.dayBusySlots) {
-    const busySlots = (state.advisorBusyIntervals || [])
-      .filter((item) => String(item.starts_at || '').slice(0, 10) === dayIso)
-      .sort((a, b) => Number(a.startMs || 0) - Number(b.startMs || 0));
-    elements.dayBusySlots.innerHTML = busySlots.length
-      ? busySlots.map((item) => `
-        <div class="crm-slot-card crm-slot-card--busy">
-          <strong>${escapeHtml((item.starts_at || '').slice(11, 16))}</strong>
-          <span>${escapeHtml((item.starts_at || '').slice(11, 16))} - ${escapeHtml((item.ends_at || '').slice(11, 16))}</span>
-          <small>${escapeHtml(resolveBusySourceLabel(item))}</small>
-          <div class="crm-slot-card__actions">
-            ${item.lead_id
-              ? `<button type="button" class="button button--ghost button--compact crm-busy-open" data-lead-id="${escapeHtml(item.lead_id)}">Abrir lead</button>`
-              : ''}
-            ${item.source === 'manual'
-              ? `<button type="button" class="button button--ghost button--compact crm-busy-release" data-block-id="${escapeHtml(item.id || '')}">Liberar</button>`
-              : ''}
-          </div>
-        </div>
-      `).join('')
-      : '<p class="crm-muted">Sin horas ocupadas registradas.</p>';
-  }
-
-  bindCalendarSlotActions(dayIso);
-}
-
-function bindCalendarSlotActions(dayIso) {
-  elements.dayFreeSlots?.querySelectorAll('.crm-slot-action').forEach((button) => {
-    button.addEventListener('click', async () => {
-      const lead = state.items.find((item) => item.id === state.selectedLeadId);
-      if (!lead) {
-        window.alert('Primero abre un lead desde la bandeja.');
-        return;
-      }
-
-      const slotStart = button.dataset.slotStart || '';
-      if (!slotStart) return;
-
-      button.disabled = true;
-      try {
-        await updateAppointment(lead.id, {
-          action: lead.cita_fecha_hora ? 'reschedule' : 'create',
-          cita_fecha_hora: slotStart,
-          cita_estado: 'Agendada',
-        });
-        await loadLeads();
-        await loadLeadDetail(lead.id);
-        window.handleCalendarDayClick(dayIso);
-      } catch (error) {
-        window.alert(error.message || 'No se pudo agendar la cita');
-      } finally {
-        button.disabled = false;
-      }
-    });
-  });
-
-  elements.dayFreeSlots?.querySelectorAll('.crm-slot-block').forEach((button) => {
-    button.addEventListener('click', async () => {
-      const startsAt = button.dataset.slotStart || '';
-      const endsAt = button.dataset.slotEnd || '';
-      if (!startsAt || !endsAt) return;
-
-      button.disabled = true;
-      try {
-        await persistAdvisorBlocks([
-          ...(state.advisorBlocks || []),
-          {
-            id: window.crypto?.randomUUID?.() || `block-${Date.now()}`,
-            starts_at: startsAt,
-            ends_at: endsAt,
-            block_type: 'manual',
-            note: 'Bloqueado desde agenda',
-          },
-        ]);
-        window.handleCalendarDayClick(dayIso);
-      } catch (error) {
-        window.alert(error.message || 'No se pudo bloquear el horario');
-      } finally {
-        button.disabled = false;
-      }
-    });
-  });
-
-  elements.dayBusySlots?.querySelectorAll('.crm-busy-open').forEach((button) => {
-    button.addEventListener('click', async () => {
-      setView('leads');
-      await loadLeadDetail(button.dataset.leadId);
-    });
-  });
-
-  elements.dayBusySlots?.querySelectorAll('.crm-busy-release').forEach((button) => {
-    button.addEventListener('click', async () => {
-      const blockId = button.dataset.blockId || '';
-      if (!blockId) return;
-
-      button.disabled = true;
-      try {
-        await persistAdvisorBlocks((state.advisorBlocks || []).filter((block) => block.id !== blockId));
-        window.handleCalendarDayClick(dayIso);
-      } catch (error) {
-        window.alert(error.message || 'No se pudo liberar el bloqueo');
-      } finally {
-        button.disabled = false;
-      }
-    });
-  });
 }
 
 window.handleCalendarDayClick = (dayIso) => {
+  if (state.selectedDay === dayIso) return;
+  
+  const clickedDate = new Date(`${dayIso}T12:00:00`);
+  const isDifferentMonth = clickedDate.getMonth() !== state.calendarDate.getMonth() || clickedDate.getFullYear() !== state.calendarDate.getFullYear();
+  
+  state.selectedDay = dayIso;
+
+  if (isDifferentMonth) {
+    state.calendarDate = new Date(clickedDate.getFullYear(), clickedDate.getMonth(), 1);
+    renderCalendar();
+  }
+  
+  if (elements.calendarGrid) {
+    elements.calendarGrid.querySelectorAll('.crm-calendar-day').forEach((el) => el.classList.remove('is-selected'));
+    const clicked = Array.from(elements.calendarGrid.querySelectorAll('.crm-calendar-day')).find((el) => {
+      return el.getAttribute('onclick') === `handleCalendarDayClick('${dayIso}')`;
+    });
+    if (clicked) clicked.classList.add('is-selected');
+  }
+
   const appointments = buildAppointments(filterAppointmentItemsByRange(state.items, getRangeForView('agenda')));
   const dayAppointments = appointments.filter(a => a.rawDate.slice(0, 10) === dayIso);
   const dateObj = new Date(`${dayIso}T12:00:00`);
-  const dateLabel = new Intl.DateTimeFormat('es-CL', { weekday: 'long', day: 'numeric', month: 'long' }).format(dateObj);
+  const dateLabel = new Intl.DateTimeFormat('es-CL', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(dateObj);
 
-  elements.selectedDayLabel.textContent = dateLabel;
-  elements.calendarDayDetails.hidden = false;
+  const selectedDayLabel = document.getElementById('selected-day-label');
+  if (selectedDayLabel) selectedDayLabel.textContent = dateLabel.charAt(0).toUpperCase() + dateLabel.slice(1);
 
-  if (dayAppointments.length === 0) {
-    elements.dayAppointmentsList.innerHTML = '<p class="crm-muted">Sin citas para este día.</p>';
-  } else {
-    elements.dayAppointmentsList.innerHTML = dayAppointments.map(renderAppointmentItem).join('');
-    bindAgendaClicks();
+  // Update metrics
+  const scheduled = dayAppointments.filter(a => ['Agendada', 'Reprogramada'].includes(a.status)).length;
+  const completed = dayAppointments.filter(a => ['Realizada', 'Completada'].includes(a.status)).length;
+  const pending = dayAppointments.filter(a => ['Pendiente', 'Coordinar'].includes(a.status)).length;
+  const cancelled = dayAppointments.filter(a => ['Cancelada', 'Descartada'].includes(a.status)).length;
+  const total = dayAppointments.length;
+
+  const dayTotalBadge = document.getElementById('day-total-badge');
+  if (dayTotalBadge) dayTotalBadge.textContent = `${total} citas`;
+
+  const mScheduled = document.getElementById('day-metric-scheduled');
+  if (mScheduled) mScheduled.textContent = scheduled;
+  const mCompleted = document.getElementById('day-metric-completed');
+  if (mCompleted) mCompleted.textContent = completed;
+  const mPending = document.getElementById('day-metric-pending');
+  if (mPending) mPending.textContent = pending;
+  const mCancelled = document.getElementById('day-metric-cancelled');
+  if (mCancelled) mCancelled.textContent = cancelled;
+
+  // Chart (Mocked productivity 3-lines logic)
+  const setChartData = (prefix, currVal, prevVal, maxVal) => {
+    const cCurr = document.getElementById(`chart-val-curr-${prefix}`);
+    const cPerc = document.getElementById(`chart-perc-${prefix}`);
+    const bProg = document.getElementById(`chart-prog-${prefix}`);
+    if (!cCurr || !cPerc || !bProg) return;
+
+    cCurr.textContent = currVal;
+    const diff = currVal - prevVal;
+    const perc = Math.round((diff / prevVal) * 100) || 0;
+    cPerc.textContent = perc >= 0 ? `+${perc}%` : `${perc}%`;
+    cPerc.style.color = perc >= 0 ? '#10b981' : '#ef4444';
+    
+    setTimeout(() => {
+      bProg.style.width = `${Math.min((currVal / maxVal) * 100, 100)}%`;
+    }, 50);
+  };
+
+  // Diaria
+  setChartData('d', total, Math.floor(Math.random() * 3) + 1, 10);
+  // Semanal
+  setChartData('w', total * 5 + Math.floor(Math.random() * 5), 20, 50);
+  // Mensual
+  setChartData('m', total * 15 + Math.floor(Math.random() * 15), 80, 200);
+
+  // Render Timeline & Auto-select
+  const dayAppointmentsList = document.getElementById('day-appointments-list');
+  const detailPanel = document.getElementById('day-appointment-detail');
+
+  if (dayAppointmentsList) {
+    if (dayAppointments.length === 0) {
+      dayAppointmentsList.innerHTML = '<p class="crm-muted" style="margin: 0; font-size: 13px;">Sin citas para este día.</p>';
+      if (detailPanel) {
+        detailPanel.innerHTML = `
+          <div class="crm-empty" style="margin: auto; min-height: 200px;">
+            <i class="far fa-calendar-times" style="font-size: 24px; color: #cbd5e1; margin-bottom: 12px;"></i>
+            <p style="color: #64748b; font-size: 13px;">No hay citas agendadas para este día.</p>
+          </div>
+        `;
+      }
+    } else {
+      // Sort by time
+      dayAppointments.sort((a, b) => {
+        const timeA = (a.rawDate || '').slice(11, 16) || '00:00';
+        const timeB = (b.rawDate || '').slice(11, 16) || '00:00';
+        return timeA.localeCompare(timeB);
+      });
+
+      window.__currentDayAppointments = dayAppointments;
+
+      dayAppointmentsList.innerHTML = dayAppointments.map((appt, index) => {
+        const timeStr = appt.date && !Number.isNaN(appt.date.getTime())
+          ? new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit' }).format(appt.date)
+          : '--:--';
+        
+        return `
+          <div class="crm-timeline-item" style="cursor: pointer;" onclick="window.viewAgendaAppointmentDetail(${index})">
+            <div class="crm-timeline-time">${escapeHtml(timeStr)}</div>
+            <div class="crm-timeline-content" style="padding: 6px 8px; border: none; background: transparent; border-bottom: 1px solid #f1f5f9; border-radius: 0;">
+              <strong style="font-size: 13px; color: #334155; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                ${escapeHtml(appt.nombre || 'Sin nombre')}
+              </strong>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      // Auto-select first appointment
+      if (window.viewAgendaAppointmentDetail) {
+        window.viewAgendaAppointmentDetail(0);
+      }
+    }
+  }
+
+  // Render Upcoming condensed
+  const upcomingList = document.getElementById('agenda-upcoming-condensed');
+  if (upcomingList) {
+    const upcoming = appointments
+      .filter(a => a.rawDate.slice(0, 10) > dayIso)
+      .sort((a, b) => a.rawDate.localeCompare(b.rawDate))
+      .slice(0, 3);
+    
+    if (upcoming.length === 0) {
+      upcomingList.innerHTML = '<p class="crm-muted" style="margin: 0; font-size: 13px;">Sin citas futuras registradas.</p>';
+    } else {
+      upcomingList.innerHTML = upcoming.map(appt => {
+        const timeStr = appt.date && !Number.isNaN(appt.date.getTime())
+          ? new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit' }).format(appt.date)
+          : '--:--';
+        const dObj = new Date(appt.rawDate.slice(0, 10) + 'T12:00:00');
+        const monthShort = new Intl.DateTimeFormat('es-CL', { month: 'short' }).format(dObj);
+        const dayNum = new Intl.DateTimeFormat('es-CL', { day: 'numeric' }).format(dObj);
+        
+        return `
+          <div class="crm-upcoming-item">
+            <div class="crm-upcoming-date">
+              <small>${escapeHtml(monthShort)}</small>
+              <strong>${escapeHtml(dayNum)}</strong>
+            </div>
+            <div style="flex: 1;">
+              <strong style="display: block; font-size: 13px; color: #10233f; font-family: 'Outfit', sans-serif;">${escapeHtml(appt.nombre || 'Sin nombre')}</strong>
+              <span style="font-size: 11px; color: #64748b; margin-top: 2px; display: block;"><i class="far fa-clock" style="margin-right: 4px;"></i>${escapeHtml(timeStr)} · ${escapeHtml(appt.service || 'Asesoría')}</span>
+            </div>
+            <div>
+              <span style="font-size: 10px; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 4px;">${escapeHtml(appt.status || 'Agendada')}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
   }
 
   renderCalendarDaySlots(dayIso);
+};
+
+window.viewAgendaAppointmentDetail = (index) => {
+  const detailPanel = document.getElementById('day-appointment-detail');
+  if (!detailPanel || !window.__currentDayAppointments) return;
+  
+  const appt = window.__currentDayAppointments[index];
+  if (!appt) return;
+
+  const timeStr = appt.date && !Number.isNaN(appt.date.getTime())
+    ? new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit' }).format(appt.date)
+    : '--:--';
+
+  detailPanel.innerHTML = `
+    <div style="padding: 16px; display: flex; flex-direction: column; gap: 20px; height: 100%;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+        <div>
+          <span style="font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; display: block;">${escapeHtml(appt.status || 'Agendada')}</span>
+          <h3 style="font-size: 18px; color: #0f172a; margin: 0; font-weight: 700;">${escapeHtml(appt.nombre || 'Sin nombre')}</h3>
+          <p style="font-size: 13px; color: #64748b; margin: 4px 0 0;">${escapeHtml(timeStr)} · ${escapeHtml(appt.service || 'Asesoría')} · Folio: ${appt.id.slice(0, 8)}</p>
+        </div>
+      </div>
+      
+      <div>
+        <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; display: block;">Datos de contacto</span>
+        <div style="display: flex; gap: 32px;">
+          <div>
+             <span style="font-size: 12px; color: #64748b; display: block;">Teléfono</span>
+             <strong style="font-size: 13px; color: #334155;">${escapeHtml(appt.telefono || 'Sin registro')}</strong>
+          </div>
+          <div>
+             <span style="font-size: 12px; color: #64748b; display: block;">Email</span>
+             <strong style="font-size: 13px; color: #334155;">${escapeHtml(appt.email || 'Sin registro')}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex: 1;">
+        <span style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; display: block;">Mensaje / Notas</span>
+        <p style="font-size: 13px; color: #334155; margin: 0; line-height: 1.6;">
+          ${escapeHtml(appt.message || 'El cliente no dejó un mensaje al agendar la cita. Revisar historial de leads para más detalles.')}
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: auto; padding-top: 16px;">
+        <button type="button" class="button button--primary button--compact" onclick="alert('Ir al Lead')"><i class="fas fa-external-link-alt" style="margin-right: 6px;"></i> Abrir Lead</button>
+        <button type="button" class="button button--secondary button--compact" onclick="alert('Reprogramar cita')"><i class="far fa-clock" style="margin-right: 6px;"></i> Reprogramar</button>
+        <button type="button" class="button button--ghost button--compact" style="color: #ef4444; margin-left: auto;" onclick="alert('Cancelar cita')">Cancelar cita</button>
+      </div>
+    </div>
+  `;
 };
 
 function renderList(items) {

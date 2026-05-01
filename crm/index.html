@@ -255,7 +255,6 @@
             <p class="crm-eyebrow">Panel operativo</p>
             <strong>Leads y seguimiento</strong>
           </div>
-                    <div class="crm-chip-range" id="range-selector" hidden></div>
         </div>
       </div>
 
@@ -368,78 +367,163 @@
       </section>
 
       <section class="crm-view" data-view-panel="agenda">
-        <div class="crm-calendar-wrapper">
-          <div class="crm-calendar-header">
-            <div class="crm-calendar-current">
-              <h2 id="calendar-month-year">Abril 2026</h2>
-            </div>
-            <div class="crm-calendar-nav">
-              <button type="button" class="button button--ghost button--icon" id="prev-month" title="Mes anterior">
-                <i class="fas fa-chevron-left"></i>
-              </button>
-              <button type="button" class="button button--ghost" id="today-month">Hoy</button>
-              <button type="button" class="button button--ghost button--icon" id="next-month" title="Mes siguiente">
-                <i class="fas fa-chevron-right"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="crm-calendar">
-            <div class="crm-calendar-weekdays">
-              <span>Dom</span>
-              <span>Lun</span>
-              <span>Mar</span>
-              <span>Mié</span>
-              <span>Jue</span>
-              <span>Vie</span>
-              <span>Sáb</span>
-            </div>
-            <div class="crm-calendar-grid" id="calendar-grid">
-              <!-- Los días se generarán dinámicamente -->
-            </div>
-          </div>
-
-          <div class="crm-calendar-footer">
-            <div class="crm-calendar-legend">
-              <span class="legend-item"><span class="dot dot--pending"></span> Pendiente</span>
-              <span class="legend-item"><span class="dot dot--confirmed"></span> Confirmada</span>
-              <span class="legend-item"><span class="dot dot--completed"></span> Realizada</span>
-            </div>
-            <span class="crm-card__hint" id="calendar-sync-hint">Disponibilidad basada en reglas del asesor.</span>
-          </div>
-        </div>
-
-        <div id="calendar-day-details" class="crm-calendar-details" hidden>
-          <div class="crm-calendar-details-header">
-            <h3>Citas para el <span id="selected-day-label">--</span></h3>
-            <button type="button" class="button button--ghost" id="close-details">Cerrar</button>
-          </div>
-          <div id="day-appointments-list" class="crm-appointment-list">
-            <!-- Citas filtradas por día -->
-          </div>
-          <div class="crm-calendar-blocks">
-            <section class="crm-card crm-card--inner">
-              <div class="crm-card__header">
-                <div>
-                  <p class="crm-eyebrow">Bloques libres</p>
-                  <h3>Disponibilidad del día</h3>
+        <div class="crm-agenda-5-grid">
+          <!-- TOP ROW (3 Blocks) -->
+          <!-- BLOCK 1: Calendar -->
+          <div class="crm-agenda-block crm-agenda-block--1 crm-calendar-wrapper">
+            <div class="crm-calendar-header">
+              <div class="crm-card__header" style="padding-bottom: 16px; min-height: auto; flex: 1;">
+                <div style="display: flex; align-items: baseline; gap: 8px;">
+                  <h2 style="font-size: 15px; margin: 0;">Calendario</h2>
+                  <span id="calendar-month-year" style="font-size: 12px; color: #64748b; font-weight: 500;">Mayo 2026</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 16px;">
+                  <div class="crm-chip-range" id="range-selector" hidden></div>
+                  <div class="crm-calendar-nav">
+                    <button type="button" class="button button--ghost button--icon button--compact" id="prev-month" title="Mes anterior" style="height: 24px; width: 24px; min-width: 0;"><i class="fas fa-chevron-left" style="font-size: 11px;"></i></button>
+                    <button type="button" class="button button--ghost button--icon button--compact" id="next-month" title="Mes siguiente" style="height: 24px; width: 24px; min-width: 0;"><i class="fas fa-chevron-right" style="font-size: 11px;"></i></button>
+                  </div>
                 </div>
               </div>
-              <div id="day-free-slots" class="crm-slot-list"></div>
-            </section>
-            <section class="crm-card crm-card--inner">
-              <div class="crm-card__header">
+            </div>
+
+            <div class="crm-calendar">
+              <div class="crm-calendar-weekdays">
+                <span>Dom</span><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span>
+              </div>
+              <div class="crm-calendar-grid" id="calendar-grid">
+                <!-- Días se generarán dinámicamente -->
+              </div>
+            </div>
+
+            <div class="crm-calendar-footer">
+              <div class="crm-calendar-legend">
+                <span class="legend-item"><span class="dot dot--confirmed"></span> Confirmada</span>
+                <span class="legend-item"><span class="dot dot--pending"></span> Pendiente</span>
+              </div>
+              <button type="button" class="button button--ghost button--compact crm-link-btn" onclick="alert('Próximamente')">Ver calendario completo <i class="fas fa-external-link-alt"></i></button>
+            </div>
+          </div>
+          
+          <!-- BLOCK 2: Resumen del Día -->
+          <div class="crm-agenda-block crm-agenda-block--2 crm-card crm-card--sidebar">
+            <div class="crm-card__header">
+              <div>
+                <h2 style="font-size: 15px;">Resumen del día</h2>
+                <p class="crm-eyebrow" id="selected-day-label">--</p>
+              </div>
+              <span class="crm-card__badge" id="day-total-badge">0 citas</span>
+            </div>
+            
+            <div class="crm-day-metrics" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
+              <div class="crm-day-metric"><strong class="color-primary" id="day-metric-scheduled">0</strong><span>Programadas</span></div>
+              <div class="crm-day-metric"><strong class="color-success" id="day-metric-completed">0</strong><span>Completadas</span></div>
+              <div class="crm-day-metric"><strong class="color-warning" id="day-metric-pending">0</strong><span>Pendientes</span></div>
+              <div class="crm-day-metric"><strong class="color-danger" id="day-metric-cancelled">0</strong><span>Canceladas</span></div>
+            </div>
+
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--crm-border);">
+              <div class="crm-card__header" style="padding-bottom: 12px; min-height: 0;">
                 <div>
-                  <p class="crm-eyebrow">Horas ocupadas</p>
-                  <h3>Bloqueos y citas</h3>
+                  <h2 style="font-size: 13px;">Distribución de la Jornada</h2>
                 </div>
               </div>
-              <div id="day-busy-slots" class="crm-slot-list"></div>
-            </section>
+              <div id="day-free-slots" style="display: flex; flex-direction: column; gap: 8px;">
+                <!-- Free slot bars -->
+              </div>
+            </div>
+          </div>
+          
+          <!-- BLOCK 3: Gráfico de Avance -->
+          <div class="crm-agenda-block crm-agenda-block--3 crm-card crm-card--sidebar">
+            <div class="crm-card__header" style="padding-bottom: 8px;">
+              <div>
+                <h2 style="font-size: 15px;">Productividad</h2>
+              </div>
+            </div>
+            <div id="agenda-chart-container" style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 16px;">
+              
+              <!-- Línea Diaria -->
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                  <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase;">Diaria</span>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <strong id="chart-val-curr-d" style="font-size: 14px; font-weight: 800; color: #10233f; line-height: 1;">0</strong>
+                    <span id="chart-perc-d" style="font-size: 10px; color: #10b981; font-weight: 600;">+0%</span>
+                  </div>
+                </div>
+                <div style="width: 100%; background: #f1f5f9; height: 6px; border-radius: 99px; overflow: hidden;">
+                   <div id="chart-prog-d" style="height: 100%; width: 0%; background: #3b82f6; border-radius: 99px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                </div>
+              </div>
+
+              <!-- Línea Semanal -->
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                  <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase;">Semanal</span>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <strong id="chart-val-curr-w" style="font-size: 14px; font-weight: 800; color: #10233f; line-height: 1;">0</strong>
+                    <span id="chart-perc-w" style="font-size: 10px; color: #10b981; font-weight: 600;">+0%</span>
+                  </div>
+                </div>
+                <div style="width: 100%; background: #f1f5f9; height: 6px; border-radius: 99px; overflow: hidden;">
+                   <div id="chart-prog-w" style="height: 100%; width: 0%; background: #6366f1; border-radius: 99px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                </div>
+              </div>
+
+              <!-- Línea Mensual -->
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                  <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase;">Mensual</span>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <strong id="chart-val-curr-m" style="font-size: 14px; font-weight: 800; color: #10233f; line-height: 1;">0</strong>
+                    <span id="chart-perc-m" style="font-size: 10px; color: #10b981; font-weight: 600;">+0%</span>
+                  </div>
+                </div>
+                <div style="width: 100%; background: #f1f5f9; height: 6px; border-radius: 99px; overflow: hidden;">
+                   <div id="chart-prog-m" style="height: 100%; width: 0%; background: #8b5cf6; border-radius: 99px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);"></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- BOTTOM ROW (2 Blocks) -->
+          <!-- BLOCK 4: Detalle de Citas -->
+          <div class="crm-agenda-block crm-agenda-block--4 crm-card crm-card--sidebar">
+            <div class="crm-card__header">
+              <div>
+                <h2 style="font-size: 15px;">Detalle Operativo del Día</h2>
+                <p class="crm-eyebrow">Selecciona una cita para expandir</p>
+              </div>
+            </div>
+            <div id="agenda-selected-details" class="crm-agenda-details-split">
+               <div id="day-appointments-list" class="crm-timeline-list" style="flex: 0 0 280px; overflow-y: auto; padding-right: 16px; border-right: 1px solid var(--crm-border);">
+                 <!-- Timeline events -->
+               </div>
+               <div id="day-appointment-detail" style="flex: 1; padding-left: 16px; display: flex; flex-direction: column;">
+                 <div class="crm-empty" style="margin: auto; min-height: 200px;">
+                   <i class="far fa-hand-pointer" style="font-size: 24px; color: #cbd5e1; margin-bottom: 12px;"></i>
+                   <p style="color: #64748b; font-size: 13px;">Haz clic en Ver en una cita del panel izquierdo.</p>
+                 </div>
+               </div>
+            </div>
+          </div>
+
+          <!-- BLOCK 5: Próximas Citas -->
+          <div class="crm-agenda-block crm-agenda-block--5 crm-card crm-card--sidebar">
+            <div class="crm-card__header">
+              <div>
+                <h2 style="font-size: 18px;">Agenda Próxima</h2>
+                <p class="crm-eyebrow">Tus próximas citas programadas</p>
+              </div>
+              <button type="button" class="button button--ghost button--compact crm-link-btn" onclick="alert('Próximamente')">Ver todas</button>
+            </div>
+            <div id="agenda-upcoming-condensed" class="crm-upcoming-list" style="flex: 1; overflow-y: auto;">
+              <!-- Condensed list here -->
+            </div>
           </div>
         </div>
-
-        <div id="agenda-section-list" class="crm-agenda-table"></div>
       </section>
 
       <section class="crm-view" data-view-panel="profile">
